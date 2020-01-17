@@ -21,6 +21,10 @@ const AZ_RESOURCE = 'https://graph.microsoft.com'; // '00000002-0000-0000-c000-0
 const AZ_TENANT = 'common';
 const AZ_AUTHORITY_URL = `${AZ_AUTHORITY_HOST_URL}/${AZ_TENANT}`;
 
+/**
+ * Internal error class
+ * @private
+ */
 class StatusCodeError extends Error {
   constructor(msg, statusCode) {
     super(msg);
@@ -31,18 +35,23 @@ class StatusCodeError extends Error {
 /**
  * the maximum subscription time in milliseconds
  * @see https://docs.microsoft.com/en-us/graph/api/resources/subscription?view=graph-rest-1.0#maximum-length-of-subscription-per-resource-type
+ *
+ * @static
+ * @memberOf OneDrive
  */
 const MAX_SUBSCRIPTION_EXPIRATION_TIME = 4230 * 60 * 1000;
 
 
 /**
  * Remember the access token for future action invocations.
+ * @private
  */
 let tokenCache = {};
 
 /**
  * map that caches share item data. key is a sharing url, the value a drive item.
  * @type {Map<string, *>}
+ * @private
  */
 const shareItemCache = new Map();
 
@@ -50,21 +59,41 @@ const shareItemCache = new Map();
  * Helper class that facilitates accessing one drive.
  */
 class OneDrive extends EventEmitter {
+  /**
+   * @param {OneDriveOptions} opts Options
+   * @param {string} opts.clientId The client id of the app
+   * @param {string} opts.clientSecret The client secret of the app
+   * @param {string} [opts.refreshToken] The refresh token.
+   * @param {string} [opts.refreshToken] The access token.
+   * @param {number} [opts.expiresOn] Expiration time.
+   * @param {Logger} [opts.log] A logger.
+   */
   constructor(opts) {
     super(opts);
     this.clientId = opts.clientId;
     this.clientSecret = opts.clientSecret;
     this.refreshToken = opts.refreshToken;
     this._log = opts.log || console;
-    tokenCache.accessToken = opts.accessToken || '';
+    tokenCache.refreshToken = opts.accessToken || '';
     tokenCache.expiresOn = opts.expiresOn || undefined;
   }
 
+  /**
+   */
+  get log() {
+    return this._log;
+  }
+
+  /**
+   * @returns {boolean}
+   */
   // eslint-disable-next-line class-methods-use-this
   get authenticated() {
     return !!tokenCache.accessToken;
   }
 
+  /**
+   */
   async getAccessToken() {
     const { log } = this;
     if (tokenCache.accessToken) {
@@ -97,10 +126,14 @@ class OneDrive extends EventEmitter {
     });
   }
 
+  /**
+   */
   createLoginUrl(redirectUri, state) {
     return `${AZ_AUTHORITY_URL}/oauth2/authorize?response_type=code&client_id=${this.clientId}&redirect_uri=${redirectUri}&state=${state}&resource=${AZ_RESOURCE}`;
   }
 
+  /**
+   */
   async acquireToken(redirectUri, code) {
     const context = new AuthenticationContext(AZ_AUTHORITY_URL);
     return new Promise((resolve, reject) => {
@@ -123,6 +156,8 @@ class OneDrive extends EventEmitter {
     });
   }
 
+  /**
+   */
   async getClient(raw = false) {
     const token = await this.getAccessToken();
     const opts = {
@@ -137,10 +172,6 @@ class OneDrive extends EventEmitter {
       opts.encoding = null;
     }
     return rp.defaults(opts);
-  }
-
-  get log() {
-    return this._log;
   }
 
   async me() {
@@ -169,6 +200,8 @@ class OneDrive extends EventEmitter {
     return `u!${base64}`;
   }
 
+  /**
+   */
   async resolveShareLink(sharingUrl) {
     const link = OneDrive.encodeSharingUrl(sharingUrl);
     this.log.info(`resolving sharelink ${sharingUrl} (${link})`);
@@ -181,6 +214,8 @@ class OneDrive extends EventEmitter {
     }
   }
 
+  /**
+   */
   async getDriveItemFromShareLink(sharingUrl) {
     let driveItem = shareItemCache.get(sharingUrl);
     if (!driveItem) {
@@ -190,6 +225,8 @@ class OneDrive extends EventEmitter {
     return driveItem;
   }
 
+  /**
+   */
   async listChildren(folderItem, relPath) {
     // eslint-disable-next-line no-param-reassign
     relPath = relPath.replace(/\/+$/, '');
@@ -204,6 +241,8 @@ class OneDrive extends EventEmitter {
     }
   }
 
+  /**
+   */
   async getDriveItem(folderItem, relPath, download = false) {
     // eslint-disable-next-line no-param-reassign
     relPath = relPath.replace(/\/+$/, '');
@@ -221,6 +260,8 @@ class OneDrive extends EventEmitter {
     }
   }
 
+  /**
+   */
   async downloadDriveItem(driveItem) {
     const uri = `/drives/${driveItem.parentReference.driveId}/items/${driveItem.id}/content`;
     try {
@@ -232,6 +273,8 @@ class OneDrive extends EventEmitter {
     }
   }
 
+  /**
+   */
   async listSubscriptions() {
     try {
       return (await this.getClient())
@@ -242,6 +285,8 @@ class OneDrive extends EventEmitter {
     }
   }
 
+  /**
+   */
   async refreshSubscription(id, expiresIn = MAX_SUBSCRIPTION_EXPIRATION_TIME) {
     this.log.debug(`refreshing expiration time of subscription ${id} by ${expiresIn} ms`);
     try {
@@ -267,7 +312,7 @@ class OneDrive extends EventEmitter {
    * Use an empty token to fetch the initial state or `latest` to fetch the latest state.
    * @param {string} resource OneDrive resource path.
    * @param {string} [token] Delta token.
-   * @returns {Promise<[]>} A return object with the values and a `@odata.deltaLink`.
+   * @returns {Promise<Array>} A return object with the values and a `@odata.deltaLink`.
    */
   async fetchChanges(resource, token) {
     let next = token ? `${resource}/delta?token=${token}` : `${resource}/delta`;

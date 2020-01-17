@@ -35,12 +35,12 @@ export declare interface DriveItem {
 /**
  * Helper class that facilitates accessing one drive.
  */
-export declare interface OneDrive extends EventEmitter {
+export declare class OneDrive extends EventEmitter {
   /**
    * the maximum subscription time in milliseconds
    * @see https://docs.microsoft.com/en-us/graph/api/resources/subscription?view=graph-rest-1.0#maximum-length-of-subscription-per-resource-type
    */
-  MAX_SUBSCRIPTION_EXPIRATION_TIME: number;
+  static MAX_SUBSCRIPTION_EXPIRATION_TIME: number;
 
   /**
    * Encodes the sharing url into a token that can be used to access drive items.
@@ -48,15 +48,23 @@ export declare interface OneDrive extends EventEmitter {
    * @see https://docs.microsoft.com/en-us/onedrive/developer/rest-api/api/shares_get?view=odsp-graph-online#encoding-sharing-urls
    * @returns {string} an id for a shared item.
    */
+  static encodeSharingUrl(sharingUrl: string): string;
 
-  /*static*/
-  encodeSharingUrl(sharingUrl: string): string;
-
+  /**
+   * Creates a new OneDrive helper.
+   * @param {OneDriveOptions} opts Options.
+   */
   constructor(opts: OneDriveOptions);
 
+  /**
+   * is set to {@code true} if this client is initialized.
+   */
   authenticated: boolean;
 
-  log: Logger,
+  /**
+   * the logger of this client
+   */
+  log: Logger;
 
   getAccessToken(): Promise<string>;
 
@@ -87,7 +95,7 @@ export declare interface OneDrive extends EventEmitter {
    * Use an empty token to fetch the initial state or `latest` to fetch the latest state.
    * @param {string} resource OneDrive resource path.
    * @param {string} [token] Delta token.
-   * @returns {Promise<[]>} A return object with the values and a `@odata.deltaLink`.
+   * @returns {Promise<Array>} A return object with the values and a `@odata.deltaLink`.
    */
   fetchChanges(resource: string, token?: string);
 }
