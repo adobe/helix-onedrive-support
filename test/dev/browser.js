@@ -197,7 +197,7 @@ async function createSubscription(req, res) {
 async function md(req, res) {
   const { l } = req.query;
   if (!l) {
-    res.end('no share lin provided.');
+    res.end('no share link provided.');
     return;
   }
   try {
