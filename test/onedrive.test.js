@@ -9,8 +9,17 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-const OneDrive = require('./OneDrive.js');
 
-module.exports = {
-  OneDrive,
-};
+/* eslint-env mocha */
+
+'use strict';
+
+const assert = require('assert');
+const OneDrive = require('../src/OneDrive.js');
+
+describe('OneDrive Tests', () => {
+  it('can be constructed.', async () => {
+    const drive = new OneDrive({});
+    assert.ok(drive);
+  });
+});

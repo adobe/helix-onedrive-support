@@ -39,3 +39,18 @@ $ npm test
 ```bash
 $ npm run lint
 ```
+
+## Testing
+
+You can browse the OneDrive integration using _browser.js_:
+
+1. start with: `npm start`.
+2. open web browser at `http://localhost:3000/`.
+3. sign in with Microsoft.
+3. copy-paste share-link of a shared folder (see below) and click the `list` button.
+
+
+## Authentication
+
+The action authenticates against OneDrive using an oauth2 refresh token. In case you need to
+create a new one, use the _browser.js_ to generate a `tokens.json`.
