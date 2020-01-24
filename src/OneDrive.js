@@ -76,6 +76,10 @@ class OneDrive extends EventEmitter {
     this._log = opts.log || console;
     tokenCache.refreshToken = opts.accessToken || '';
     tokenCache.expiresOn = opts.expiresOn || undefined;
+
+    if (!this.clientId || !this.clientSecret) {
+      throw new Error('Missing clientId or clientSecret parameter.');
+    }
   }
 
   /**

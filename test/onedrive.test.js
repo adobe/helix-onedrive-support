@@ -18,8 +18,13 @@ const assert = require('assert');
 const OneDrive = require('../src/OneDrive.js');
 
 describe('OneDrive Tests', () => {
+  it('throws when required parameters are not specified.', async () => {
+    assert.throws(() => new OneDrive({}));
+  });
   it('can be constructed.', async () => {
-    const drive = new OneDrive({});
+    const drive = new OneDrive({
+      clientId: 'foo', clientSecret: 'bar',
+    });
     assert.ok(drive);
   });
 });
