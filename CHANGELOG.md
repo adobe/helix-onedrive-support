@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/adobe/helix-onedrive-support/compare/v1.0.1...v1.0.2) (2020-01-24)
+
+
+### Bug Fixes
+
+* **ci:** trigger release ([3dc55c6](https://github.com/adobe/helix-onedrive-support/commit/3dc55c626d5e26193fd6210ac603b3cf94ee1465))
+
 ## [1.0.1](https://github.com/adobe/helix-onedrive-support/compare/v1.0.0...v1.0.1) (2020-01-24)
 
 
