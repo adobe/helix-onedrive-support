@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/adobe/helix-onedrive-support/compare/v1.0.2...v1.0.3) (2020-01-27)
+
+
+### Bug Fixes
+
+* **client:** set access token correctly ([#9](https://github.com/adobe/helix-onedrive-support/issues/9)) ([92464b5](https://github.com/adobe/helix-onedrive-support/commit/92464b5f753f4ef5b38cd77fb6ded50d58867e74))
+
 ## [1.0.2](https://github.com/adobe/helix-onedrive-support/compare/v1.0.1...v1.0.2) (2020-01-24)
 
 
