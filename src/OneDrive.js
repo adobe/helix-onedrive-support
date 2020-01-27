@@ -74,7 +74,7 @@ class OneDrive extends EventEmitter {
     this.clientSecret = opts.clientSecret;
     this.refreshToken = opts.refreshToken;
     this._log = opts.log || console;
-    tokenCache.refreshToken = opts.accessToken || '';
+    tokenCache.accessToken = opts.accessToken || '';
     tokenCache.expiresOn = opts.expiresOn || undefined;
 
     if (!this.clientId || !this.clientSecret) {
@@ -103,7 +103,7 @@ class OneDrive extends EventEmitter {
     if (tokenCache.accessToken) {
       const expires = Date.parse(tokenCache.expiresOn);
       if (expires >= (Date.now())) {
-        log.info('access token still valid.');
+        log.debug('access token still valid.');
         return tokenCache.accessToken;
       }
       log.info('access token is expired. Requesting new one.');
