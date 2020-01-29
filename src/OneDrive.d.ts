@@ -80,7 +80,7 @@ export declare class OneDrive extends EventEmitter {
 
   getDriveItemFromShareLink(sharingUrl: string): Promise<GraphResult>;
 
-  listChildren(folderItem: DriveItem, relPath: string): Promise<GraphResult>;
+  listChildren(folderItem: DriveItem, relPath?: string): Promise<GraphResult>;
 
   getDriveItem(folderItem: DriveItem, relPath: string, download?: boolean): Promise<GraphResult>;
 
