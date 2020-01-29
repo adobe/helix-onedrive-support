@@ -133,7 +133,7 @@ class OneDrive extends EventEmitter {
   /**
    */
   createLoginUrl(redirectUri, state) {
-    return `${AZ_AUTHORITY_URL}/oauth2/authorize?response_type=code&client_id=${this.clientId}&redirect_uri=${redirectUri}&state=${state}&resource=${AZ_RESOURCE}`;
+    return `${AZ_AUTHORITY_URL}/oauth2/authorize?response_type=code&scope=/.default&client_id=${this.clientId}&redirect_uri=${redirectUri}&state=${state}&resource=${AZ_RESOURCE}`;
   }
 
   /**
@@ -231,7 +231,7 @@ class OneDrive extends EventEmitter {
 
   /**
    */
-  async listChildren(folderItem, relPath) {
+  async listChildren(folderItem, relPath = '') {
     // eslint-disable-next-line no-param-reassign
     relPath = relPath.replace(/\/+$/, '');
     const rootPath = `/drives/${folderItem.parentReference.driveId}/items/${folderItem.id}`;
