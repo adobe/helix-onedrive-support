@@ -1,3 +1,10 @@
+## [1.0.4](https://github.com/adobe/helix-onedrive-support/compare/v1.0.3...v1.0.4) (2020-01-29)
+
+
+### Bug Fixes
+
+* **api:** make relpath optional in list children ([#11](https://github.com/adobe/helix-onedrive-support/issues/11)) ([6fef240](https://github.com/adobe/helix-onedrive-support/commit/6fef240169aa13be886eab59b3f5b3fa36fcb95f))
+
 ## [1.0.3](https://github.com/adobe/helix-onedrive-support/compare/v1.0.2...v1.0.3) (2020-01-27)
 
 
