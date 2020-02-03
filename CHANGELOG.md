@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/adobe/helix-onedrive-support/compare/v1.0.4...v1.1.0) (2020-02-03)
+
+
+### Features
+
+* **core:** add support for uploading drive items ([#12](https://github.com/adobe/helix-onedrive-support/issues/12)) ([37665a7](https://github.com/adobe/helix-onedrive-support/commit/37665a7755b0379c81e496c94a5570f3b498f94c))
+
 ## [1.0.4](https://github.com/adobe/helix-onedrive-support/compare/v1.0.3...v1.0.4) (2020-01-29)
 
 
