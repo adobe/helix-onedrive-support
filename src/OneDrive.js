@@ -18,8 +18,7 @@ const url = require('url');
 
 const AZ_AUTHORITY_HOST_URL = 'https://login.windows.net';
 const AZ_RESOURCE = 'https://graph.microsoft.com'; // '00000002-0000-0000-c000-000000000000'; ??
-const AZ_TENANT = 'common';
-const AZ_AUTHORITY_URL = `${AZ_AUTHORITY_HOST_URL}/${AZ_TENANT}`;
+const AZ_DEFAULT_TENANT = 'common';
 
 /**
  * Internal error class
@@ -74,6 +73,8 @@ class OneDrive extends EventEmitter {
     this.clientSecret = opts.clientSecret;
     this.refreshToken = opts.refreshToken;
     this._log = opts.log || console;
+    this.tenant = opts.tenant || AZ_DEFAULT_TENANT;
+
     tokenCache.accessToken = opts.accessToken || '';
     tokenCache.expiresOn = opts.expiresOn || undefined;
 
@@ -86,6 +87,10 @@ class OneDrive extends EventEmitter {
    */
   get log() {
     return this._log;
+  }
+
+  get authorityUrl() {
+    return `${AZ_AUTHORITY_HOST_URL}/${this.tenant}`;
   }
 
   /**
@@ -110,36 +115,37 @@ class OneDrive extends EventEmitter {
     }
 
     return new Promise((resolve, reject) => {
-      const context = new AuthenticationContext(AZ_AUTHORITY_URL);
-      context.acquireTokenWithRefreshToken(
-        this.refreshToken,
-        this.clientId,
-        this.clientSecret,
-        AZ_RESOURCE,
-        (err, response) => {
-          if (err) {
-            log.error('Error while refreshing access token', err);
-            reject(err);
-          } else {
-            tokenCache = response;
-            this.emit('tokens', response);
-            resolve(tokenCache.accessToken);
-          }
-        },
-      );
+      const context = new AuthenticationContext(this.authorityUrl);
+      const callback = (err, response) => {
+        if (err) {
+          log.error('Error while refreshing access token', err);
+          reject(err);
+        } else {
+          tokenCache = response;
+          this.emit('tokens', response);
+          resolve(tokenCache.accessToken);
+        }
+      };
+      if (this.refreshToken) {
+        context.acquireTokenWithRefreshToken(this.refreshToken, this.clientId, this.clientSecret,
+          AZ_RESOURCE, callback);
+      } else {
+        context.acquireTokenWithClientCredentials(AZ_RESOURCE, this.clientId, this.clientSecret,
+          callback);
+      }
     });
   }
 
   /**
    */
   createLoginUrl(redirectUri, state) {
-    return `${AZ_AUTHORITY_URL}/oauth2/authorize?response_type=code&scope=/.default&client_id=${this.clientId}&redirect_uri=${redirectUri}&state=${state}&resource=${AZ_RESOURCE}`;
+    return `${this.authorityUrl}/oauth2/authorize?response_type=code&scope=/.default&client_id=${this.clientId}&redirect_uri=${redirectUri}&state=${state}&resource=${AZ_RESOURCE}`;
   }
 
   /**
    */
   async acquireToken(redirectUri, code) {
-    const context = new AuthenticationContext(AZ_AUTHORITY_URL);
+    const context = new AuthenticationContext(this.authorityUrl);
     return new Promise((resolve, reject) => {
       context.acquireTokenWithAuthorizationCode(
         code,
@@ -271,6 +277,36 @@ class OneDrive extends EventEmitter {
     try {
       return (await this.getClient(true))
         .get(uri);
+    } catch (e) {
+      this.log.error(e);
+      throw new StatusCodeError(e.msg, 500);
+    }
+  }
+
+  /**
+   * @see https://docs.microsoft.com/en-us/graph/api/driveitem-put-content?view=graph-rest-1.0&tabs=http
+   */
+  async uploadDriveItem(buffer, driveItem, relPath = '') {
+    // eslint-disable-next-line no-param-reassign
+    relPath = relPath.replace(/\/+$/, '');
+    if (relPath) {
+      // eslint-disable-next-line no-param-reassign
+      relPath = `:${relPath}:`;
+    }
+
+    // PUT /drives/{drive-id}/items/{parent-id}:/{filename}:/content
+    const uri = `/drives/${driveItem.parentReference.driveId}/items/${driveItem.id}${relPath}/content`;
+    try {
+      const client = await this.getClient();
+      return client({
+        uri,
+        method: 'PUT',
+        body: buffer,
+        headers: {
+          'Content-Type': 'application/octet-stream',
+        },
+      });
+      // return buffer.pipe(client.put(uri));
     } catch (e) {
       this.log.error(e);
       throw new StatusCodeError(e.msg, 500);
