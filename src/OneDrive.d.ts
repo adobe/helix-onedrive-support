@@ -20,10 +20,11 @@ declare interface Logger {
 export declare interface OneDriveOptions {
   clientId: string;
   clientSecret: string;
-  refreshToken: string;
+  refreshToken?: string;
   log?: Logger;
   accessToken?: string;
   expiresOn?: number;
+  tenant?: string;
 }
 
 export declare interface GraphResult {
@@ -66,6 +67,11 @@ export declare class OneDrive extends EventEmitter {
    */
   log: Logger;
 
+  /**
+   * the authority url for login.
+   */
+  authorityUrl: string;
+
   getAccessToken(): Promise<string>;
 
   createLoginUrl(): string;
@@ -89,6 +95,8 @@ export declare class OneDrive extends EventEmitter {
   listSubscriptions(): Promise<GraphResult>;
 
   refreshSubscription(id: string, expiresIn: number): Promise<GraphResult>;
+
+  uploadDriveItem(buffer: Buffer, driveItem: string, relPath?: string);
 
   /**
    * Fetches the changes from the respective resource using the provided delta token.
