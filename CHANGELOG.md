@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/adobe/helix-onedrive-support/compare/v1.1.0...v1.2.0) (2020-02-04)
+
+
+### Features
+
+* **auth:** add support for interactive login flow ([#17](https://github.com/adobe/helix-onedrive-support/issues/17)) ([2d19e33](https://github.com/adobe/helix-onedrive-support/commit/2d19e3386fb336794b21cd21c5638cdff1f4d992)), closes [#16](https://github.com/adobe/helix-onedrive-support/issues/16)
+
 # [1.1.0](https://github.com/adobe/helix-onedrive-support/compare/v1.0.4...v1.1.0) (2020-02-03)
 
 
