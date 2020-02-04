@@ -19,7 +19,7 @@ declare interface Logger {
 
 export declare interface OneDriveOptions {
   clientId: string;
-  clientSecret: string;
+  clientSecret?: string;
   refreshToken?: string;
   log?: Logger;
   accessToken?: string;

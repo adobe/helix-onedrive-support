@@ -36,7 +36,7 @@ Helper class that facilitates accessing one drive.
 | --- | --- | --- |
 | opts | <code>OneDriveOptions</code> | Options |
 | opts.clientId | <code>string</code> | The client id of the app |
-| opts.clientSecret | <code>string</code> | The client secret of the app |
+| [opts.clientSecret] | <code>string</code> | The client secret of the app |
 | [opts.refreshToken] | <code>string</code> | The refresh token. |
 | [opts.refreshToken] | <code>string</code> | The access token. |
 | [opts.expiresOn] | <code>number</code> | Expiration time. |

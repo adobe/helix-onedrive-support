@@ -62,7 +62,7 @@ class OneDrive extends EventEmitter {
   /**
    * @param {OneDriveOptions} opts Options
    * @param {string} opts.clientId The client id of the app
-   * @param {string} opts.clientSecret The client secret of the app
+   * @param {string} [opts.clientSecret] The client secret of the app
    * @param {string} [opts.refreshToken] The refresh token.
    * @param {string} [opts.refreshToken] The access token.
    * @param {number} [opts.expiresOn] Expiration time.
@@ -71,16 +71,16 @@ class OneDrive extends EventEmitter {
   constructor(opts) {
     super(opts);
     this.clientId = opts.clientId;
-    this.clientSecret = opts.clientSecret;
-    this.refreshToken = opts.refreshToken;
+    this.clientSecret = opts.clientSecret || '';
+    this.refreshToken = opts.refreshToken || '';
     this._log = opts.log || console;
     this.tenant = opts.tenant || AZ_DEFAULT_TENANT;
 
     tokenCache.accessToken = opts.accessToken || '';
     tokenCache.expiresOn = opts.expiresOn || undefined;
 
-    if (!this.clientId || !this.clientSecret) {
-      throw new Error('Missing clientId or clientSecret parameter.');
+    if (!this.clientId) {
+      throw new Error('Missing clientId.');
     }
 
     this.authContext = new AuthenticationContext(this.authorityUrl);
