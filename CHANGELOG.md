@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/adobe/helix-onedrive-support/compare/v1.2.0...v1.2.1) (2020-02-04)
+
+
+### Bug Fixes
+
+* **core:** client secret must not be mandatory ([#18](https://github.com/adobe/helix-onedrive-support/issues/18)) ([ba1945c](https://github.com/adobe/helix-onedrive-support/commit/ba1945c7b74ff418d57e0732fb7d4c7c9cffbd83))
+
 # [1.2.0](https://github.com/adobe/helix-onedrive-support/compare/v1.1.0...v1.2.0) (2020-02-04)
 
 
