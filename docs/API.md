@@ -10,6 +10,7 @@ Helper class that facilitates accessing one drive.
     * _instance_
         * [.log](#OneDrive+log)
         * [.authenticated](#OneDrive+authenticated) ⇒ <code>boolean</code>
+        * [.login()](#OneDrive+login) ⇒ <code>Promise.&lt;void&gt;</code>
         * [.getAccessToken()](#OneDrive+getAccessToken)
         * [.createLoginUrl()](#OneDrive+createLoginUrl)
         * [.acquireToken()](#OneDrive+acquireToken)
@@ -19,6 +20,7 @@ Helper class that facilitates accessing one drive.
         * [.listChildren()](#OneDrive+listChildren)
         * [.getDriveItem()](#OneDrive+getDriveItem)
         * [.downloadDriveItem()](#OneDrive+downloadDriveItem)
+        * [.uploadDriveItem()](#OneDrive+uploadDriveItem)
         * [.listSubscriptions()](#OneDrive+listSubscriptions)
         * [.refreshSubscription()](#OneDrive+refreshSubscription)
         * [.fetchChanges(resource, [token])](#OneDrive+fetchChanges) ⇒ <code>Promise.&lt;Array&gt;</code>
@@ -48,6 +50,14 @@ Helper class that facilitates accessing one drive.
 
 ### oneDrive.authenticated ⇒ <code>boolean</code>
 **Kind**: instance property of [<code>OneDrive</code>](#OneDrive)  
+<a name="OneDrive+login"></a>
+
+### oneDrive.login() ⇒ <code>Promise.&lt;void&gt;</code>
+Performs a login using an interactive flow which prompts the user to open a browser window and
+enter the authorization code.
+
+**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)  
+**Params**: <code>boolean</code> open - if true, automatically opens the default browser  
 <a name="OneDrive+getAccessToken"></a>
 
 ### oneDrive.getAccessToken()
@@ -84,6 +94,11 @@ Helper class that facilitates accessing one drive.
 
 ### oneDrive.downloadDriveItem()
 **Kind**: instance method of [<code>OneDrive</code>](#OneDrive)  
+<a name="OneDrive+uploadDriveItem"></a>
+
+### oneDrive.uploadDriveItem()
+**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)  
+**See**: https://docs.microsoft.com/en-us/graph/api/driveitem-put-content?view=graph-rest-1.0&tabs=http  
 <a name="OneDrive+listSubscriptions"></a>
 
 ### oneDrive.listSubscriptions()

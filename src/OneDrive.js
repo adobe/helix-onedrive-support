@@ -15,6 +15,7 @@ const EventEmitter = require('events');
 const { AuthenticationContext } = require('adal-node');
 const rp = require('request-promise-native');
 const url = require('url');
+const openBrowser = require('open');
 
 const AZ_AUTHORITY_HOST_URL = 'https://login.windows.net';
 const AZ_RESOURCE = 'https://graph.microsoft.com'; // '00000002-0000-0000-c000-000000000000'; ??
@@ -81,6 +82,8 @@ class OneDrive extends EventEmitter {
     if (!this.clientId || !this.clientSecret) {
       throw new Error('Missing clientId or clientSecret parameter.');
     }
+
+    this.authContext = new AuthenticationContext(this.authorityUrl);
   }
 
   /**
@@ -102,10 +105,53 @@ class OneDrive extends EventEmitter {
   }
 
   /**
+   * Performs a login using an interactive flow which prompts the user to open a browser window and
+   * enter the authorization code.
+   * @params {boolean} open - if true, automatically opens the default browser
+   * @returns {Promise<void>}
    */
-  async getAccessToken() {
-    const { log } = this;
-    if (tokenCache.accessToken) {
+  async login(open = false) {
+    const { log, authContext: context } = this;
+    const code = await new Promise((resolve, reject) => {
+      context.acquireUserCode(AZ_RESOURCE, this.clientId, 'en', (err, response) => {
+        if (err) {
+          log.error('Error while requesting user code', err);
+          reject(err);
+        } else {
+          resolve(response);
+        }
+      });
+    });
+
+    log.info(code.message);
+    if (open) {
+      await openBrowser(code.verificationUrl);
+    }
+
+    await new Promise((resolve, reject) => {
+      context.acquireTokenWithDeviceCode(AZ_RESOURCE, this.clientId, code,
+        (err, response) => {
+          if (err) {
+            log.error('Error while requesting access token with device code', err);
+            reject(err);
+          } else {
+            tokenCache = response;
+            this.emit('tokens', response);
+            resolve(tokenCache.accessToken);
+          }
+        });
+    });
+  }
+
+  /**
+   */
+  async getAccessToken(autoRefresh = true) {
+    const { log, authContext: context } = this;
+    if (!tokenCache.accessToken) {
+      if (!autoRefresh) {
+        return '';
+      }
+    } else {
       const expires = Date.parse(tokenCache.expiresOn);
       if (expires >= (Date.now())) {
         log.debug('access token still valid.');
@@ -115,7 +161,6 @@ class OneDrive extends EventEmitter {
     }
 
     return new Promise((resolve, reject) => {
-      const context = new AuthenticationContext(this.authorityUrl);
       const callback = (err, response) => {
         if (err) {
           log.error('Error while refreshing access token', err);
@@ -145,7 +190,7 @@ class OneDrive extends EventEmitter {
   /**
    */
   async acquireToken(redirectUri, code) {
-    const context = new AuthenticationContext(this.authorityUrl);
+    const { log, authContext: context } = this;
     return new Promise((resolve, reject) => {
       context.acquireTokenWithAuthorizationCode(
         code,
@@ -155,6 +200,7 @@ class OneDrive extends EventEmitter {
         this.clientSecret,
         (err, response) => {
           if (err) {
+            log.error('Error while getting token with authorization code.', err);
             reject(err);
           } else {
             tokenCache = response;
@@ -360,7 +406,7 @@ class OneDrive extends EventEmitter {
 
     try {
       const client = await this.getClient();
-      for (;;) {
+      for (; ;) {
         const {
           value,
           '@odata.nextLink': nextLink,

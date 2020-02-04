@@ -72,7 +72,15 @@ export declare class OneDrive extends EventEmitter {
    */
   authorityUrl: string;
 
-  getAccessToken(): Promise<string>;
+  /**
+   * Performs a login using an interactive flow which prompts the user to open a browser window and
+   * enter the authorization code.
+   * @params {boolean} [open=false] - if true, automatically opens the default browser
+   * @returns {Promise<void>}
+   */
+  login(open: boolean): Promise<any>;
+
+  getAccessToken(autoRefresh: boolean): Promise<string>;
 
   createLoginUrl(): string;
 
