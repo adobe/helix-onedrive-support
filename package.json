@@ -5,8 +5,8 @@
   "main": "src/index.js",
   "types": "src/index.d.ts",
   "scripts": {
-    "test": " nyc --reporter=text --reporter=lcov --check-coverage --branches 19 --statements 16 --lines 16 mocha",
-    "test-ci": "nyc --reporter=text --reporter=lcov --check-coverage --branches 19 --statements 16 --lines 16 mocha --reporter xunit --reporter-options output=./junit/test-results.xml && codecov",
+    "test": " nyc --reporter=text --reporter=lcov --check-coverage --branches 19 --statements 15 --lines 15 mocha",
+    "test-ci": "nyc --reporter=text --reporter=lcov --check-coverage --branches 19 --statements 15 --lines 15 mocha --reporter xunit --reporter-options output=./junit/test-results.xml && codecov",
     "lint": "./node_modules/.bin/eslint .",
     "semantic-release": "semantic-release",
     "docs": "npx jsdoc2md -c .jsdoc.json --files 'src/*.js'  > docs/API.md",
@@ -24,7 +24,6 @@
   "homepage": "https://github.com/adobe/helix-onedrive-support#readme",
   "dependencies": {
     "adal-node": "0.2.1",
-    "open": "^7.0.2",
     "request": "2.88.0",
     "request-promise-native": "1.0.8"
   },

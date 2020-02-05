@@ -15,7 +15,6 @@ const EventEmitter = require('events');
 const { AuthenticationContext } = require('adal-node');
 const rp = require('request-promise-native');
 const url = require('url');
-const openBrowser = require('open');
 
 const AZ_AUTHORITY_HOST_URL = 'https://login.windows.net';
 const AZ_RESOURCE = 'https://graph.microsoft.com'; // '00000002-0000-0000-c000-000000000000'; ??
@@ -107,10 +106,10 @@ class OneDrive extends EventEmitter {
   /**
    * Performs a login using an interactive flow which prompts the user to open a browser window and
    * enter the authorization code.
-   * @params {boolean} open - if true, automatically opens the default browser
+   * @params {function} [onCode] - optional function that gets invoked after code was retrieved.
    * @returns {Promise<void>}
    */
-  async login(open = false) {
+  async login(onCode) {
     const { log, authContext: context } = this;
     const code = await new Promise((resolve, reject) => {
       context.acquireUserCode(AZ_RESOURCE, this.clientId, 'en', (err, response) => {
@@ -124,8 +123,8 @@ class OneDrive extends EventEmitter {
     });
 
     log.info(code.message);
-    if (open) {
-      await openBrowser(code.verificationUrl);
+    if (typeof onCode === 'function') {
+      await onCode(code);
     }
 
     await new Promise((resolve, reject) => {
