@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/adobe/helix-onedrive-support/compare/v1.2.1...v1.3.0) (2020-02-05)
+
+
+### Features
+
+* **login:** provide callback instead of flag ([#19](https://github.com/adobe/helix-onedrive-support/issues/19)) ([5d255e9](https://github.com/adobe/helix-onedrive-support/commit/5d255e9939a98a1951cba424c5b4d69232acb25b))
+
 ## [1.2.1](https://github.com/adobe/helix-onedrive-support/compare/v1.2.0...v1.2.1) (2020-02-04)
 
 
