@@ -342,7 +342,7 @@ class OneDrive extends EventEmitter {
     // PUT /drives/{drive-id}/items/{parent-id}:/{filename}:/content
     const uri = `/drives/${driveItem.parentReference.driveId}/items/${driveItem.id}${relPath}/content`;
     try {
-      const client = await this.getClient();
+      const client = await this.getClient(true);
       return client({
         uri,
         method: 'PUT',
