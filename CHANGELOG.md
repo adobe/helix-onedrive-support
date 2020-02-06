@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/adobe/helix-onedrive-support/compare/v1.3.0...v1.3.1) (2020-02-06)
+
+
+### Bug Fixes
+
+* **pur:** Put should not be set to json ([#21](https://github.com/adobe/helix-onedrive-support/issues/21)) ([2f61840](https://github.com/adobe/helix-onedrive-support/commit/2f61840b038c6fa77209ce88ffc025c5006ce30e))
+
 # [1.3.0](https://github.com/adobe/helix-onedrive-support/compare/v1.2.1...v1.3.0) (2020-02-05)
 
 
