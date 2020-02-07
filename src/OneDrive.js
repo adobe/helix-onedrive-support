@@ -271,6 +271,19 @@ class OneDrive extends EventEmitter {
 
   /**
    */
+  async getRootFolderId(driveId) {
+    const uri = `/drives/${driveId}/root`;
+    try {
+      return (await this.getClient())
+        .get(uri);
+    } catch (e) {
+      this.log.error(e);
+      throw new StatusCodeError(e.msg, 500);
+    }
+  }
+
+  /**
+   */
   async getDriveItemFromShareLink(sharingUrl) {
     let driveItem = shareItemCache.get(sharingUrl);
     if (!driveItem) {
