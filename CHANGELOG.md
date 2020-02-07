@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/adobe/helix-onedrive-support/compare/v1.3.1...v1.4.0) (2020-02-07)
+
+
+### Features
+
+* **rootfolder:** add support for getting the root folder id ([#22](https://github.com/adobe/helix-onedrive-support/issues/22)) ([40c682f](https://github.com/adobe/helix-onedrive-support/commit/40c682f9592921039236dc265367c9823ac451f2))
+
 ## [1.3.1](https://github.com/adobe/helix-onedrive-support/compare/v1.3.0...v1.3.1) (2020-02-06)
 
 
