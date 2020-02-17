@@ -107,6 +107,13 @@ export declare class OneDrive extends EventEmitter {
   uploadDriveItem(buffer: Buffer, driveItem: string, relPath?: string);
 
   /**
+   * Returns the root item for a drive given its id.
+   * @param driveId drive id
+   * @returns {Promise<GraphResult>}
+   */
+  getDriveRootItem(driveId: string): Promise<GraphResult>;
+
+  /**
    * Fetches the changes from the respective resource using the provided delta token.
    * Use an empty token to fetch the initial state or `latest` to fetch the latest state.
    * @param {string} resource OneDrive resource path.

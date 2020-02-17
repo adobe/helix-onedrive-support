@@ -271,7 +271,7 @@ class OneDrive extends EventEmitter {
 
   /**
    */
-  async getRootFolderId(driveId) {
+  async getDriveRootItem(driveId) {
     const uri = `/drives/${driveId}/root`;
     try {
       return (await this.getClient())
