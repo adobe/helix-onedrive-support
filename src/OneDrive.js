@@ -410,7 +410,7 @@ class OneDrive extends EventEmitter {
    * Use an empty token to fetch the initial state or `latest` to fetch the latest state.
    * @param {string} resource OneDrive resource path.
    * @param {string} [token] Delta token.
-   * @returns {Promise<Array>} A return object with the values and a `@odata.deltaLink`.
+   * @returns {Promise<Array>} An object with an array of changes and a delta token.
    */
   async fetchChanges(resource, token) {
     let next = token ? `${resource}/delta?token=${token}` : `${resource}/delta`;
@@ -433,8 +433,8 @@ class OneDrive extends EventEmitter {
         } else if (deltaLink) {
           // last page, we have a next link
           return {
-            value: items,
-            '@odata.deltaLink': deltaLink,
+            changes: items,
+            token: url.parse(deltaLink, true).query.token,
           };
         } else {
           throw new Error('Received response with neither next nor delta link.');
