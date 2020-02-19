@@ -1,3 +1,16 @@
+# [2.0.0](https://github.com/adobe/helix-onedrive-support/compare/v1.4.1...v2.0.0) (2020-02-19)
+
+
+### Bug Fixes
+
+* rename API ([#25](https://github.com/adobe/helix-onedrive-support/issues/25)) ([7c1cffa](https://github.com/adobe/helix-onedrive-support/commit/7c1cffa6b198246d6abb838a495b206a47a2b5de))
+
+
+### BREAKING CHANGES
+
+* renamed API to getDriveRootItem()
+* return token from fetchChanges (fix #26)
+
 ## [1.4.1](https://github.com/adobe/helix-onedrive-support/compare/v1.4.0...v1.4.1) (2020-02-18)
 
 
