@@ -25,6 +25,8 @@ export declare interface OneDriveOptions {
   accessToken?: string;
   expiresOn?: number;
   tenant?: string;
+  username?: string;
+  password?: string;
 }
 
 export declare interface GraphResult {

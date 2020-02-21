@@ -63,7 +63,9 @@ class OneDrive extends EventEmitter {
    * @param {string} opts.clientId The client id of the app
    * @param {string} [opts.clientSecret] The client secret of the app
    * @param {string} [opts.refreshToken] The refresh token.
-   * @param {string} [opts.refreshToken] The access token.
+   * @param {string} [opts.accessToken] The access token.
+   * @param {string} [opts.username] Username for username/password authentication.
+   * @param {string} [opts.password] Password for username/password authentication.
    * @param {number} [opts.expiresOn] Expiration time.
    * @param {Logger} [opts.log] A logger.
    */
@@ -72,6 +74,8 @@ class OneDrive extends EventEmitter {
     this.clientId = opts.clientId;
     this.clientSecret = opts.clientSecret || '';
     this.refreshToken = opts.refreshToken || '';
+    this.username = opts.username || '';
+    this.password = opts.password || '';
     this._log = opts.log || console;
     this.tenant = opts.tenant || AZ_DEFAULT_TENANT;
 
@@ -173,6 +177,9 @@ class OneDrive extends EventEmitter {
       if (this.refreshToken) {
         context.acquireTokenWithRefreshToken(this.refreshToken, this.clientId, this.clientSecret,
           AZ_RESOURCE, callback);
+      } else if (this.username && this.password) {
+        context.acquireTokenWithUsernamePassword(AZ_RESOURCE, this.username, this.password,
+          this.clientId, callback);
       } else {
         context.acquireTokenWithClientCredentials(AZ_RESOURCE, this.clientId, this.clientSecret,
           callback);
