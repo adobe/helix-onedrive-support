@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/adobe/helix-onedrive-support/compare/v2.0.0...v2.1.0) (2020-02-21)
+
+
+### Features
+
+* **auth:** add support for username+password authentication ([#27](https://github.com/adobe/helix-onedrive-support/issues/27)) ([a1eb863](https://github.com/adobe/helix-onedrive-support/commit/a1eb863d93166200dcf12bf7b8dcbff79a8f78e8))
+
 # [2.0.0](https://github.com/adobe/helix-onedrive-support/compare/v1.4.1...v2.0.0) (2020-02-19)
 
 
