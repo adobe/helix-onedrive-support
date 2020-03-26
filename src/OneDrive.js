@@ -79,8 +79,13 @@ class OneDrive extends EventEmitter {
     this._log = opts.log || console;
     this.tenant = opts.tenant || AZ_DEFAULT_TENANT;
 
-    tokenCache.accessToken = opts.accessToken || '';
-    tokenCache.expiresOn = opts.expiresOn || undefined;
+    if (!tokenCache.accessToken) {
+      tokenCache.accessToken = opts.accessToken || '';
+      tokenCache.expiresOn = opts.expiresOn || undefined;
+    }
+    if (!tokenCache.refreshToken) {
+      tokenCache.refreshToken = this.refreshToken;
+    }
 
     if (!this.clientId) {
       throw new Error('Missing clientId.');
@@ -150,6 +155,7 @@ class OneDrive extends EventEmitter {
    */
   async getAccessToken(autoRefresh = true) {
     const { log, authContext: context } = this;
+
     if (!tokenCache.accessToken) {
       if (!autoRefresh) {
         return '';
@@ -169,18 +175,22 @@ class OneDrive extends EventEmitter {
           log.error('Error while refreshing access token', err);
           reject(err);
         } else {
+          log.debug('Token acquired.');
           tokenCache = response;
           this.emit('tokens', response);
           resolve(tokenCache.accessToken);
         }
       };
-      if (this.refreshToken) {
-        context.acquireTokenWithRefreshToken(this.refreshToken, this.clientId, this.clientSecret,
-          AZ_RESOURCE, callback);
+      if (tokenCache.refreshToken) {
+        log.debug('acquire token with refresh token.');
+        context.acquireTokenWithRefreshToken(tokenCache.refreshToken, this.clientId,
+          this.clientSecret, AZ_RESOURCE, callback);
       } else if (this.username && this.password) {
+        log.debug('acquire token with ROPC.');
         context.acquireTokenWithUsernamePassword(AZ_RESOURCE, this.username, this.password,
           this.clientId, callback);
       } else {
+        log.debug('acquire token with client credentials.');
         context.acquireTokenWithClientCredentials(AZ_RESOURCE, this.clientId, this.clientSecret,
           callback);
       }
