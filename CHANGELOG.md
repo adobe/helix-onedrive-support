@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/adobe/helix-onedrive-support/compare/v2.1.0...v2.2.0) (2020-03-26)
+
+
+### Features
+
+* **cache:** improve token cache ([#32](https://github.com/adobe/helix-onedrive-support/issues/32)) ([ad59d0f](https://github.com/adobe/helix-onedrive-support/commit/ad59d0f6769c742d8aa17c9682fbdcd9f78c95b0)), closes [#31](https://github.com/adobe/helix-onedrive-support/issues/31)
+
 # [2.1.0](https://github.com/adobe/helix-onedrive-support/compare/v2.0.0...v2.1.0) (2020-02-21)
 
 
