@@ -104,7 +104,11 @@ export declare class OneDrive extends EventEmitter {
 
   listSubscriptions(): Promise<GraphResult>;
 
+  createSubscription(resource: string, notificationUrl: string, clientState: string, changeType: string, expiresIn: number): Promise<GraphResult>;
+
   refreshSubscription(id: string, expiresIn: number): Promise<GraphResult>;
+
+  deleteSubscription(id: string): Promise<GraphResult>;
 
   uploadDriveItem(buffer: Buffer, driveItem: string, relPath?: string);
 

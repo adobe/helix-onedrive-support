@@ -3,7 +3,7 @@
 ## OneDrive
 Helper class that facilitates accessing one drive.
 
-**Kind**: global class  
+**Kind**: global class
 
 * [OneDrive](#OneDrive)
     * [new OneDrive(opts)](#new_OneDrive_new)
@@ -16,6 +16,7 @@ Helper class that facilitates accessing one drive.
         * [.acquireToken()](#OneDrive+acquireToken)
         * [.getClient()](#OneDrive+getClient)
         * [.resolveShareLink()](#OneDrive+resolveShareLink)
+        * [.getRootFolderId()](#OneDrive+getRootFolderId)
         * [.getDriveItemFromShareLink()](#OneDrive+getDriveItemFromShareLink)
         * [.listChildren()](#OneDrive+listChildren)
         * [.getDriveItem()](#OneDrive+getDriveItem)
@@ -45,76 +46,88 @@ Helper class that facilitates accessing one drive.
 <a name="OneDrive+log"></a>
 
 ### oneDrive.log
-**Kind**: instance property of [<code>OneDrive</code>](#OneDrive)  
+**Kind**: instance property of [<code>OneDrive</code>](#OneDrive)
 <a name="OneDrive+authenticated"></a>
 
 ### oneDrive.authenticated ⇒ <code>boolean</code>
-**Kind**: instance property of [<code>OneDrive</code>](#OneDrive)  
+**Kind**: instance property of [<code>OneDrive</code>](#OneDrive)
 <a name="OneDrive+login"></a>
 
 ### oneDrive.login() ⇒ <code>Promise.&lt;void&gt;</code>
 Performs a login using an interactive flow which prompts the user to open a browser window and
 enter the authorization code.
 
-**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)  
-**Params**: <code>boolean</code> open - if true, automatically opens the default browser  
+**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)
+**Params**: <code>function</code> [onCode] - optional function that gets invoked after code was retrieved.
 <a name="OneDrive+getAccessToken"></a>
 
 ### oneDrive.getAccessToken()
-**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)  
+**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)
 <a name="OneDrive+createLoginUrl"></a>
 
 ### oneDrive.createLoginUrl()
-**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)  
+**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)
 <a name="OneDrive+acquireToken"></a>
 
 ### oneDrive.acquireToken()
-**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)  
+**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)
 <a name="OneDrive+getClient"></a>
 
 ### oneDrive.getClient()
-**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)  
+**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)
 <a name="OneDrive+resolveShareLink"></a>
 
 ### oneDrive.resolveShareLink()
-**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)  
+**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)
 <a name="OneDrive+getDriveItemFromShareLink"></a>
 
 ### oneDrive.getDriveItemFromShareLink()
-**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)  
+**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)
 <a name="OneDrive+listChildren"></a>
 
 ### oneDrive.listChildren()
-**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)  
+**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)
 <a name="OneDrive+getDriveItem"></a>
 
 ### oneDrive.getDriveItem()
-**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)  
+**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)
 <a name="OneDrive+downloadDriveItem"></a>
 
 ### oneDrive.downloadDriveItem()
-**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)  
+**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)
 <a name="OneDrive+uploadDriveItem"></a>
 
 ### oneDrive.uploadDriveItem()
-**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)  
-**See**: https://docs.microsoft.com/en-us/graph/api/driveitem-put-content?view=graph-rest-1.0&tabs=http  
+**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)
+**See**: https://docs.microsoft.com/en-us/graph/api/driveitem-put-content?view=graph-rest-1.0&tabs=http
 <a name="OneDrive+listSubscriptions"></a>
 
 ### oneDrive.listSubscriptions()
-**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)  
+**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)
 <a name="OneDrive+refreshSubscription"></a>
 
+### oneDrive.createSubscription()
+**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)
+<a name="OneDrive+createSubscription"></a>
+
 ### oneDrive.refreshSubscription()
-**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)  
-<a name="OneDrive+fetchChanges"></a>
+**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)
+<a name="OneDrive+refreshSubscription"></a>
+
+### oneDrive.deleteSubscription()
+**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)
+<a name="OneDrive+deleteSubscription"></a>
+
+### oneDrive.getDriveRootItem()
+**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)
+<a name="OneDrive+getDriveRootItem"></a>
 
 ### oneDrive.fetchChanges(resource, [token]) ⇒ <code>Promise.&lt;Array&gt;</code>
 Fetches the changes from the respective resource using the provided delta token.
 Use an empty token to fetch the initial state or `latest` to fetch the latest state.
 
-**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)  
-**Returns**: <code>Promise.&lt;Array&gt;</code> - A return object with the values and a `@odata.deltaLink`.  
+**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)
+**Returns**: <code>Promise.&lt;Array&gt;</code> - A return object with the values and a `@odata.deltaLink`.
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -126,16 +139,16 @@ Use an empty token to fetch the initial state or `latest` to fetch the latest st
 ### OneDrive.MAX\_SUBSCRIPTION\_EXPIRATION\_TIME
 the maximum subscription time in milliseconds
 
-**Kind**: static constant of [<code>OneDrive</code>](#OneDrive)  
-**See**: https://docs.microsoft.com/en-us/graph/api/resources/subscription?view=graph-rest-1.0#maximum-length-of-subscription-per-resource-type  
+**Kind**: static constant of [<code>OneDrive</code>](#OneDrive)
+**See**: https://docs.microsoft.com/en-us/graph/api/resources/subscription?view=graph-rest-1.0#maximum-length-of-subscription-per-resource-type
 <a name="OneDrive.encodeSharingUrl"></a>
 
 ### OneDrive.encodeSharingUrl(sharingUrl) ⇒ <code>string</code>
 Encodes the sharing url into a token that can be used to access drive items.
 
-**Kind**: static method of [<code>OneDrive</code>](#OneDrive)  
-**Returns**: <code>string</code> - an id for a shared item.  
-**See**: https://docs.microsoft.com/en-us/onedrive/developer/rest-api/api/shares_get?view=odsp-graph-online#encoding-sharing-urls  
+**Kind**: static method of [<code>OneDrive</code>](#OneDrive)
+**Returns**: <code>string</code> - an id for a shared item.
+**See**: https://docs.microsoft.com/en-us/onedrive/developer/rest-api/api/shares_get?view=odsp-graph-online#encoding-sharing-urls
 
 | Param | Type | Description |
 | --- | --- | --- |
