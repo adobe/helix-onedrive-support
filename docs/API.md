@@ -23,9 +23,9 @@ Helper class that facilitates accessing one drive.
         * [.downloadDriveItem()](#OneDrive+downloadDriveItem)
         * [.uploadDriveItem()](#OneDrive+uploadDriveItem)
         * [.listSubscriptions()](#OneDrive+listSubscriptions)
-        * [.listSubscriptions()](#OneDrive+createSubscription)
+        * [.createSubscription()](#OneDrive+createSubscription)
         * [.refreshSubscription()](#OneDrive+refreshSubscription)
-        * [.listSubscriptions()](#OneDrive+deleteSubscription)
+        * [.deleteSubscription()](#OneDrive+deleteSubscription)
         * [.fetchChanges(resource, [token])](#OneDrive+fetchChanges) ⇒ <code>Promise.&lt;Array&gt;</code>
     * _static_
         * [.MAX_SUBSCRIPTION_EXPIRATION_TIME](#OneDrive.MAX_SUBSCRIPTION_EXPIRATION_TIME)
