@@ -35,6 +35,14 @@ export declare interface GraphResult {
 export declare interface DriveItem {
 }
 
+export declare interface SubscriptionOptions {
+  resource: string;
+  notificationUrl: string;
+  clientState: string;
+  changeType?: string;
+  expiresIn?: number;
+}
+
 /**
  * Helper class that facilitates accessing one drive.
  */
@@ -104,7 +112,7 @@ export declare class OneDrive extends EventEmitter {
 
   listSubscriptions(): Promise<GraphResult>;
 
-  createSubscription(resource: string, notificationUrl: string, clientState: string, changeType: string, expiresIn: number): Promise<GraphResult>;
+  createSubscription(opts: SubscriptionOptions): Promise<GraphResult>;
 
   refreshSubscription(id: string, expiresIn: number): Promise<GraphResult>;
 

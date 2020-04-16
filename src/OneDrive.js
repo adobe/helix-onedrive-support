@@ -402,13 +402,13 @@ class OneDrive extends EventEmitter {
 
   /**
    */
-  async createSubscription(
+  async createSubscription({
     resource,
     notificationUrl,
     clientState,
     changeType = 'updated',
     expiresIn = MAX_SUBSCRIPTION_EXPIRATION_TIME,
-  ) {
+  }) {
     try {
       return (await this.getClient())({
         uri: '/subscriptions',
