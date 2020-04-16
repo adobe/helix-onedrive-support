@@ -402,6 +402,37 @@ class OneDrive extends EventEmitter {
 
   /**
    */
+  async createSubscription({
+    resource,
+    notificationUrl,
+    clientState,
+    changeType = 'updated',
+    expiresIn = MAX_SUBSCRIPTION_EXPIRATION_TIME,
+  }) {
+    try {
+      return (await this.getClient())({
+        uri: '/subscriptions',
+        method: 'POST',
+        body: {
+          changeType,
+          notificationUrl,
+          resource,
+          expirationDateTime: new Date(Date.now() + expiresIn).toISOString(),
+          clientState,
+        },
+        json: true,
+        headers: {
+          'content-type': 'application/json',
+        },
+      });
+    } catch (e) {
+      this.log.error(e);
+      throw new StatusCodeError(e.msg, 500);
+    }
+  }
+
+  /**
+   */
   async refreshSubscription(id, expiresIn = MAX_SUBSCRIPTION_EXPIRATION_TIME) {
     this.log.debug(`refreshing expiration time of subscription ${id} by ${expiresIn} ms`);
     try {
@@ -415,6 +446,21 @@ class OneDrive extends EventEmitter {
         headers: {
           'content-type': 'application/json',
         },
+      });
+    } catch (e) {
+      this.log.error(e);
+      throw new StatusCodeError(e.msg, 500);
+    }
+  }
+
+  /**
+   */
+  async deleteSubscription(id) {
+    this.log.debug(`deleting subscription ${id}`);
+    try {
+      return (await this.getClient())({
+        uri: `/subscriptions/${id}`,
+        method: 'DELETE',
       });
     } catch (e) {
       this.log.error(e);
