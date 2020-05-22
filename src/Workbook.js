@@ -11,12 +11,28 @@
  */
 const StatusCodeError = require('./StatusCodeError.js');
 const Table = require('./Table.js');
+const Worksheet = require('./Worksheet.js');
 
 class Workbook {
   constructor(oneDrive, uri, log) {
     this._oneDrive = oneDrive;
     this._uri = uri;
     this._log = log;
+  }
+
+  async getWorksheetNames() {
+    try {
+      const client = await this._oneDrive.getClient();
+      const result = await client.get(`${this._uri}/worksheets`);
+      return result.value.map((v) => v.name);
+    } catch (e) {
+      this.log.error(e);
+      throw new StatusCodeError(e.msg, 500);
+    }
+  }
+
+  getWorksheet(name) {
+    return new Worksheet(this._oneDrive, `${this._uri}/worksheets`, name, this._log);
   }
 
   async getTableNames() {
@@ -70,7 +86,13 @@ class Workbook {
   async getNamedItem(name) {
     try {
       const client = await this._oneDrive.getClient(false);
-      return client.get(`${this._uri}/names/${name}`);
+      return client.get(`${this._uri}/names/${name}`)
+        .catch((e) => {
+          if (e.statusCode === 404) {
+            return null;
+          }
+          throw e;
+        });
     } catch (e) {
       this.log.error(e);
       throw new StatusCodeError(e.msg, 500);
