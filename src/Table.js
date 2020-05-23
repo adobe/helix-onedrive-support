@@ -97,6 +97,26 @@ class Table {
     }
   }
 
+  async replaceRow(index, values) {
+    try {
+      const client = await this._oneDrive.getClient();
+      await client({
+        uri: `${this.uri}/rows/itemAt(index=${index})`,
+        method: 'PATCH',
+        body: {
+          values: [values],
+        },
+        json: true,
+        headers: {
+          'content-type': 'application/json',
+        },
+      });
+    } catch (e) {
+      this.log.error(e);
+      throw new StatusCodeError(e.msg, 500);
+    }
+  }
+
   get uri() {
     return `${this._prefix}/${this._name}`;
   }

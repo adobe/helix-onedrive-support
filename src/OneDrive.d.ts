@@ -57,6 +57,12 @@ export declare interface NamedItem {
  */
 export declare interface Table {
   /**
+   * Rename the table
+   * @param name new name
+   */
+  rename(name): Promise<GraphResult>;
+
+  /**
    * Return the header names of a table
    * @returns array of header names when resolved
    */
@@ -81,12 +87,57 @@ export declare interface Table {
    * @returns zero-based index of new row
    */
   addRow(values: string[]): Promise<number>;
+
+  /**
+   * Replace a row in the table
+   * @param index zero-based index of row
+   * @param values values to replace rows with
+   */
+  replaceRow(index: string, values: string): void;
 }
 
 /**
- * Excel Workbook
+ * Excel work sheet
  */
- export declare interface Workbook {
+export declare interface Worksheet {
+  /**
+   * Return the named items in a work sheet
+   * @returns array of named items when resolved
+   */
+  getNamedItems(): Promise<NamedItem[]>;
+
+  /**
+   * Return a named item
+   * @param {string} name name
+   * @returns named item
+   */
+  getNamedItem(name: string): Promise<NamedItem>;
+
+  /**
+   * Add a named item
+   * @param name name
+   * @param reference reference
+   * @param comment comment
+   */
+  addNamedItem(name: string, reference: string, comment: string): Promise<GraphResult>;
+}
+
+/**
+ * Excel Work book
+ */
+export declare interface Workbook {
+  /**
+   * Return the worksheet names contained in a work book.
+   * @returns array of sheet names when resolved
+   */
+  getWorksheetNames(): Promise<string[]>;
+
+  /**
+   * Return a work sheet given its name
+   * @param name work sheet name
+   */
+  getWorksheet(name: string): Worksheet;
+
   /**
    * Return the table names contained in a work book.
    * @returns array of table names when resolved
@@ -120,6 +171,7 @@ export declare interface Table {
    */
   addNamedItem(name: string, reference: string, comment: string): Promise<GraphResult>;
 }
+
 
 /**
  * Helper class that facilitates accessing one drive.

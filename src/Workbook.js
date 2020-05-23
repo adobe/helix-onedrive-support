@@ -61,6 +61,19 @@ class Workbook {
     }
   }
 
+  async getNamedItem(name) {
+    try {
+      const client = await this._oneDrive.getClient(false);
+      return await client.get(`${this._uri}/names/${name}`);
+    } catch (e) {
+      if (e.statusCode === 404) {
+        return null;
+      }
+      this.log.error(e);
+      throw new StatusCodeError(e.msg, 500);
+    }
+  }
+
   async addNamedItem(name, reference, comment) {
     try {
       const client = await this._oneDrive.getClient();
@@ -77,22 +90,6 @@ class Workbook {
           'content-type': 'application/json',
         },
       });
-    } catch (e) {
-      this.log.error(e);
-      throw new StatusCodeError(e.msg, 500);
-    }
-  }
-
-  async getNamedItem(name) {
-    try {
-      const client = await this._oneDrive.getClient(false);
-      return client.get(`${this._uri}/names/${name}`)
-        .catch((e) => {
-          if (e.statusCode === 404) {
-            return null;
-          }
-          throw e;
-        });
     } catch (e) {
       this.log.error(e);
       throw new StatusCodeError(e.msg, 500);
