@@ -31,7 +31,7 @@ class Workbook {
     }
   }
 
-  getWorksheet(name) {
+  worksheet(name) {
     return new Worksheet(this._oneDrive, `${this._uri}/worksheets`, name, this._log);
   }
 
@@ -46,7 +46,7 @@ class Workbook {
     }
   }
 
-  getTable(name) {
+  table(name) {
     return new Table(this._oneDrive, `${this._uri}/tables`, name, this._log);
   }
 

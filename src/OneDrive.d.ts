@@ -93,7 +93,7 @@ export declare interface Table {
    * @param index zero-based index of row
    * @param values values to replace rows with
    */
-  replaceRow(index: string, values: string): void;
+  replaceRow(index: string, values: string): Promise<void>;
 }
 
 /**
@@ -136,7 +136,7 @@ export declare interface Workbook {
    * Return a work sheet given its name
    * @param name work sheet name
    */
-  getWorksheet(name: string): Worksheet;
+  worksheet(name: string): Worksheet;
 
   /**
    * Return the table names contained in a work book.
@@ -148,7 +148,7 @@ export declare interface Workbook {
    * Return a table given its name
    * @param name table name
    */
-  getTable(name: string): Table;
+  table(name: string): Table;
 
   /**
    * Return the named items in a work book
@@ -240,6 +240,12 @@ export declare class OneDrive extends EventEmitter {
 
   downloadDriveItem(driveItem: DriveItem): Promise<GraphResult>;
 
+  /**
+   * Creates a new workbook instance from a drive item.
+   *
+   * @param {DriveItem} fileItem drive item
+   * @returns {Workbook} workbook instance
+   */
   getWorkbook(fileItem: DriveItem): Workbook;
 
   listSubscriptions(): Promise<GraphResult>;
