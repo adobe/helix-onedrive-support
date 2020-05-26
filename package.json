@@ -36,15 +36,15 @@
     "commitizen": "4.1.2",
     "cz-conventional-changelog": "3.2.0",
     "dotenv": "8.2.0",
-    "eslint": "7.0.0",
+    "eslint": "7.1.0",
     "eslint-plugin-header": "3.0.0",
     "eslint-plugin-import": "2.20.2",
     "jsdoc-to-markdown": "5.0.3",
     "junit-report-builder": "2.0.0",
-    "lint-staged": "10.2.4",
-    "mocha": "7.1.2",
+    "lint-staged": "10.2.6",
+    "mocha": "7.2.0",
     "nyc": "15.0.1",
-    "semantic-release": "17.0.7"
+    "semantic-release": "17.0.8"
   },
   "lint-staged": {
     "*.js": "eslint"
