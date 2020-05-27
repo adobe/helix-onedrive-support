@@ -9,12 +9,18 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+
+'use strict';
+
+const NamedItemContainer = require('./NamedItemContainer.js');
 const StatusCodeError = require('./StatusCodeError.js');
 const Table = require('./Table.js');
 const Worksheet = require('./Worksheet.js');
 
-class Workbook {
+class Workbook extends NamedItemContainer {
   constructor(oneDrive, uri, log) {
+    super(oneDrive);
+
     this._oneDrive = oneDrive;
     this._uri = uri;
     this._log = log;
@@ -50,67 +56,8 @@ class Workbook {
     return new Table(this._oneDrive, `${this._uri}/tables`, name, this._log);
   }
 
-  async getNamedItems() {
-    try {
-      const client = await this._oneDrive.getClient();
-      const result = await client.get(`${this._uri}/names`);
-      return result.value.map((v) => ({
-        name: v.name,
-        value: v.value,
-        comment: v.comment,
-      }));
-    } catch (e) {
-      this.log.error(e);
-      throw new StatusCodeError(e.msg, 500);
-    }
-  }
-
-  async getNamedItem(name) {
-    try {
-      const client = await this._oneDrive.getClient(false);
-      return await client.get(`${this._uri}/names/${name}`);
-    } catch (e) {
-      if (e.statusCode === 404) {
-        return null;
-      }
-      this.log.error(e);
-      throw new StatusCodeError(e.msg, 500);
-    }
-  }
-
-  async addNamedItem(name, reference, comment) {
-    try {
-      const client = await this._oneDrive.getClient();
-      await client({
-        uri: `${this._uri}/names/add`,
-        method: 'POST',
-        body: {
-          name,
-          reference,
-          comment,
-        },
-        json: true,
-        headers: {
-          'content-type': 'application/json',
-        },
-      });
-    } catch (e) {
-      this.log.error(e);
-      throw new StatusCodeError(e.msg, 500);
-    }
-  }
-
-  async deleteNamedItem(name) {
-    try {
-      const client = await this._oneDrive.getClient();
-      await client({
-        uri: `${this._uri}/names/${name}`,
-        method: 'DELETE',
-      });
-    } catch (e) {
-      this.log.error(e);
-      throw new StatusCodeError(e.msg, 500);
-    }
+  get uri() {
+    return this._uri;
   }
 
   get log() {

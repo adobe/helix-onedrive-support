@@ -16,6 +16,7 @@
 
 const assert = require('assert');
 const Workbook = require('../src/Workbook.js');
+const namedItemOps = require('./NamedItemOps.js');
 
 const sampleBook = {
   name: 'book',
@@ -29,35 +30,13 @@ const sampleBook = {
     { name: 'alice', value: '$A2', comment: 'none' },
   ],
   ops: (component, command, method, body) => {
-    let index;
-    let len;
-    let item;
     switch (component) {
       case 'worksheets':
         return { value: sampleBook.sheetNames.map((name) => ({ name })) };
       case 'tables':
         return { value: sampleBook.tableNames.map((name) => ({ name })) };
       case 'names':
-        if (!command) {
-          return { value: sampleBook.namedItems };
-        }
-        if (command === 'add') {
-          len = sampleBook.namedItems.push({
-            name: body.name,
-            value: body.reference,
-            comment: body.comment,
-          });
-          return sampleBook.namedItems[len - 1];
-        }
-        index = sampleBook.namedItems.findIndex((i) => i.name === command);
-        if (index === -1) {
-          throw new Error('not found');
-        }
-        item = sampleBook.namedItems[index];
-        if (method === 'DELETE') {
-          sampleBook.namedItems.splice(index, 1);
-        }
-        return item;
+        return namedItemOps(sampleBook.namedItems)(command, method, body);
       default:
         return { values: sampleBook.name };
     }

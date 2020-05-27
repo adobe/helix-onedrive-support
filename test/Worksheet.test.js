@@ -16,6 +16,7 @@
 
 const assert = require('assert');
 const Worksheet = require('../src/Worksheet.js');
+const namedItemOps = require('./NamedItemOps.js');
 
 const sampleSheet = {
   name: 'sheet',
@@ -23,31 +24,9 @@ const sampleSheet = {
     { name: 'alice', value: '$A2', comment: 'none' },
   ],
   ops: (component, command, method, body) => {
-    let index;
-    let len;
-    let item;
     switch (component) {
       case 'names':
-        if (!command) {
-          return { value: sampleSheet.namedItems };
-        }
-        if (command === 'add') {
-          len = sampleSheet.namedItems.push({
-            name: body.name,
-            value: body.reference,
-            comment: body.comment,
-          });
-          return sampleSheet.namedItems[len - 1];
-        }
-        index = sampleSheet.namedItems.findIndex((i) => i.name === command);
-        if (index === -1) {
-          throw new Error('not found');
-        }
-        item = sampleSheet.namedItems[index];
-        if (method === 'DELETE') {
-          sampleSheet.namedItems.splice(index, 1);
-        }
-        return item;
+        return namedItemOps(sampleSheet.namedItems)(command, method, body);
       default:
         return { values: sampleSheet.name };
     }
