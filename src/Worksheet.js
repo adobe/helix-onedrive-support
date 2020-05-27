@@ -66,6 +66,20 @@ class Worksheet {
     }
   }
 
+  async deleteNamedItem(name) {
+    try {
+      const client = await this._oneDrive.getClient();
+      await client({
+        uri: `${this.uri}/names/${name}`,
+        method: 'DELETE',
+      });
+    } catch (e) {
+      this.log.error(e);
+      throw new StatusCodeError(e.msg, 500);
+    }
+  }
+
+
   get uri() {
     return `${this._prefix}/${this._name}`;
   }

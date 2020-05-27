@@ -120,6 +120,12 @@ export declare interface Worksheet {
    * @param comment comment
    */
   addNamedItem(name: string, reference: string, comment: string): Promise<GraphResult>;
+
+  /**
+   * Delete a named item.
+   * @param name name
+   */
+  deleteNamedItem(name: string): Promise<void>;
 }
 
 /**
@@ -170,6 +176,12 @@ export declare interface Workbook {
    * @param comment comment
    */
   addNamedItem(name: string, reference: string, comment: string): Promise<GraphResult>;
+
+  /**
+   * Delete a named item.
+   * @param name name
+   */
+  deleteNamedItem(name: string): Promise<void>;
 }
 
 
