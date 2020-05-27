@@ -48,7 +48,7 @@ export declare interface SubscriptionOptions {
  */
 export declare interface NamedItem {
   name: string;
-  reference: string;
+  value: string;
   comment: string;
 }
 
