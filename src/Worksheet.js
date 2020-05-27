@@ -24,7 +24,11 @@ class Worksheet {
     try {
       const client = await this._oneDrive.getClient();
       const result = await client.get(`${this.uri}/names`);
-      return result.value.map((v) => v.name);
+      return result.value.map((v) => ({
+        name: v.name,
+        value: v.value,
+        comment: v.comment,
+      }));
     } catch (e) {
       this.log.error(e);
       throw new StatusCodeError(e.msg, 500);
@@ -34,7 +38,12 @@ class Worksheet {
   async getNamedItem(name) {
     try {
       const client = await this._oneDrive.getClient(false);
-      return await client.get(`${this.uri}/names/${name}`);
+      const result = await client.get(`${this.uri}/names/${name}`);
+      return {
+        name: result.name,
+        value: result.value,
+        comment: result.comment,
+      };
     } catch (e) {
       if (e.statusCode === 404) {
         return null;
@@ -78,7 +87,6 @@ class Worksheet {
       throw new StatusCodeError(e.msg, 500);
     }
   }
-
 
   get uri() {
     return `${this._prefix}/${this._name}`;

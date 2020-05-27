@@ -54,7 +54,11 @@ class Workbook {
     try {
       const client = await this._oneDrive.getClient();
       const result = await client.get(`${this._uri}/names`);
-      return result.value.map((v) => v.name);
+      return result.value.map((v) => ({
+        name: v.name,
+        value: v.value,
+        comment: v.comment,
+      }));
     } catch (e) {
       this.log.error(e);
       throw new StatusCodeError(e.msg, 500);
@@ -89,6 +93,19 @@ class Workbook {
         headers: {
           'content-type': 'application/json',
         },
+      });
+    } catch (e) {
+      this.log.error(e);
+      throw new StatusCodeError(e.msg, 500);
+    }
+  }
+
+  async deleteNamedItem(name) {
+    try {
+      const client = await this._oneDrive.getClient();
+      await client({
+        uri: `${this._uri}/names/${name}`,
+        method: 'DELETE',
       });
     } catch (e) {
       this.log.error(e);
