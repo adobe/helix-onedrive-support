@@ -16,20 +16,12 @@ const { AuthenticationContext } = require('adal-node');
 const rp = require('request-promise-native');
 const url = require('url');
 
+const Workbook = require('./Workbook.js');
+const StatusCodeError = require('./StatusCodeError.js');
+
 const AZ_AUTHORITY_HOST_URL = 'https://login.windows.net';
 const AZ_RESOURCE = 'https://graph.microsoft.com'; // '00000002-0000-0000-c000-000000000000'; ??
 const AZ_DEFAULT_TENANT = 'common';
-
-/**
- * Internal error class
- * @private
- */
-class StatusCodeError extends Error {
-  constructor(msg, statusCode) {
-    super(msg);
-    this.statusCode = statusCode;
-  }
-}
 
 /**
  * the maximum subscription time in milliseconds
@@ -382,6 +374,18 @@ class OneDrive extends EventEmitter {
         },
       });
       // return buffer.pipe(client.put(uri));
+    } catch (e) {
+      this.log.error(e);
+      throw new StatusCodeError(e.msg, 500);
+    }
+  }
+
+  /**
+   */
+  getWorkbook(driveItem) {
+    const uri = `/drives/${driveItem.parentReference.driveId}/items/${driveItem.id}/workbook`;
+    try {
+      return new Workbook(this, uri, this.log);
     } catch (e) {
       this.log.error(e);
       throw new StatusCodeError(e.msg, 500);
