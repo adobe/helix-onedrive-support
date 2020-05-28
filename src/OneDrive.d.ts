@@ -151,7 +151,7 @@ export declare interface Workbook {
   getTableNames(): Promise<string[]>;
 
   /**
-   * Return a table given its name
+   * Return a new `Table` instance given its name
    * @param name table name
    */
   table(name: string): Table;
