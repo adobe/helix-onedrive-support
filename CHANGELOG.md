@@ -1,3 +1,10 @@
+# [2.4.0](https://github.com/adobe/helix-onedrive-support/compare/v2.3.0...v2.4.0) (2020-05-28)
+
+
+### Features
+
+* **excel:** support Workbooks and Tables ([#44](https://github.com/adobe/helix-onedrive-support/issues/44)) ([a285651](https://github.com/adobe/helix-onedrive-support/commit/a285651930afac700ebabab126dc8cb1d86075a1))
+
 # [2.3.0](https://github.com/adobe/helix-onedrive-support/compare/v2.2.0...v2.3.0) (2020-04-16)
 
 
