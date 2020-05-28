@@ -139,7 +139,7 @@ export declare interface Workbook {
   getWorksheetNames(): Promise<string[]>;
 
   /**
-   * Return a work sheet given its name
+   * Return a new `Worksheet` instance given its name
    * @param name work sheet name
    */
   worksheet(name: string): Worksheet;
