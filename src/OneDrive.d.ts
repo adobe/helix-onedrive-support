@@ -94,6 +94,12 @@ export declare interface Table {
    * @param values values to replace rows with
    */
   replaceRow(index: string, values: string): Promise<void>;
+
+  /**
+   * Get the number of rows in the table, not including the header row
+   * @returns number of rows
+   */
+  getRowCount(): Promise<number>;
 }
 
 /**

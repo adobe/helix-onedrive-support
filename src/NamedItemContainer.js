@@ -11,6 +11,19 @@
  */
 const StatusCodeError = require('./StatusCodeError.js');
 
+/**
+ * Returns the actual error, recursively descending through all error properties.
+ *
+ * @param {Error} e error caught
+ */
+function getActualError(e) {
+  let error = e;
+  while ('error' in error) {
+    error = error.error;
+  }
+  return error;
+}
+
 class NamedItemContaner {
   constructor(oneDrive) {
     this._oneDrive = oneDrive;
@@ -26,8 +39,8 @@ class NamedItemContaner {
         comment: v.comment,
       }));
     } catch (e) {
-      this.log.error(e);
-      throw new StatusCodeError(e.msg, 500);
+      this.log.error(getActualError(e));
+      throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
 
@@ -39,8 +52,8 @@ class NamedItemContaner {
       if (e.statusCode === 404) {
         return null;
       }
-      this.log.error(e);
-      throw new StatusCodeError(e.msg, 500);
+      this.log.error(getActualError(e));
+      throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
 
@@ -61,8 +74,8 @@ class NamedItemContaner {
         },
       });
     } catch (e) {
-      this.log.error(e);
-      throw new StatusCodeError(e.msg, 500);
+      this.log.error(getActualError(e));
+      throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
 
@@ -74,8 +87,8 @@ class NamedItemContaner {
         method: 'DELETE',
       });
     } catch (e) {
-      this.log.error(e);
-      throw new StatusCodeError(e.msg, 500);
+      this.log.error(getActualError(e));
+      throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
 }

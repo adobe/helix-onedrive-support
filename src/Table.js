@@ -11,6 +11,19 @@
  */
 const StatusCodeError = require('./StatusCodeError.js');
 
+/**
+ * Returns the actual error, recursively descending through all error properties.
+ *
+ * @param {Error} e error caught
+ */
+function getActualError(e) {
+  let error = e;
+  while ('error' in error) {
+    error = error.error;
+  }
+  return error;
+}
+
 class Table {
   constructor(oneDrive, prefix, name, log) {
     this._oneDrive = oneDrive;
@@ -70,8 +83,8 @@ class Table {
       const result = await client.get(`${this.uri}/rows/itemAt(index=${index})`);
       return result.values;
     } catch (e) {
-      this.log.error(e);
-      throw new StatusCodeError(e.msg, 500);
+      this.log.error(getActualError(e));
+      throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
 
@@ -114,6 +127,17 @@ class Table {
     } catch (e) {
       this.log.error(e);
       throw new StatusCodeError(e.msg, 500);
+    }
+  }
+
+  async getRowCount() {
+    try {
+      const client = await this._oneDrive.getClient();
+      const result = await client.get(`${this.uri}/dataBodyRange?$select=rowCount`);
+      return result.rowCount;
+    } catch (e) {
+      this.log.error(getActualError(e));
+      throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
 

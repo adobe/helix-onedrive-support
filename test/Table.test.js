@@ -15,7 +15,11 @@
 'use strict';
 
 const assert = require('assert');
+
+const StatusCodeError = require('../src/StatusCodeError.js');
 const Table = require('../src/Table.js');
+
+const getClient = require('./getClient.js');
 
 const sampleTable = {
   name: 'table',
@@ -31,9 +35,13 @@ const sampleTable = {
     ['Kepler', 'Johannes'],
     ['Kopernikus', 'Nikolaus'],
   ],
-  ops: (component, command, body) => {
+  ops: ({
+    component, command, body,
+  }) => {
     let index;
     switch (component) {
+      case 'dataBodyRange':
+        return { rowCount: sampleTable.rows.length };
       case 'headerRowRange':
         return { values: [sampleTable.headerNames] };
       case 'rows':
@@ -45,6 +53,9 @@ const sampleTable = {
           return { index: sampleTable.rows.length - 1 };
         }
         index = parseInt(command.replace(/itemAt\(index=([0-9]+)\)/, '$1'), 10);
+        if (index < 0 || index >= sampleTable.rows.length) {
+          throw new StatusCodeError(`Index out of range: ${index}`, 400);
+        }
         if (body) {
           [sampleTable.rows[index]] = body.values;
         }
@@ -59,16 +70,7 @@ const sampleTable = {
 };
 
 const oneDrive = {
-  getClient: async () => {
-    const f = async ({
-      uri, body,
-    }) => {
-      const [, , component, command] = uri.split('/');
-      return sampleTable.ops(component, command, body);
-    };
-    f.get = (uri) => f({ method: 'GET', uri });
-    return f;
-  },
+  getClient: async () => getClient(sampleTable.ops),
 };
 
 describe('Table Tests', () => {
@@ -91,6 +93,10 @@ describe('Table Tests', () => {
     const values = await table.getRow(index);
     assert.deepEqual(values, sampleTable.rows[index]);
   });
+  it('Get row in table with a bad index', async () => {
+    const index = 20;
+    await assert.rejects(async () => table.getRow(index), /Index out of range/);
+  });
   it('Add row to table', async () => {
     const row = ['Heisenberg', 'Werner'];
     const index = await table.addRow(row);
@@ -101,5 +107,9 @@ describe('Table Tests', () => {
     const row = ['Heisenberg', 'Werner'];
     await table.replaceRow(index, row);
     assert.deepEqual(row, sampleTable.rows[index]);
+  });
+  it('Get number of rows it table', async () => {
+    const count = await table.getRowCount();
+    assert.equal(count, sampleTable.rows.length);
   });
 });
