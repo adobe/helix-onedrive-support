@@ -12,11 +12,17 @@
 
 'use strict';
 
-const namedItemOps = (namedItems) => (command, method, body) => {
+const StatusCodeError = require('../src/StatusCodeError.js');
+
+const namedItemOps = (namedItems) => ({ command, method, body }) => {
   if (!command) {
     return { value: namedItems };
   }
   if (command === 'add') {
+    const namedItem = namedItems.find((i) => i.name === body.name);
+    if (namedItem) {
+      throw new StatusCodeError(`Named item already exists: ${namedItem.name}`, 400);
+    }
     const len = namedItems.push({
       name: body.name,
       value: body.reference,
@@ -26,7 +32,7 @@ const namedItemOps = (namedItems) => (command, method, body) => {
   }
   const index = namedItems.findIndex((i) => i.name === command);
   if (index === -1) {
-    throw new Error('not found');
+    throw new StatusCodeError(`Named item not found: ${command}`, 404);
   }
   const item = namedItems[index];
   if (method === 'DELETE') {

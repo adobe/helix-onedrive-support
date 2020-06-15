@@ -16,6 +16,8 @@
 
 const assert = require('assert');
 const Worksheet = require('../src/Worksheet.js');
+
+const getClient = require('./getClient.js');
 const namedItemOps = require('./NamedItemOps.js');
 
 const sampleSheet = {
@@ -23,10 +25,12 @@ const sampleSheet = {
   namedItems: [
     { name: 'alice', value: '$A2', comment: 'none' },
   ],
-  ops: (component, command, method, body) => {
+  ops: ({
+    component, command, method, body,
+  }) => {
     switch (component) {
       case 'names':
-        return namedItemOps(sampleSheet.namedItems)(command, method, body);
+        return namedItemOps(sampleSheet.namedItems)({ command, method, body });
       default:
         return { values: sampleSheet.name };
     }
@@ -34,16 +38,7 @@ const sampleSheet = {
 };
 
 const oneDrive = {
-  getClient: async () => {
-    const f = async ({
-      uri, method, body,
-    }) => {
-      const [, , component, command] = uri.split('/');
-      return sampleSheet.ops(component, command, method, body);
-    };
-    f.get = (uri) => f({ method: 'GET', uri });
-    return f;
-  },
+  getClient: async () => getClient(sampleSheet.ops),
 };
 
 describe('Worksheet Tests', () => {
