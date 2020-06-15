@@ -1,3 +1,10 @@
+## [2.4.1](https://github.com/adobe/helix-onedrive-support/compare/v2.4.0...v2.4.1) (2020-06-15)
+
+
+### Bug Fixes
+
+* **table:** add row count ([#48](https://github.com/adobe/helix-onedrive-support/issues/48)) ([f0b8e7e](https://github.com/adobe/helix-onedrive-support/commit/f0b8e7e2ec9f8467b5203afbbbd896d4eb0c7851))
+
 # [2.4.0](https://github.com/adobe/helix-onedrive-support/compare/v2.3.0...v2.4.0) (2020-05-28)
 
 
