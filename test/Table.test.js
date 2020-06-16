@@ -36,7 +36,7 @@ const sampleTable = {
     ['Kopernikus', 'Nikolaus'],
   ],
   ops: ({
-    component, command, body,
+    component, name, command, body,
   }) => {
     let index;
     switch (component) {
@@ -46,7 +46,7 @@ const sampleTable = {
         return { values: [sampleTable.headerNames] };
       case 'rows':
         if (!command) {
-          return { value: sampleTable.rows.map((row) => ({ values: row })) };
+          return { value: sampleTable.rows.map((row) => ({ values: [row] })) };
         }
         if (command === 'add') {
           sampleTable.rows.push(body.values[0]);
@@ -59,7 +59,18 @@ const sampleTable = {
         if (body) {
           [sampleTable.rows[index]] = body.values;
         }
-        return { values: sampleTable.rows[index] };
+        return { values: [sampleTable.rows[index]] };
+      case 'columns':
+        index = sampleTable.headerNames.findIndex((n) => n === name);
+        if (index === -1) {
+          throw new StatusCodeError(`Column name not found: ${name}`, 400);
+        }
+        return {
+          values: [
+            [sampleTable.headerNames[index]],
+            ...sampleTable.rows.map((row) => [row[index]]),
+          ],
+        };
       default:
         if (body) {
           sampleTable.name = body.name;
@@ -111,5 +122,11 @@ describe('Table Tests', () => {
   it('Get number of rows it table', async () => {
     const count = await table.getRowCount();
     assert.equal(count, sampleTable.rows.length);
+  });
+  it('Get column in table', async () => {
+    const index = 0;
+    const values = await table.getColumn('Name');
+    assert.deepEqual(values[0], [sampleTable.headerNames[index]]);
+    assert.deepEqual(values[5], [sampleTable.rows[4][index]]);
   });
 });
