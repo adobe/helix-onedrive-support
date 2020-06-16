@@ -70,7 +70,7 @@ class Table {
     try {
       const client = await this._oneDrive.getClient();
       const result = await client.get(`${this.uri}/rows`);
-      return result.value.map((v) => v.values);
+      return result.value.map((v) => v.values[0]);
     } catch (e) {
       this.log.error(e);
       throw new StatusCodeError(e.msg, 500);
@@ -81,7 +81,7 @@ class Table {
     try {
       const client = await this._oneDrive.getClient();
       const result = await client.get(`${this.uri}/rows/itemAt(index=${index})`);
-      return result.values;
+      return result.values[0];
     } catch (e) {
       this.log.error(getActualError(e));
       throw new StatusCodeError(e.message, e.statusCode || 500);
@@ -135,6 +135,17 @@ class Table {
       const client = await this._oneDrive.getClient();
       const result = await client.get(`${this.uri}/dataBodyRange?$select=rowCount`);
       return result.rowCount;
+    } catch (e) {
+      this.log.error(getActualError(e));
+      throw new StatusCodeError(e.message, e.statusCode || 500);
+    }
+  }
+
+  async getColumn(name) {
+    try {
+      const client = await this._oneDrive.getClient();
+      const result = await client.get(`${this.uri}/columns('${name}')`);
+      return result.values;
     } catch (e) {
       this.log.error(getActualError(e));
       throw new StatusCodeError(e.message, e.statusCode || 500);

@@ -12,24 +12,18 @@
 
 'use strict';
 
-const querystring = require('querystring');
-
 function getClient(ops) {
   const f = ({
     method, uri, body,
   }) => {
     // eslint-disable-next-line prefer-const
     let [, , component, command] = uri.split('/');
-    let query = [];
+    let name = null;
     if (component) {
-      const index = component.indexOf('?');
-      if (index !== -1) {
-        query = querystring.parse(component.substring(index + 1));
-        component = component.substring(0, index);
-      }
+      [, component, , name] = component.match(/([^?(]+)(\('([^)]+)'\))?(\?(.+))?/);
     }
     return ops({
-      method, component, query, command, body,
+      method, component, name, command, body,
     });
   };
   f.get = (uri) => f({ method: 'GET', uri });

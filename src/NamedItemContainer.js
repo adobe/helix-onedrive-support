@@ -74,7 +74,11 @@ class NamedItemContaner {
         },
       });
     } catch (e) {
-      this.log.error(getActualError(e));
+      const actual = getActualError(e);
+      if (actual.code === 'ItemAlreadyExists') {
+        throw new StatusCodeError(e.message, 409);
+      }
+      this.log.error(actual);
       throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
@@ -87,7 +91,11 @@ class NamedItemContaner {
         method: 'DELETE',
       });
     } catch (e) {
-      this.log.error(getActualError(e));
+      const actual = getActualError(e);
+      if (actual.code === 'ItemNotFound') {
+        throw new StatusCodeError(e.message, 404);
+      }
+      this.log.error(actual);
       throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
