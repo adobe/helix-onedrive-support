@@ -32,7 +32,6 @@ const AZ_DEFAULT_TENANT = 'common';
  */
 const MAX_SUBSCRIPTION_EXPIRATION_TIME = 4230 * 60 * 1000;
 
-
 /**
  * Remember the access token for future action invocations.
  * @private
