@@ -1,3 +1,10 @@
+# [2.5.0](https://github.com/adobe/helix-onedrive-support/compare/v2.4.1...v2.5.0) (2020-06-16)
+
+
+### Features
+
+* **table:** add getColumn method and simplify row handling ([#55](https://github.com/adobe/helix-onedrive-support/issues/55)) ([f02c440](https://github.com/adobe/helix-onedrive-support/commit/f02c4406ed1775c2c1734bfc0586b79bf47443e5))
+
 ## [2.4.1](https://github.com/adobe/helix-onedrive-support/compare/v2.4.0...v2.4.1) (2020-06-15)
 
 
