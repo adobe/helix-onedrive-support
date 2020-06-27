@@ -89,6 +89,11 @@ class Table {
   }
 
   async addRow(values) {
+    const result = await this.addRows([values]);
+    return result;
+  }
+
+  async addRows(values) {
     try {
       const client = await this._oneDrive.getClient();
       const result = await client({
@@ -96,7 +101,7 @@ class Table {
         method: 'POST',
         body: {
           index: null,
-          values: [values],
+          values,
         },
         json: true,
         headers: {
@@ -105,8 +110,8 @@ class Table {
       });
       return result.index;
     } catch (e) {
-      this.log.error(e);
-      throw new StatusCodeError(e.msg, 500);
+      this.log.error(getActualError(e));
+      throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
 
@@ -125,8 +130,8 @@ class Table {
         },
       });
     } catch (e) {
-      this.log.error(e);
-      throw new StatusCodeError(e.msg, 500);
+      this.log.error(getActualError(e));
+      throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
 

@@ -49,7 +49,7 @@ const sampleTable = {
           return { value: sampleTable.rows.map((row) => ({ values: [row] })) };
         }
         if (command === 'add') {
-          sampleTable.rows.push(body.values[0]);
+          sampleTable.rows.push(...body.values);
           return { index: sampleTable.rows.length - 1 };
         }
         index = parseInt(command.replace(/itemAt\(index=([0-9]+)\)/, '$1'), 10);
@@ -112,6 +112,12 @@ describe('Table Tests', () => {
     const row = ['Heisenberg', 'Werner'];
     const index = await table.addRow(row);
     assert.deepEqual(row, sampleTable.rows[index]);
+  });
+  it('Add rows to table', async () => {
+    const rows = [['Heisenberg', 'Werner'], ['Planck', 'Max']];
+    const index = await table.addRows(rows);
+    assert.deepEqual(rows[0], sampleTable.rows[index - 1]);
+    assert.deepEqual(rows[1], sampleTable.rows[index]);
   });
   it('Replace row in table', async () => {
     const index = 5;
