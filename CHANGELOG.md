@@ -1,3 +1,10 @@
+## [2.5.1](https://github.com/adobe/helix-onedrive-support/compare/v2.5.0...v2.5.1) (2020-06-27)
+
+
+### Bug Fixes
+
+* **table:** support addRows ([4eec5fd](https://github.com/adobe/helix-onedrive-support/commit/4eec5fda1a9d97d8ff547788dce6f3c1900187ec))
+
 # [2.5.0](https://github.com/adobe/helix-onedrive-support/compare/v2.4.1...v2.5.0) (2020-06-16)
 
 
