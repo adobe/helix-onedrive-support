@@ -382,13 +382,7 @@ class OneDrive extends EventEmitter {
   /**
    */
   getWorkbook(driveItem) {
-    const uri = `/drives/${driveItem.parentReference.driveId}/items/${driveItem.id}/workbook`;
-    try {
-      return new Workbook(this, uri, this.log);
-    } catch (e) {
-      this.log.error(e);
-      throw new StatusCodeError(e.msg, 500);
-    }
+    return new Workbook(this, `/drives/${driveItem.parentReference.driveId}/items/${driveItem.id}/workbook`, this.log);
   }
 
   /**

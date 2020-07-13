@@ -29,6 +29,7 @@ class Workbook extends NamedItemContainer {
   async getWorksheetNames() {
     try {
       const client = await this._oneDrive.getClient();
+      this.log.debug(`get worksheet names from ${this._uri}/worksheets`);
       const result = await client.get(`${this._uri}/worksheets`);
       return result.value.map((v) => v.name);
     } catch (e) {
@@ -44,6 +45,7 @@ class Workbook extends NamedItemContainer {
   async getTableNames() {
     try {
       const client = await this._oneDrive.getClient();
+      this.log.debug(`get table names from ${this._uri}/tables`);
       const result = await client.get(`${this._uri}/tables`);
       return result.value.map((v) => v.name);
     } catch (e) {

@@ -50,7 +50,7 @@ class Table {
       this._name = name;
       return result;
     } catch (e) {
-      this.log.error(e);
+      this.log.error(getActualError(e));
       throw new StatusCodeError(e.msg, 500);
     }
   }
@@ -61,7 +61,7 @@ class Table {
       const result = await client.get(`${this.uri}/headerRowRange`);
       return result.values[0];
     } catch (e) {
-      this.log.error(e);
+      this.log.error(getActualError(e));
       throw new StatusCodeError(e.msg, 500);
     }
   }
@@ -72,7 +72,33 @@ class Table {
       const result = await client.get(`${this.uri}/rows`);
       return result.value.map((v) => v.values[0]);
     } catch (e) {
-      this.log.error(e);
+      this.log.error(getActualError(e));
+      throw new StatusCodeError(e.msg, 500);
+    }
+  }
+
+  async getRowsAsObjects() {
+    const { log } = this;
+    try {
+      const client = await this._oneDrive.getClient();
+      this.log.debug(`get columns from ${this.uri}/columns`);
+      const result = await client.get(`${this.uri}/columns`);
+      const columnNames = result.value.map(({ name }) => name);
+      log.debug(`got column names: ${columnNames}`);
+
+      const rowValues = result.value[0].values
+        .map((_, rownum) => columnNames.reduce((row, name, column) => {
+          const [value] = result.value[column].values[rownum];
+          // eslint-disable-next-line no-param-reassign
+          row[name] = value;
+          return row;
+        }, {}));
+
+      // discard the first row
+      rowValues.shift();
+      return rowValues;
+    } catch (e) {
+      this.log.error(getActualError(e));
       throw new StatusCodeError(e.msg, 500);
     }
   }
