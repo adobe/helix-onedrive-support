@@ -1,3 +1,10 @@
+# [2.6.0](https://github.com/adobe/helix-onedrive-support/compare/v2.5.1...v2.6.0) (2020-07-14)
+
+
+### Features
+
+* **excel:** add support for ranges and object serialization ([#66](https://github.com/adobe/helix-onedrive-support/issues/66)) ([2220028](https://github.com/adobe/helix-onedrive-support/commit/2220028d0458ce04a93984ef75696ccddc931f05))
+
 ## [2.5.1](https://github.com/adobe/helix-onedrive-support/compare/v2.5.0...v2.5.1) (2020-06-27)
 
 
