@@ -15,10 +15,11 @@
 'use strict';
 
 const assert = require('assert');
-const Worksheet = require('../src/Worksheet.js');
 
-const getClient = require('./getClient.js');
-const namedItemOps = require('./NamedItemOps.js');
+const MockOneDrive = require('./MockOneDrive.js');
+const exampleBook = require('./fixtures/book.js');
+
+
 
 const sampleSheet = {
   name: 'sheet',
@@ -53,12 +54,15 @@ const sampleSheet = {
   },
 };
 
-const oneDrive = {
-  getClient: async () => getClient(sampleSheet.ops),
-};
-
 describe('Worksheet Tests', () => {
-  const sheet = new Worksheet(oneDrive, 'workbook', 'sheet', console);
+  let sheet;
+  beforeEach(() => {
+    const oneDrive = new MockOneDrive()
+      .registerWorkbook('my-drive', 'my-item', exampleBook);
+    const book = oneDrive.getWorkbook();
+    sheet = book.worksheet('sheet');
+  });
+
   it('Get named items', async () => {
     const values = await sheet.getNamedItems();
     assert.deepEqual(values, sampleSheet.namedItems);

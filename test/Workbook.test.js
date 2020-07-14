@@ -15,60 +15,33 @@
 'use strict';
 
 const assert = require('assert');
-const Workbook = require('../src/Workbook.js');
-
-const getClient = require('./getClient.js');
-const namedItemOps = require('./NamedItemOps.js');
-
-const sampleBook = {
-  name: 'book',
-  tableNames: [
-    ['table'],
-  ],
-  sheetNames: [
-    ['sheet'],
-  ],
-  namedItems: [
-    { name: 'alice', value: '$A2', comment: 'none' },
-  ],
-  ops: ({
-    component, command, method, body,
-  }) => {
-    switch (component) {
-      case 'worksheets':
-        return { value: sampleBook.sheetNames.map((name) => ({ name })) };
-      case 'tables':
-        return { value: sampleBook.tableNames.map((name) => ({ name })) };
-      case 'names':
-        return namedItemOps(sampleBook.namedItems)({ command, method, body });
-      default:
-        return { values: sampleBook.name };
-    }
-  },
-};
-
-const oneDrive = {
-  getClient: async () => getClient(sampleBook.ops),
-};
+const MockOneDrive = require('./MockOneDrive.js');
+const exampleBook = require('./fixtures/book.js');
 
 describe('Workbook Tests', () => {
-  const book = new Workbook(oneDrive, '/book', console);
+  let book;
+  beforeEach(() => {
+    const oneDrive = new MockOneDrive()
+      .registerWorkbook('my-drive', 'my-item', exampleBook);
+    book = oneDrive.getWorkbook();
+  });
+
   it('Get sheet names', async () => {
     const values = await book.getWorksheetNames();
-    assert.deepEqual(values, sampleBook.sheetNames);
+    assert.deepEqual(values, ['sheet']);
   });
   it('Get table names', async () => {
     const values = await book.getTableNames();
-    assert.deepEqual(values, sampleBook.tableNames);
+    assert.deepEqual(values, ['table']);
   });
   it('Get named items', async () => {
     const values = await book.getNamedItems();
-    assert.deepEqual(values, sampleBook.namedItems);
+    assert.deepEqual(values, exampleBook.namedItems);
   });
   it('Get named item', async () => {
     const name = 'alice';
     const values = await book.getNamedItem(name);
-    assert.deepEqual(values, sampleBook.namedItems[0]);
+    assert.deepEqual(values, exampleBook.namedItems[0]);
   });
   it('Get named item that doesn\'t exist', async () => {
     const name = 'fred';
@@ -78,7 +51,7 @@ describe('Workbook Tests', () => {
   it('Add named item', async () => {
     const namedItem = { name: 'bob', value: '$B2', comment: 'none' };
     await book.addNamedItem(namedItem.name, namedItem.value, namedItem.comment);
-    assert.deepEqual(namedItem, sampleBook.namedItems[sampleBook.namedItems.length - 1]);
+    assert.deepEqual(namedItem, exampleBook.namedItems[exampleBook.namedItems.length - 1]);
   });
   it('Add named item that already exists', async () => {
     const item = { name: 'alice', value: '$B2', comment: 'none' };
@@ -87,7 +60,7 @@ describe('Workbook Tests', () => {
   it('Delete named item', async () => {
     const name = 'alice';
     await book.deleteNamedItem(name);
-    const index = sampleBook.namedItems.findIndex((item) => item.name === name);
+    const index = exampleBook.namedItems.findIndex((item) => item.name === name);
     assert.equal(index, -1);
   });
   it('Delete named item that doesn\'t exist', async () => {

@@ -40,6 +40,7 @@ class Worksheet extends NamedItemContainer {
       const client = await this._oneDrive.getClient();
       this.log.debug(`get table names from ${this._uri}/tables`);
       const result = await client.get(`${this._uri}/tables`);
+      console.log(result);
       return result.value.map((v) => v.name);
     } catch (e) {
       this.log.error(e);
