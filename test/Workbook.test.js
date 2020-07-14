@@ -18,14 +18,24 @@ const assert = require('assert');
 const MockOneDrive = require('./MockOneDrive.js');
 const exampleBook = require('./fixtures/book.js');
 
+const TEST_SHARE_LINK = 'https://adobe.sharepoint.com/:x:/r/sites/cg-helix/Shared%20Documents/data-embed-unit-tests/example-data.xlsx';
+
 describe('Workbook Tests', () => {
   let book;
   let sampleBook;
+  let oneDrive;
   beforeEach(() => {
-    const oneDrive = new MockOneDrive()
-      .registerWorkbook('my-drive', 'my-item', exampleBook);
+    oneDrive = new MockOneDrive()
+      .registerWorkbook('my-drive', 'my-item', exampleBook)
+      .registerShareLink(TEST_SHARE_LINK, 'my-drive', 'my-item');
     book = oneDrive.getWorkbook();
     sampleBook = oneDrive.workbooks[0].data;
+  });
+
+  it('Get workbook via sharelink', async () => {
+    const item = await oneDrive.getDriveItemFromShareLink(TEST_SHARE_LINK);
+    const workbook = oneDrive.getWorkbook(item);
+    assert.equal(workbook.uri, '/drives/my-drive/items/my-item/workbook');
   });
 
   it('Get sheet names', async () => {

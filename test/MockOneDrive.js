@@ -42,6 +42,7 @@ const namedItemOps = (namedItems) => ({ command, method, body }) => {
 class MockOneDrive {
   constructor() {
     this.workbooks = [];
+    this.sharelinks = {};
   }
 
   registerWorkbook(driveId, itemId, data) {
@@ -51,6 +52,24 @@ class MockOneDrive {
       data: JSON.parse(JSON.stringify(data)),
     });
     return this;
+  }
+
+  registerShareLink(uri, driveId, itemId) {
+    this.sharelinks[uri] = {
+      parentReference: {
+        driveId,
+      },
+      id: itemId,
+    };
+    return this;
+  }
+
+  async getDriveItemFromShareLink(uri) {
+    const driveItem = this.sharelinks[uri];
+    if (!driveItem) {
+      throw new StatusCodeError(404, uri);
+    }
+    return driveItem;
   }
 
   getWorkbook(driveItem) {
