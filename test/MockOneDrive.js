@@ -11,7 +11,33 @@
  */
 const Workbook = require('../src/Workbook.js');
 const StatusCodeError = require('../src/StatusCodeError.js');
-const namedItemOps = require('./NamedItemOps.js');
+
+const namedItemOps = (namedItems) => ({ command, method, body }) => {
+  if (!command) {
+    return { value: namedItems };
+  }
+  if (command === 'add') {
+    const namedItem = namedItems.find((i) => i.name === body.name);
+    if (namedItem) {
+      throw new StatusCodeError(`Named item already exists: ${namedItem.name}`, 400);
+    }
+    const len = namedItems.push({
+      name: body.name,
+      value: body.reference,
+      comment: body.comment,
+    });
+    return namedItems[len - 1];
+  }
+  const index = namedItems.findIndex((i) => i.name === command);
+  if (index === -1) {
+    throw new StatusCodeError(`Named item not found: ${command}`, 404);
+  }
+  const item = namedItems[index];
+  if (method === 'DELETE') {
+    namedItems.splice(index, 1);
+  }
+  return item;
+};
 
 class MockOneDrive {
   constructor() {
@@ -21,7 +47,8 @@ class MockOneDrive {
   registerWorkbook(driveId, itemId, data) {
     this.workbooks.push({
       uri: `/drives/${driveId}/items/${itemId}/workbook`,
-      data,
+      // poor mans deep clone
+      data: JSON.parse(JSON.stringify(data)),
     });
     return this;
   }
@@ -41,42 +68,117 @@ class MockOneDrive {
       }
       const { data } = wb;
 
-      // eslint-disable-next-line prefer-const
-      let [, component, command] = uri.substring(wb.uri.length).split('/');
-      let name = null;
-      if (component) {
-        [, component, , name] = component.match(/([^?(]+)(\('([^)]+)'\))?(\?(.+))?/);
-      }
-      console.log(`component: '${component}' command: '${command}, name: '${name}`);
+      // eslint-disable-next-line no-unused-vars
+      const [path, query] = uri.substring(wb.uri.length).split('?');
+      const segs = path.split('/');
+      segs.shift();
 
-      switch (component) {
-        case 'worksheets':
-          if (command) {
-            const sheet = data.sheets.find((s) => (s.name === command));
-            console.log(sheet);
-            if (!sheet) {
-              throw StatusCodeError(command, 404);
-            }
-            return sheet;
-          } else {
-            return { value: data.sheets.map((sheet) => ({ name: sheet.name })) };
+      let sheet = data;
+      if (segs[0] === 'worksheets') {
+        segs.shift();
+        if (segs[0]) {
+          const sheetName = segs.shift();
+          sheet = data.sheets.find((s) => (s.name === sheetName));
+          if (!sheet) {
+            throw new StatusCodeError(sheetName, 404);
           }
+          if (!segs[0]) {
+            // if no more segments, return the sheet data
+            return sheet;
+          }
+        } else {
+          return { value: data.sheets.map((st) => ({ name: st.name })) };
+        }
+      }
+
+      switch (segs.shift()) {
+        case 'usedRange':
+          return sheet.usedRange;
         case 'tables':
-          return { value: data.tables.map((table) => ({ name: table.name })) };
+          if (segs[0]) {
+            const tableName = segs.shift();
+            const table = sheet.tables.find((t) => t.name === tableName);
+            if (!table) {
+              throw new StatusCodeError(tableName, 404);
+            }
+            let command;
+            let name;
+            if (segs[0]) {
+              [, command, , name] = segs.shift().match(/([^?(]+)(\('([^)]+)'\))?(\?(.+))?/);
+            }
+            switch (command) {
+              case 'dataBodyRange':
+                return { rowCount: table.rows.length };
+              case 'headerRowRange':
+                return { values: [table.headerNames] };
+              case 'rows': {
+                if (!segs[0]) {
+                  return { value: table.rows.map((row) => ({ values: [row] })) };
+                }
+                const subCommand = segs.shift();
+                if (subCommand === 'add') {
+                  table.rows.push(...body.values);
+                  return { index: table.rows.length - 1 };
+                }
+                const index = parseInt(subCommand.replace(/itemAt\(index=([0-9]+)\)/, '$1'), 10);
+                if (index < 0 || index >= table.rows.length) {
+                  throw new StatusCodeError(`Index out of range: ${index}`, 400);
+                }
+                if (body) {
+                  [table.rows[index]] = body.values;
+                }
+                return { values: [table.rows[index]] };
+              }
+              case 'columns': {
+                if (!name) {
+                  const cols = table.headerNames.map((n) => ({
+                    name: n,
+                    values: [[n]],
+                  }));
+                  table.rows.forEach((row) => {
+                    row.forEach((value, idx) => {
+                      cols[idx].values.push([value]);
+                    });
+                  });
+                  return {
+                    value: cols,
+                  };
+                }
+                const columnName = name;
+                const index = table.headerNames.findIndex((n) => n === columnName);
+                if (index === -1) {
+                  throw new StatusCodeError(`Column name not found: ${columnName}`, 400);
+                }
+                return {
+                  values: [
+                    [table.headerNames[index]],
+                    ...table.rows.map((row) => [row[index]]),
+                  ],
+                };
+              }
+
+              default:
+                if (body) {
+                  table.name = body.name;
+                }
+                return { values: table.name };
+            }
+          } else {
+            return { value: sheet.tables.map((table) => ({ name: table.name })) };
+          }
         case 'names':
-          return namedItemOps(data.namedItems)({
-            command,
+          return namedItemOps(sheet.namedItems)({
+            command: segs[0],
             method,
             body,
           });
         default:
-          return { values: data.name };
+          return { values: sheet.name };
       }
     };
     f.get = (uri) => f({ method: 'GET', uri });
     return f;
   }
-
 }
 
 module.exports = MockOneDrive;

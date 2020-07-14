@@ -11,7 +11,27 @@
  */
 const tables = [{
   name: 'table',
+  headerNames: ['Name', 'Firstname'],
+  rows: [
+    ['Einstein', 'Albert'],
+    ['Curie', 'Marie'],
+    ['Hawking', 'Steven'],
+    ['Newton', 'Isaac'],
+    ['Bohr', 'Niels'],
+    ['Faraday', 'Michael'],
+    ['Galilei', 'Galileo'],
+    ['Kepler', 'Johannes'],
+    ['Kopernikus', 'Nikolaus'],
+  ],
 }];
+
+const namedItems = [
+  {
+    name: 'alice',
+    value: '$A2',
+    comment: 'none',
+  },
+];
 
 module.exports = {
   name: 'book',
@@ -19,13 +39,7 @@ module.exports = {
   sheets: [{
     name: 'sheet',
     tables,
-    namedItems: [
-      {
-        name: 'alice',
-        value: '$A2',
-        comment: 'none',
-      },
-    ],
+    namedItems,
     usedRange: {
       address: 'Sheet1!A1:B4',
       addressLocal: 'A1:B4',
@@ -37,7 +51,5 @@ module.exports = {
     },
   },
   ],
-  namedItems: [
-    { name: 'alice', value: '$A2', comment: 'none' },
-  ],
+  namedItems,
 };

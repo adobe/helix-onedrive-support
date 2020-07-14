@@ -15,100 +15,33 @@
 'use strict';
 
 const assert = require('assert');
-
-const StatusCodeError = require('../src/StatusCodeError.js');
-const Table = require('../src/Table.js');
-
-const getClient = require('./getClient.js');
-
-const sampleTable = {
-  name: 'table',
-  headerNames: ['Name', 'Firstname'],
-  rows: [
-    ['Einstein', 'Albert'],
-    ['Curie', 'Marie'],
-    ['Hawking', 'Steven'],
-    ['Newton', 'Isaac'],
-    ['Bohr', 'Niels'],
-    ['Faraday', 'Michael'],
-    ['Galilei', 'Galileo'],
-    ['Kepler', 'Johannes'],
-    ['Kopernikus', 'Nikolaus'],
-  ],
-  ops: ({
-    component, name, command, body,
-  }) => {
-    let index;
-    switch (component) {
-      case 'dataBodyRange':
-        return { rowCount: sampleTable.rows.length };
-      case 'headerRowRange':
-        return { values: [sampleTable.headerNames] };
-      case 'rows':
-        if (!command) {
-          return { value: sampleTable.rows.map((row) => ({ values: [row] })) };
-        }
-        if (command === 'add') {
-          sampleTable.rows.push(...body.values);
-          return { index: sampleTable.rows.length - 1 };
-        }
-        index = parseInt(command.replace(/itemAt\(index=([0-9]+)\)/, '$1'), 10);
-        if (index < 0 || index >= sampleTable.rows.length) {
-          throw new StatusCodeError(`Index out of range: ${index}`, 400);
-        }
-        if (body) {
-          [sampleTable.rows[index]] = body.values;
-        }
-        return { values: [sampleTable.rows[index]] };
-      case 'columns':
-        if (!name) {
-          const cols = sampleTable.headerNames.map((n) => ({
-            name: n,
-            values: [[n]],
-          }));
-          sampleTable.rows.forEach((row) => {
-            row.forEach((value, idx) => {
-              cols[idx].values.push([value]);
-            });
-          });
-          return {
-            value: cols,
-          };
-        }
-        index = sampleTable.headerNames.findIndex((n) => n === name);
-        if (index === -1) {
-          throw new StatusCodeError(`Column name not found: ${name}`, 400);
-        }
-        return {
-          values: [
-            [sampleTable.headerNames[index]],
-            ...sampleTable.rows.map((row) => [row[index]]),
-          ],
-        };
-      default:
-        if (body) {
-          sampleTable.name = body.name;
-        }
-        return { values: sampleTable.name };
-    }
-  },
-};
-
-const oneDrive = {
-  getClient: async () => getClient(sampleTable.ops),
-};
+const MockOneDrive = require('./MockOneDrive.js');
+const exampleBook = require('./fixtures/book.js');
 
 describe('Table Tests', () => {
-  const table = new Table(oneDrive, 'workbook', 'table', console);
+  let table;
+  let sampleTable;
+  beforeEach(() => {
+    const oneDrive = new MockOneDrive()
+      .registerWorkbook('my-drive', 'my-item', exampleBook);
+    const book = oneDrive.getWorkbook();
+    table = book.table('table');
+    [sampleTable] = oneDrive.workbooks[0].data.tables;
+  });
+
   it('Rename a table', async () => {
     const name = 'table1';
+    assert.equal(sampleTable.name, 'table');
     await table.rename(name);
-    assert.equal(name, sampleTable.name);
+    assert.equal(sampleTable.name, 'table1');
+    console.log(exampleBook);
   });
+
   it('Get header names of table', async () => {
     const values = await table.getHeaderNames();
     assert.equal(values, sampleTable.headerNames);
   });
+
   it('Get all rows in table', async () => {
     const values = await table.getRows();
     assert.deepEqual(values, sampleTable.rows);
