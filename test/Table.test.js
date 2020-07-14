@@ -61,6 +61,20 @@ const sampleTable = {
         }
         return { values: [sampleTable.rows[index]] };
       case 'columns':
+        if (!name) {
+          const cols = sampleTable.headerNames.map((n) => ({
+            name: n,
+            values: [[n]],
+          }));
+          sampleTable.rows.forEach((row) => {
+            row.forEach((value, idx) => {
+              cols[idx].values.push([value]);
+            });
+          });
+          return {
+            value: cols,
+          };
+        }
         index = sampleTable.headerNames.findIndex((n) => n === name);
         if (index === -1) {
           throw new StatusCodeError(`Column name not found: ${name}`, 400);
@@ -107,6 +121,20 @@ describe('Table Tests', () => {
   it('Get row in table with a bad index', async () => {
     const index = 20;
     await assert.rejects(async () => table.getRow(index), /Index out of range/);
+  });
+  it('Get rows as objects', async () => {
+    const data = await table.getRowsAsObjects();
+    assert.deepEqual(data, [
+      { Firstname: 'Albert', Name: 'Einstein' },
+      { Firstname: 'Marie', Name: 'Curie' },
+      { Firstname: 'Steven', Name: 'Hawking' },
+      { Firstname: 'Isaac', Name: 'Newton' },
+      { Firstname: 'Niels', Name: 'Bohr' },
+      { Firstname: 'Michael', Name: 'Faraday' },
+      { Firstname: 'Galileo', Name: 'Galilei' },
+      { Firstname: 'Johannes', Name: 'Kepler' },
+      { Firstname: 'Nikolaus', Name: 'Kopernikus' },
+    ]);
   });
   it('Add row to table', async () => {
     const row = ['Heisenberg', 'Werner'];

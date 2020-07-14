@@ -13,23 +13,46 @@
 'use strict';
 
 const NamedItemContainer = require('./NamedItemContainer.js');
+const StatusCodeError = require('./StatusCodeError.js');
+const Table = require('./Table.js');
+const Range = require('./Range.js');
 
 class Worksheet extends NamedItemContainer {
   constructor(oneDrive, prefix, name, log) {
     super(oneDrive);
 
     this._oneDrive = oneDrive;
-    this._prefix = prefix;
+    this._uri = `${prefix}/${name}`;
     this._name = name;
     this._log = log;
   }
 
   get uri() {
-    return `${this._prefix}/${this._name}`;
+    return this._uri;
   }
 
   get log() {
     return this._log;
+  }
+
+  async getTableNames() {
+    try {
+      const client = await this._oneDrive.getClient();
+      this.log.debug(`get table names from ${this._uri}/tables`);
+      const result = await client.get(`${this._uri}/tables`);
+      return result.value.map((v) => v.name);
+    } catch (e) {
+      this.log.error(e);
+      throw new StatusCodeError(e.msg, 500);
+    }
+  }
+
+  table(name) {
+    return new Table(this._oneDrive, `${this._uri}/tables`, name, this._log);
+  }
+
+  usedRange() {
+    return new Range(this._oneDrive, `${this._uri}/usedRange`, this._log);
   }
 }
 

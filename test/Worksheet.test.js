@@ -22,15 +22,31 @@ const namedItemOps = require('./NamedItemOps.js');
 
 const sampleSheet = {
   name: 'sheet',
+  tableNames: [
+    ['table'],
+  ],
   namedItems: [
     { name: 'alice', value: '$A2', comment: 'none' },
   ],
+  usedRange: {
+    address: 'Sheet1!A1:B4',
+    addressLocal: 'A1:B4',
+    values: [
+      ['project', 'created'],
+      ['Helix', 2018],
+      ['What', 2019],
+      ['this', 2020]],
+  },
   ops: ({
     component, command, method, body,
   }) => {
     switch (component) {
       case 'names':
         return namedItemOps(sampleSheet.namedItems)({ command, method, body });
+      case 'tables':
+        return { value: sampleSheet.tableNames.map((name) => ({ name })) };
+      case 'usedRange':
+        return sampleSheet.usedRange;
       default:
         return { values: sampleSheet.name };
     }
@@ -62,5 +78,38 @@ describe('Worksheet Tests', () => {
     await sheet.deleteNamedItem(name);
     const index = sampleSheet.namedItems.findIndex((item) => item.name === name);
     assert.equal(index, -1);
+  });
+  it('Get table names', async () => {
+    const values = await sheet.getTableNames();
+    assert.deepEqual(values, sampleSheet.tableNames);
+  });
+  it('Get used range address', async () => {
+    const range = sheet.usedRange();
+    const address = await range.getAddress();
+    assert.equal(address, 'Sheet1!A1:B4');
+  });
+  it('Get used range address local', async () => {
+    const range = sheet.usedRange();
+    const address = await range.getAddressLocal();
+    assert.equal(address, 'A1:B4');
+  });
+  it('Get all data', async () => {
+    const range = sheet.usedRange();
+    const address = await range.getData();
+    assert.deepEqual(address, sampleSheet.usedRange);
+  });
+  it('Get column names', async () => {
+    const range = sheet.usedRange();
+    const names = await range.getColumnNames();
+    assert.deepEqual(names, ['project', 'created']);
+  });
+  it('Get rows as objects', async () => {
+    const range = sheet.usedRange();
+    const data = await range.getRowsAsObjects();
+    assert.deepEqual(data, [
+      { created: 2018, project: 'Helix' },
+      { created: 2019, project: 'What' },
+      { created: 2020, project: 'this' },
+    ]);
   });
 });
