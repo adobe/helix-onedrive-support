@@ -15,51 +15,56 @@
 'use strict';
 
 const assert = require('assert');
-const Workbook = require('../src/Workbook.js');
+const OneDriveMock = require('../src/OneDriveMock.js');
+const StatusCodeError = require('../src/StatusCodeError.js');
+const exampleBook = require('./fixtures/book.js');
 
-const getClient = require('./getClient.js');
-const namedItemOps = require('./NamedItemOps.js');
-
-const sampleBook = {
-  name: 'book',
-  tableNames: [
-    ['table'],
-  ],
-  sheetNames: [
-    ['sheet'],
-  ],
-  namedItems: [
-    { name: 'alice', value: '$A2', comment: 'none' },
-  ],
-  ops: ({
-    component, command, method, body,
-  }) => {
-    switch (component) {
-      case 'worksheets':
-        return { value: sampleBook.sheetNames.map((name) => ({ name })) };
-      case 'tables':
-        return { value: sampleBook.tableNames.map((name) => ({ name })) };
-      case 'names':
-        return namedItemOps(sampleBook.namedItems)({ command, method, body });
-      default:
-        return { values: sampleBook.name };
-    }
-  },
-};
-
-const oneDrive = {
-  getClient: async () => getClient(sampleBook.ops),
-};
+const TEST_SHARE_LINK = 'https://adobe.sharepoint.com/:x:/r/sites/cg-helix/Shared%20Documents/data-embed-unit-tests/example-data.xlsx';
 
 describe('Workbook Tests', () => {
-  const book = new Workbook(oneDrive, '/book', console);
+  let book;
+  let sampleBook;
+  let oneDrive;
+  beforeEach(() => {
+    oneDrive = new OneDriveMock()
+      .registerWorkbook('my-drive', 'my-item', exampleBook)
+      .registerShareLink(TEST_SHARE_LINK, 'my-drive', 'my-item');
+    book = oneDrive.getWorkbook();
+    sampleBook = oneDrive.workbooks[0].data;
+  });
+
+  it('Get workbook via sharelink', async () => {
+    const item = await oneDrive.getDriveItemFromShareLink(TEST_SHARE_LINK);
+    const workbook = oneDrive.getWorkbook(item);
+    assert.equal(workbook.uri, '/drives/my-drive/items/my-item/workbook');
+  });
+
+  it('Get workbook via invalid sharelink failed', async () => {
+    await assert.rejects(async () => oneDrive.getDriveItemFromShareLink('/not-found'), new StatusCodeError('/not-found', 404));
+  });
+
+  it('Get non registered workbook fails', async () => {
+    book = oneDrive.getWorkbook({
+      id: 'foo',
+      parentReference: {
+        driveId: 'bar',
+      },
+    });
+    await assert.rejects(async () => book.getWorksheetNames(), new StatusCodeError('', 500));
+  });
+
+  it('Get the workbook data', async () => {
+    const { name } = await book.getData();
+    assert.equal(name, 'book');
+  });
+
   it('Get sheet names', async () => {
     const values = await book.getWorksheetNames();
-    assert.deepEqual(values, sampleBook.sheetNames);
+    assert.deepEqual(values, ['sheet']);
   });
   it('Get table names', async () => {
     const values = await book.getTableNames();
-    assert.deepEqual(values, sampleBook.tableNames);
+    assert.deepEqual(values, ['table']);
   });
   it('Get named items', async () => {
     const values = await book.getNamedItems();
@@ -78,7 +83,7 @@ describe('Workbook Tests', () => {
   it('Add named item', async () => {
     const namedItem = { name: 'bob', value: '$B2', comment: 'none' };
     await book.addNamedItem(namedItem.name, namedItem.value, namedItem.comment);
-    assert.deepEqual(namedItem, sampleBook.namedItems[sampleBook.namedItems.length - 1]);
+    assert.deepEqual(sampleBook.namedItems[sampleBook.namedItems.length - 1], namedItem);
   });
   it('Add named item that already exists', async () => {
     const item = { name: 'alice', value: '$B2', comment: 'none' };

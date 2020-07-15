@@ -26,6 +26,17 @@ class Workbook extends NamedItemContainer {
     this._log = log;
   }
 
+  async getData() {
+    try {
+      const client = await this._oneDrive.getClient();
+      const result = await client.get(this._uri);
+      return result.value;
+    } catch (e) {
+      this.log.error(e);
+      throw new StatusCodeError(e.msg, 500);
+    }
+  }
+
   async getWorksheetNames() {
     try {
       const client = await this._oneDrive.getClient();

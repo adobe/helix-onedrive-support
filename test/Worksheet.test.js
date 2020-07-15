@@ -15,73 +15,60 @@
 'use strict';
 
 const assert = require('assert');
-const Worksheet = require('../src/Worksheet.js');
 
-const getClient = require('./getClient.js');
-const namedItemOps = require('./NamedItemOps.js');
-
-const sampleSheet = {
-  name: 'sheet',
-  tableNames: [
-    ['table'],
-  ],
-  namedItems: [
-    { name: 'alice', value: '$A2', comment: 'none' },
-  ],
-  usedRange: {
-    address: 'Sheet1!A1:B4',
-    addressLocal: 'A1:B4',
-    values: [
-      ['project', 'created'],
-      ['Helix', 2018],
-      ['What', 2019],
-      ['this', 2020]],
-  },
-  ops: ({
-    component, command, method, body,
-  }) => {
-    switch (component) {
-      case 'names':
-        return namedItemOps(sampleSheet.namedItems)({ command, method, body });
-      case 'tables':
-        return { value: sampleSheet.tableNames.map((name) => ({ name })) };
-      case 'usedRange':
-        return sampleSheet.usedRange;
-      default:
-        return { values: sampleSheet.name };
-    }
-  },
-};
-
-const oneDrive = {
-  getClient: async () => getClient(sampleSheet.ops),
-};
+const OneDriveMock = require('../src/OneDriveMock.js');
+const StatusCodeError = require('../src/StatusCodeError.js');
+const exampleBook = require('./fixtures/book.js');
 
 describe('Worksheet Tests', () => {
-  const sheet = new Worksheet(oneDrive, 'workbook', 'sheet', console);
+  let sheet;
+  let oneDrive;
+  let book;
+  beforeEach(() => {
+    oneDrive = new OneDriveMock()
+      .registerWorkbook('my-drive', 'my-item', exampleBook);
+    book = oneDrive.getWorkbook();
+    sheet = book.worksheet('sheet');
+  });
+
+  it('Get the sheet data', async () => {
+    const { name } = await sheet.getData();
+    assert.equal(name, 'sheet');
+  });
+
+  it('Get a sheet that does not exist fails.', async () => {
+    sheet = book.worksheet('sheet-not-exist');
+    await assert.rejects(async () => sheet.getData(), new StatusCodeError('', 500));
+  });
+
   it('Get named items', async () => {
     const values = await sheet.getNamedItems();
-    assert.deepEqual(values, sampleSheet.namedItems);
+    assert.deepEqual(values, [{ name: 'alice', value: '$A2', comment: 'none' }]);
   });
   it('Get named item', async () => {
     const name = 'alice';
     const values = await sheet.getNamedItem(name);
-    assert.deepEqual(values, sampleSheet.namedItems[0]);
+    assert.deepEqual(values, { name: 'alice', value: '$A2', comment: 'none' });
   });
   it('Add named item', async () => {
     const namedItem = { name: 'bob', value: '$B2', comment: 'none' };
     await sheet.addNamedItem(namedItem.name, namedItem.value, namedItem.comment);
-    assert.deepEqual(namedItem, sampleSheet.namedItems[sampleSheet.namedItems.length - 1]);
+    assert.deepEqual(namedItem, {
+      comment: 'none',
+      name: 'bob',
+      value: '$B2',
+    });
   });
   it('Delete named item', async () => {
     const name = 'alice';
     await sheet.deleteNamedItem(name);
-    const index = sampleSheet.namedItems.findIndex((item) => item.name === name);
+    const index = oneDrive.workbooks[0].data.sheets[0].namedItems
+      .findIndex((item) => item.name === name);
     assert.equal(index, -1);
   });
   it('Get table names', async () => {
     const values = await sheet.getTableNames();
-    assert.deepEqual(values, sampleSheet.tableNames);
+    assert.deepEqual(values, ['table']);
   });
   it('Get used range address', async () => {
     const range = sheet.usedRange();
@@ -96,7 +83,7 @@ describe('Worksheet Tests', () => {
   it('Get all data', async () => {
     const range = sheet.usedRange();
     const address = await range.getData();
-    assert.deepEqual(address, sampleSheet.usedRange);
+    assert.deepEqual(address, oneDrive.workbooks[0].data.sheets[0].usedRange);
   });
   it('Get column names', async () => {
     const range = sheet.usedRange();

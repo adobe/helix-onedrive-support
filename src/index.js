@@ -10,7 +10,9 @@
  * governing permissions and limitations under the License.
  */
 const OneDrive = require('./OneDrive.js');
+const OneDriveMock = require('./OneDriveMock.js');
 
 module.exports = {
   OneDrive,
+  OneDriveMock,
 };
