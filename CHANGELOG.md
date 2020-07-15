@@ -1,3 +1,10 @@
+# [2.7.0](https://github.com/adobe/helix-onedrive-support/compare/v2.6.0...v2.7.0) (2020-07-15)
+
+
+### Features
+
+* **test:** add MockOneDrive for emulating excel workbooks ([5995ca2](https://github.com/adobe/helix-onedrive-support/commit/5995ca28aaf61ecdc14920e6baacc01d3009acdb))
+
 # [2.6.0](https://github.com/adobe/helix-onedrive-support/compare/v2.5.1...v2.6.0) (2020-07-14)
 
 
