@@ -15,16 +15,18 @@
 'use strict';
 
 const assert = require('assert');
-const MockOneDrive = require('./MockOneDrive.js');
+const OneDriveMock = require('../src/OneDriveMock.js');
 const exampleBook = require('./fixtures/book.js');
+const StatusCodeError = require('../src/StatusCodeError.js');
 
 describe('Table Tests', () => {
   let table;
   let sampleTable;
+  let book;
   beforeEach(() => {
-    const oneDrive = new MockOneDrive()
+    const oneDrive = new OneDriveMock()
       .registerWorkbook('my-drive', 'my-item', exampleBook);
-    const book = oneDrive.getWorkbook();
+    book = oneDrive.getWorkbook();
     table = book.table('table');
     [sampleTable] = oneDrive.workbooks[0].data.tables;
   });
@@ -34,7 +36,12 @@ describe('Table Tests', () => {
     assert.equal(sampleTable.name, 'table');
     await table.rename(name);
     assert.equal(sampleTable.name, 'table1');
-    console.log(exampleBook);
+  });
+
+  it('Rename a table that does not exist', async () => {
+    const name = 'table1';
+    table = book.table('table-not-exist');
+    await assert.rejects(async () => table.rename(name), new StatusCodeError('', 500));
   });
 
   it('Get header names of table', async () => {
@@ -95,5 +102,8 @@ describe('Table Tests', () => {
     const values = await table.getColumn('Name');
     assert.deepEqual(values[0], [sampleTable.headerNames[index]]);
     assert.deepEqual(values[5], [sampleTable.rows[4][index]]);
+  });
+  it('Get column in table that does not exist', async () => {
+    await assert.rejects(table.getColumn('Foobar'), new StatusCodeError('Column name not found: Foobar', 400));
   });
 });

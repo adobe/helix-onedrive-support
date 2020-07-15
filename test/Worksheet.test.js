@@ -16,17 +16,29 @@
 
 const assert = require('assert');
 
-const MockOneDrive = require('./MockOneDrive.js');
+const OneDriveMock = require('../src/OneDriveMock.js');
+const StatusCodeError = require('../src/StatusCodeError.js');
 const exampleBook = require('./fixtures/book.js');
 
 describe('Worksheet Tests', () => {
   let sheet;
   let oneDrive;
+  let book;
   beforeEach(() => {
-    oneDrive = new MockOneDrive()
+    oneDrive = new OneDriveMock()
       .registerWorkbook('my-drive', 'my-item', exampleBook);
-    const book = oneDrive.getWorkbook();
+    book = oneDrive.getWorkbook();
     sheet = book.worksheet('sheet');
+  });
+
+  it('Get the sheet data', async () => {
+    const { name } = await sheet.getData();
+    assert.equal(name, 'sheet');
+  });
+
+  it('Get a sheet that does not exist fails.', async () => {
+    sheet = book.worksheet('sheet-not-exist');
+    await assert.rejects(async () => sheet.getData(), new StatusCodeError('', 500));
   });
 
   it('Get named items', async () => {

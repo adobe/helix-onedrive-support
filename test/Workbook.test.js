@@ -15,7 +15,8 @@
 'use strict';
 
 const assert = require('assert');
-const MockOneDrive = require('./MockOneDrive.js');
+const OneDriveMock = require('../src/OneDriveMock.js');
+const StatusCodeError = require('../src/StatusCodeError.js');
 const exampleBook = require('./fixtures/book.js');
 
 const TEST_SHARE_LINK = 'https://adobe.sharepoint.com/:x:/r/sites/cg-helix/Shared%20Documents/data-embed-unit-tests/example-data.xlsx';
@@ -25,7 +26,7 @@ describe('Workbook Tests', () => {
   let sampleBook;
   let oneDrive;
   beforeEach(() => {
-    oneDrive = new MockOneDrive()
+    oneDrive = new OneDriveMock()
       .registerWorkbook('my-drive', 'my-item', exampleBook)
       .registerShareLink(TEST_SHARE_LINK, 'my-drive', 'my-item');
     book = oneDrive.getWorkbook();
@@ -36,6 +37,25 @@ describe('Workbook Tests', () => {
     const item = await oneDrive.getDriveItemFromShareLink(TEST_SHARE_LINK);
     const workbook = oneDrive.getWorkbook(item);
     assert.equal(workbook.uri, '/drives/my-drive/items/my-item/workbook');
+  });
+
+  it('Get workbook via invalid sharelink failed', async () => {
+    await assert.rejects(async () => oneDrive.getDriveItemFromShareLink('/not-found'), new StatusCodeError('/not-found', 404));
+  });
+
+  it('Get non registered workbook fails', async () => {
+    book = oneDrive.getWorkbook({
+      id: 'foo',
+      parentReference: {
+        driveId: 'bar',
+      },
+    });
+    await assert.rejects(async () => book.getWorksheetNames(), new StatusCodeError('', 500));
+  });
+
+  it('Get the workbook data', async () => {
+    const { name } = await book.getData();
+    assert.equal(name, 'book');
   });
 
   it('Get sheet names', async () => {
