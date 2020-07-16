@@ -56,11 +56,29 @@ export declare class OneDrive extends EventEmitter {
 
   /**
    * Encodes the sharing url into a token that can be used to access drive items.
-   * @param {string} sharingUrl A sharing URL from OneDrive
+   * @param {string|URL} sharingUrl A sharing URL from OneDrive
    * @see https://docs.microsoft.com/en-us/onedrive/developer/rest-api/api/shares_get?view=odsp-graph-online#encoding-sharing-urls
    * @returns {string} an id for a shared item.
    */
-  static encodeSharingUrl(sharingUrl: string): string;
+  static encodeSharingUrl(sharingUrl: string|URL): string;
+
+  /**
+   * Returns a onedrive uri for the given drive item. the uri has the format:
+   * `onedrive:/drives/<driveId>/items/<itemId>`
+   *
+   * @param {DriveItem} driveItem
+   * @returns {URL} An url representing the drive item
+   */
+  static driveItemToURL(driveItem: DriveItem): URL;
+
+  /**
+   * Returns a partial drive item from the given url. The urls needs to have the format:
+   * `onedrive:/drives/<driveId>/items/<itemId>`
+   *
+   * @param {URL|string} url The url of the drive item.
+   * @return {DriveItem} A (partial) drive item.
+   */
+  static driveItemFromURL(url: URL): DriveItem;
 
   /**
    * Creates a new OneDrive helper.
@@ -101,9 +119,14 @@ export declare class OneDrive extends EventEmitter {
 
   me(): Promise<GraphResult>;
 
-  resolveShareLink(sharingUrl: string): Promise<GraphResult>;
+  resolveShareLink(sharingUrl: string|URL): Promise<GraphResult>;
 
-  getDriveItemFromShareLink(sharingUrl: string): Promise<GraphResult>;
+  /**
+   * Returns a drive item from the given share link or onedrive uri.
+   * @param {string|URL} url The share link url or a onedrive uri.
+   * @see OneDrive.driveItemToURL
+   */
+  getDriveItemFromShareLink(url: string|URL): Promise<DriveItem>;
 
   listChildren(folderItem: DriveItem, relPath?: string): Promise<GraphResult>;
 

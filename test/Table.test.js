@@ -41,7 +41,7 @@ describe('Table Tests', () => {
   it('Rename a table that does not exist', async () => {
     const name = 'table1';
     table = book.table('table-not-exist');
-    await assert.rejects(async () => table.rename(name), new StatusCodeError('', 500));
+    await assert.rejects(async () => table.rename(name), new StatusCodeError('table-not-exist', 404));
   });
 
   it('Get header names of table', async () => {

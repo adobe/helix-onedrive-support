@@ -38,7 +38,7 @@ describe('Worksheet Tests', () => {
 
   it('Get a sheet that does not exist fails.', async () => {
     sheet = book.worksheet('sheet-not-exist');
-    await assert.rejects(async () => sheet.getData(), new StatusCodeError('', 500));
+    await assert.rejects(async () => sheet.getData(), new StatusCodeError('sheet-not-exist', 404));
   });
 
   it('Get named items', async () => {

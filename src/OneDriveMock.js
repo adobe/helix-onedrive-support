@@ -11,6 +11,7 @@
  */
 const Workbook = require('./Workbook.js');
 const StatusCodeError = require('./StatusCodeError.js');
+const { driveItemFromURL, driveItemToURL } = require('./utils.js');
 
 /**
  * Handle the `namedItems` operation on a workbook / worksheet
@@ -178,7 +179,10 @@ class OneDriveMock {
    * @see OneDrive#getDriveItemFromShareLink
    */
   async getDriveItemFromShareLink(uri) {
-    const driveItem = this.sharelinks[uri];
+    let driveItem = OneDriveMock.driveItemFromURL(uri);
+    if (!driveItem) {
+      driveItem = this.sharelinks[uri];
+    }
     if (!driveItem) {
       throw new StatusCodeError(uri, 404);
     }
@@ -250,4 +254,7 @@ class OneDriveMock {
   }
 }
 
-module.exports = OneDriveMock;
+module.exports = Object.assign(OneDriveMock, {
+  driveItemToURL,
+  driveItemFromURL,
+});
