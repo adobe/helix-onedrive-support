@@ -39,8 +39,14 @@ describe('Workbook Tests', () => {
     assert.equal(workbook.uri, '/drives/my-drive/items/my-item/workbook');
   });
 
+  it('Get workbook via onedrive uri', async () => {
+    const item = await oneDrive.getDriveItemFromShareLink('onedrive:/drives/my-drive/items/my-item');
+    const workbook = oneDrive.getWorkbook(item);
+    assert.equal(workbook.uri, '/drives/my-drive/items/my-item/workbook');
+  });
+
   it('Get workbook via invalid sharelink failed', async () => {
-    await assert.rejects(async () => oneDrive.getDriveItemFromShareLink('/not-found'), new StatusCodeError('/not-found', 404));
+    await assert.rejects(async () => oneDrive.getDriveItemFromShareLink('https://foo.com/not-found'), new StatusCodeError('https://foo.com/not-found', 404));
   });
 
   it('Get non registered workbook fails', async () => {
@@ -50,7 +56,7 @@ describe('Workbook Tests', () => {
         driveId: 'bar',
       },
     });
-    await assert.rejects(async () => book.getWorksheetNames(), new StatusCodeError('', 500));
+    await assert.rejects(async () => book.getWorksheetNames(), new StatusCodeError('not found', 404));
   });
 
   it('Get the workbook data', async () => {

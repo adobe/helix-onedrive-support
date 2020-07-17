@@ -14,10 +14,10 @@
 const EventEmitter = require('events');
 const { AuthenticationContext } = require('adal-node');
 const rp = require('request-promise-native');
-const url = require('url');
 
 const Workbook = require('./Workbook.js');
 const StatusCodeError = require('./StatusCodeError.js');
+const { driveItemFromURL, driveItemToURL } = require('./utils.js');
 
 const AZ_AUTHORITY_HOST_URL = 'https://login.windows.net';
 const AZ_RESOURCE = 'https://graph.microsoft.com'; // '00000002-0000-0000-c000-000000000000'; ??
@@ -255,7 +255,7 @@ class OneDrive extends EventEmitter {
    */
   static encodeSharingUrl(sharingUrl) {
     const base64 = Buffer
-      .from(sharingUrl, 'utf-8')
+      .from(String(sharingUrl), 'utf-8')
       .toString('base64')
       .replace(/=/, '')
       .replace(/\//, '_')
@@ -293,7 +293,11 @@ class OneDrive extends EventEmitter {
   /**
    */
   async getDriveItemFromShareLink(sharingUrl) {
-    let driveItem = shareItemCache.get(sharingUrl);
+    let driveItem = OneDrive.driveItemFromURL(sharingUrl);
+    if (driveItem) {
+      return driveItem;
+    }
+    driveItem = shareItemCache.get(sharingUrl);
     if (!driveItem) {
       driveItem = await this.resolveShareLink(sharingUrl);
       shareItemCache.set(sharingUrl, driveItem);
@@ -488,13 +492,13 @@ class OneDrive extends EventEmitter {
         items = items.concat(value);
         if (nextLink) {
           // not the last page, we have a next link
-          const nextToken = url.parse(nextLink, true).query.token;
+          const nextToken = new URL(nextLink).searchParams.get('token');
           next = `${resource}/delta?token=${nextToken}`;
         } else if (deltaLink) {
           // last page, we have a next link
           return {
             changes: items,
-            token: url.parse(deltaLink, true).query.token,
+            token: new URL(deltaLink).searchParams.get('token'),
           };
         } else {
           throw new Error('Received response with neither next nor delta link.');
@@ -507,6 +511,8 @@ class OneDrive extends EventEmitter {
   }
 }
 
-OneDrive.MAX_SUBSCRIPTION_EXPIRATION_TIME = MAX_SUBSCRIPTION_EXPIRATION_TIME;
-
-module.exports = OneDrive;
+module.exports = Object.assign(OneDrive, {
+  MAX_SUBSCRIPTION_EXPIRATION_TIME,
+  driveItemToURL,
+  driveItemFromURL,
+});

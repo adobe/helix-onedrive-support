@@ -42,7 +42,7 @@ class Worksheet extends NamedItemContainer {
       return result.value;
     } catch (e) {
       this.log.error(e);
-      throw new StatusCodeError(e.msg, 500);
+      throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
 
@@ -54,7 +54,7 @@ class Worksheet extends NamedItemContainer {
       return result.value.map((v) => v.name);
     } catch (e) {
       this.log.error(e);
-      throw new StatusCodeError(e.msg, 500);
+      throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
 

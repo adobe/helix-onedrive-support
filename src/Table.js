@@ -51,7 +51,7 @@ class Table {
       return result;
     } catch (e) {
       this.log.error(getActualError(e));
-      throw new StatusCodeError(e.msg, 500);
+      throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
 
@@ -62,7 +62,7 @@ class Table {
       return result.values[0];
     } catch (e) {
       this.log.error(getActualError(e));
-      throw new StatusCodeError(e.msg, 500);
+      throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
 
@@ -73,7 +73,7 @@ class Table {
       return result.value.map((v) => v.values[0]);
     } catch (e) {
       this.log.error(getActualError(e));
-      throw new StatusCodeError(e.msg, 500);
+      throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
 
@@ -99,7 +99,7 @@ class Table {
       return rowValues;
     } catch (e) {
       this.log.error(getActualError(e));
-      throw new StatusCodeError(e.msg, 500);
+      throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
 
