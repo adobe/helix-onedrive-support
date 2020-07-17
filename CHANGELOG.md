@@ -1,3 +1,10 @@
+# [2.8.0](https://github.com/adobe/helix-onedrive-support/compare/v2.7.0...v2.8.0) (2020-07-17)
+
+
+### Features
+
+* **onedrive:** add support for onedrive uri ([8ec07ec](https://github.com/adobe/helix-onedrive-support/commit/8ec07ec74ee49ebb67588df0ac2d455a82449021)), closes [#68](https://github.com/adobe/helix-onedrive-support/issues/68) [#69](https://github.com/adobe/helix-onedrive-support/issues/69)
+
 # [2.7.0](https://github.com/adobe/helix-onedrive-support/compare/v2.6.0...v2.7.0) (2020-07-15)
 
 
