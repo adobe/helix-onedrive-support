@@ -1,3 +1,10 @@
+# [2.9.0](https://github.com/adobe/helix-onedrive-support/compare/v2.8.0...v2.9.0) (2020-07-20)
+
+
+### Features
+
+* **1d:** allow empty relPath for getDriveItem() ([#73](https://github.com/adobe/helix-onedrive-support/issues/73)) ([0ccca04](https://github.com/adobe/helix-onedrive-support/commit/0ccca040a4ec3bbf0c233abfa49f3d59b8443ee3))
+
 # [2.8.0](https://github.com/adobe/helix-onedrive-support/compare/v2.7.0...v2.8.0) (2020-07-17)
 
 
