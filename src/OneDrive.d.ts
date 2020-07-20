@@ -130,7 +130,15 @@ export declare class OneDrive extends EventEmitter {
 
   listChildren(folderItem: DriveItem, relPath?: string): Promise<GraphResult>;
 
-  getDriveItem(folderItem: DriveItem, relPath: string, download?: boolean): Promise<GraphResult>;
+  /**
+   * Returns the drive item for the given folder id and rel path.
+   * If the relPath is empty, the folder item is returned.
+   *
+   * @param {DriveItem} folderItem Folder Item.
+   * @param {string} [relPath=''] Relative path of item to retrieved
+   * @param {boolean} [download=false] If {@code true} download the item instead.
+   */
+  getDriveItem(folderItem: DriveItem, relPath?: string, download?: boolean): Promise<GraphResult>;
 
   downloadDriveItem(driveItem: DriveItem): Promise<GraphResult>;
 
