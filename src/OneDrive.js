@@ -323,10 +323,12 @@ class OneDrive extends EventEmitter {
 
   /**
    */
-  async getDriveItem(folderItem, relPath, download = false) {
+  async getDriveItem(folderItem, relPath = '', download = false) {
     // eslint-disable-next-line no-param-reassign
     relPath = relPath.replace(/\/+$/, '');
-    const uri = `/drives/${folderItem.parentReference.driveId}/items/${folderItem.id}:${relPath}`;
+    const uri = relPath
+      ? `/drives/${folderItem.parentReference.driveId}/items/${folderItem.id}:${relPath}`
+      : `/drives/${folderItem.parentReference.driveId}/items/${folderItem.id}`;
     try {
       if (download) {
         return (await this.getClient(true))
