@@ -106,4 +106,10 @@ describe('Table Tests', () => {
   it('Get column in table that does not exist', async () => {
     await assert.rejects(table.getColumn('Foobar'), new StatusCodeError('Column name not found: Foobar', 400));
   });
+  it('Delete row in table', async () => {
+    const index = 5;
+    const rowAfter = sampleTable.rows[index + 1];
+    await table.deleteRow(index);
+    assert.deepEqual(rowAfter, sampleTable.rows[index]);
+  });
 });
