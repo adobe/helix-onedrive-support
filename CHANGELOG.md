@@ -1,3 +1,10 @@
+# [2.10.0](https://github.com/adobe/helix-onedrive-support/compare/v2.9.0...v2.10.0) (2020-08-15)
+
+
+### Features
+
+* **excel:** add Table.deleteRow() ([#77](https://github.com/adobe/helix-onedrive-support/issues/77)) ([ff01e99](https://github.com/adobe/helix-onedrive-support/commit/ff01e996c3544dd5b0e1d528178f43e668b6ffce))
+
 # [2.9.0](https://github.com/adobe/helix-onedrive-support/compare/v2.8.0...v2.9.0) (2020-07-20)
 
 
