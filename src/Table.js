@@ -161,6 +161,19 @@ class Table {
     }
   }
 
+  async deleteRow(index) {
+    try {
+      const client = await this._oneDrive.getClient();
+      await client({
+        uri: `${this.uri}/rows/itemAt(index=${index})`,
+        method: 'DELETE',
+      });
+    } catch (e) {
+      this.log.error(getActualError(e));
+      throw new StatusCodeError(e.message, e.statusCode || 500);
+    }
+  }
+
   async getRowCount() {
     try {
       const client = await this._oneDrive.getClient();

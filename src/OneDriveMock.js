@@ -88,6 +88,10 @@ function handleTable(sheet, segs, method, body) {
         if (index < 0 || index >= table.rows.length) {
           throw new StatusCodeError(`Index out of range: ${index}`, 400);
         }
+        if (method === 'DELETE') {
+          table.rows.splice(index, 1);
+          return null;
+        }
         if (body) {
           [table.rows[index]] = body.values;
         }

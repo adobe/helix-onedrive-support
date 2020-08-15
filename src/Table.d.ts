@@ -61,6 +61,12 @@ export declare interface Table {
   replaceRow(index: string, values: string): Promise<void>;
 
   /**
+   * Delete a row from the table
+   * @param index zero-based index of row
+   */
+  deleteRow(index: string): Promise<void>;
+
+  /**
    * Get the number of rows in the table, not including the header row
    * @returns number of rows
    */
