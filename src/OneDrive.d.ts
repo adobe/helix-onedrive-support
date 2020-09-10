@@ -140,6 +140,25 @@ export declare class OneDrive extends EventEmitter {
    */
   getDriveItem(folderItem: DriveItem, relPath?: string, download?: boolean): Promise<GraphResult>;
 
+  /**
+   * Tries to get the drive items for the given folder and relative path, by loading the files of
+   * the respective directory and returning the item with the best matching filename. Please note,
+   * that only the files are matched 'fuzzily' but not the folders. The rules for transforming the
+   * filenames to the name segment of the `relPath` are:
+   * - convert to lower case
+   * - replace all non-alphanumeric characters with a dash
+   * - remove all consecutive dashes
+   * - extensions are ignored, if the given path doesn't have one
+   *
+   * The result is an array of drive items that match the given path. They are ordered by the edit
+   * distance to the original name and then alphanumerically.
+   *
+   * @param folderItem
+   * @param relPath
+   * @returns {Promise<DriveItem[]>}
+   */
+  fuzzyGetDriveItem(folderItem: DriveItem, relPath?: string): Promise<DriveItem[]>;
+
   downloadDriveItem(driveItem: DriveItem): Promise<GraphResult>;
 
   /**

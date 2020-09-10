@@ -16,6 +16,7 @@
 
 const assert = require('assert');
 const OneDrive = require('../src/OneDrive.js');
+const MockDrive = require('../src/OneDriveMock.js');
 
 describe('OneDrive Tests', () => {
   it('throws when required parameters are not specified.', async () => {
@@ -78,5 +79,171 @@ describe('OneDrive Tests', () => {
   it('throws an error for onedrive with wrong format (missing items)', () => {
     assert.throws(() => OneDrive.driveItemFromURL('onedrive:/drives/drive-id/item-id'),
       new Error('URI not supported (missing \'items\' segment): onedrive:/drives/drive-id/item-id'));
+  });
+
+  it('fuzzyGetDriveItem returns folder item when relpath is missing', async () => {
+    const folderItem = OneDrive.driveItemFromURL('onedrive:/drives/123/items/456');
+
+    const data = {
+      value: {
+        folder: { childCount: 1 },
+        name: 'test',
+      },
+    };
+    const drive = new MockDrive()
+      .registerDriveItem('123', '456', data);
+    const res = await drive.fuzzyGetDriveItem(folderItem);
+
+    assert.deepEqual(res, [data.value]);
+  });
+
+  it('fuzzyGetDriveItem returns exact item', async () => {
+    const folderItem = OneDrive.driveItemFromURL('onedrive:/drives/123/items/456');
+    const data = {
+      value: [{
+        file: { mimeType: 'dummy' },
+        name: 'document.docx',
+      }],
+    };
+
+    const drive = new MockDrive()
+      .registerDriveItemChildren('123', '456', data);
+    const res = await drive.fuzzyGetDriveItem(folderItem, '/document.docx');
+
+    assert.deepEqual(res, [{
+      extension: 'docx',
+      file: {
+        mimeType: 'dummy',
+      },
+      fuzzyDistance: 0,
+      name: 'document.docx',
+    }]);
+  });
+
+  it('fuzzyGetDriveItem returns item for deep path', async () => {
+    const folderItem = OneDrive.driveItemFromURL('onedrive:/drives/123/items/456');
+    const data = {
+      value: [{
+        file: { mimeType: 'dummy' },
+        name: 'document.docx',
+      }],
+    };
+
+    const drive = new MockDrive()
+      .registerDriveItemChildren('123', '456:/publish/en:', data); // this is a bit a hack to trick OneDriveMock
+    const res = await drive.fuzzyGetDriveItem(folderItem, '/publish/en/document.docx');
+
+    assert.deepEqual(res, [{
+      extension: 'docx',
+      file: {
+        mimeType: 'dummy',
+      },
+      fuzzyDistance: 0,
+      name: 'document.docx',
+    }]);
+  });
+
+  it('fuzzyGetDriveItem returns empty array for non existing item', async () => {
+    const folderItem = OneDrive.driveItemFromURL('onedrive:/drives/123/items/456');
+    const data = {
+      value: [],
+    };
+
+    const drive = new MockDrive()
+      .registerDriveItemChildren('123', '456', data);
+    const res = await drive.fuzzyGetDriveItem(folderItem, '/document.docx');
+
+    assert.deepEqual(res, []);
+  });
+
+  it('fuzzyGetDriveItem returns matching items', async () => {
+    const folderItem = OneDrive.driveItemFromURL('onedrive:/drives/123/items/456');
+    const data = {
+      value: [{
+        file: { mimeType: 'dummy' },
+        name: 'My 1. Document.docx',
+      }, {
+        file: { mimeType: 'dummy' },
+        name: 'my-1-document.docx',
+      }, {
+        file: { mimeType: 'dummy' },
+        name: 'My-1-Document.docx',
+      }],
+    };
+
+    const drive = new MockDrive()
+      .registerDriveItemChildren('123', '456', data);
+    const res = await drive.fuzzyGetDriveItem(folderItem, '/my-1-document.docx');
+
+    assert.deepEqual(res, [
+      {
+        extension: 'docx',
+        file: { mimeType: 'dummy' },
+        fuzzyDistance: 0,
+        name: 'my-1-document.docx',
+      },
+      {
+        extension: 'docx',
+        file: { mimeType: 'dummy' },
+        fuzzyDistance: 2,
+        name: 'My-1-Document.docx',
+      },
+      {
+        extension: 'docx',
+        file: { mimeType: 'dummy' },
+        fuzzyDistance: 5,
+        name: 'My 1. Document.docx',
+      },
+    ]);
+  });
+
+  it('fuzzyGetDriveItem returns matching items w/o extension', async () => {
+    const folderItem = OneDrive.driveItemFromURL('onedrive:/drives/123/items/456');
+    const data = {
+      value: [{
+        file: { mimeType: 'dummy' },
+        name: 'My 1. Document.docx',
+      }, {
+        file: { mimeType: 'dummy' },
+        name: 'my-1-document.docx',
+      }, {
+        file: { mimeType: 'dummy' },
+        name: 'my-1-document.md',
+      }, {
+        file: { mimeType: 'dummy' },
+        name: 'My-1-Document.docx',
+      }],
+    };
+
+    const drive = new MockDrive()
+      .registerDriveItemChildren('123', '456', data);
+    const res = await drive.fuzzyGetDriveItem(folderItem, '/my-1-document');
+
+    assert.deepEqual(res, [
+      {
+        extension: 'md',
+        file: { mimeType: 'dummy' },
+        fuzzyDistance: 3,
+        name: 'my-1-document.md',
+      },
+      {
+        extension: 'docx',
+        file: { mimeType: 'dummy' },
+        fuzzyDistance: 5,
+        name: 'my-1-document.docx',
+      },
+      {
+        extension: 'docx',
+        file: { mimeType: 'dummy' },
+        fuzzyDistance: 7,
+        name: 'My-1-Document.docx',
+      },
+      {
+        extension: 'docx',
+        file: { mimeType: 'dummy' },
+        fuzzyDistance: 10,
+        name: 'My 1. Document.docx',
+      },
+    ]);
   });
 });

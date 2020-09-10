@@ -18,6 +18,7 @@ const rp = require('request-promise-native');
 const Workbook = require('./Workbook.js');
 const StatusCodeError = require('./StatusCodeError.js');
 const { driveItemFromURL, driveItemToURL } = require('./utils.js');
+const { splitByExtension, sanitize, editDistance } = require('./fuzzy-helper.js');
 
 const AZ_AUTHORITY_HOST_URL = 'https://login.windows.net';
 const AZ_RESOURCE = 'https://graph.microsoft.com'; // '00000002-0000-0000-c000-000000000000'; ??
@@ -319,6 +320,63 @@ class OneDrive extends EventEmitter {
       this.log.error(e);
       throw new StatusCodeError(e.msg, 500);
     }
+  }
+
+  /**
+   * Tries to get the drive items for the given folder and relative path, by loading the files of
+   * the respective directory and returning the item with the best matching filename. Please note,
+   * that only the files are matched 'fuzzily' but not the folders. The rules for transforming the
+   * filenames to the name segment of the `relPath` are:
+   * - convert to lower case
+   * - replace all non-alphanumeric characters with a dash
+   * - remove all consecutive dashes
+   * - extensions are ignored, if the given path doesn't have one
+   *
+   * The result is an array of drive items that match the given path. They are ordered by the edit
+   * distance to the original name and then alphanumerically.
+   *
+   * @param {DriveItem} folderItem
+   * @param {string} relPath
+   * @returns {Promise<DriveItem[]>}
+   */
+  async fuzzyGetDriveItem(folderItem, relPath = '') {
+    const idx = relPath.lastIndexOf('/');
+    if (idx < 0) {
+      const ret = await this.getDriveItem(folderItem, '', false);
+      // todo: add extra extension
+      return [ret.value];
+    }
+    const folderRelPath = relPath.substring(0, idx);
+    const name = relPath.substring(idx + 1);
+    const [baseName, ext] = splitByExtension(name);
+    const sanitizedName = sanitize(baseName);
+
+    const fileList = await this.listChildren(folderItem, folderRelPath);
+    const items = fileList.value.filter((item) => {
+      if (!item.file) {
+        return false;
+      }
+      const [itemName, itemExt] = splitByExtension(item.name);
+      // remember extension
+      // eslint-disable-next-line no-param-reassign
+      item.extension = itemExt;
+      if (ext && ext !== itemExt) {
+        // only match extension if given via relPath
+        return false;
+      }
+      const sanitizedItemName = sanitize(itemName);
+      if (sanitizedItemName !== sanitizedName) {
+        return false;
+      }
+      // compute edit distance
+      // eslint-disable-next-line no-param-reassign
+      item.fuzzyDistance = editDistance(name, item.name);
+      return true;
+    });
+
+    // sort items by edit distance
+    items.sort((i0, i1) => i0.fuzzyDistance - i1.fuzzyDistance);
+    return items;
   }
 
   /**
