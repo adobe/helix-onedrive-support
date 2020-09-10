@@ -1,3 +1,10 @@
+## [2.11.1](https://github.com/adobe/helix-onedrive-support/compare/v2.11.0...v2.11.1) (2020-09-10)
+
+
+### Bug Fixes
+
+* **error:** fix bug in StatusCodeError.getActualError ([#86](https://github.com/adobe/helix-onedrive-support/issues/86)) ([50b452c](https://github.com/adobe/helix-onedrive-support/commit/50b452cedd1272b0a48d981dbaf4725fe5079d73))
+
 # [2.11.0](https://github.com/adobe/helix-onedrive-support/compare/v2.10.1...v2.11.0) (2020-09-10)
 
 
