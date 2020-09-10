@@ -1,3 +1,10 @@
+# [2.11.0](https://github.com/adobe/helix-onedrive-support/compare/v2.10.1...v2.11.0) (2020-09-10)
+
+
+### Features
+
+* **onedrive:** add support for author friendly file names ([#85](https://github.com/adobe/helix-onedrive-support/issues/85)) ([ce53dee](https://github.com/adobe/helix-onedrive-support/commit/ce53deeb5d5a9991535b770c40696da25010de5e)), closes [#83](https://github.com/adobe/helix-onedrive-support/issues/83)
+
 ## [2.10.1](https://github.com/adobe/helix-onedrive-support/compare/v2.10.0...v2.10.1) (2020-09-10)
 
 
