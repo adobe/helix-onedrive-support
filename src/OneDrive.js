@@ -239,11 +239,10 @@ class OneDrive extends EventEmitter {
 
   async me() {
     try {
-      return (await this.getClient())
-        .get('/me');
+      return await (await this.getClient()).get('/me');
     } catch (e) {
-      this.log.error(e);
-      throw new StatusCodeError(e.msg, 500);
+      this.log.error(StatusCodeError.getActualError(e));
+      throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
 
@@ -269,11 +268,10 @@ class OneDrive extends EventEmitter {
     const link = OneDrive.encodeSharingUrl(sharingUrl);
     this.log.info(`resolving sharelink ${sharingUrl} (${link})`);
     try {
-      return (await this.getClient())
-        .get(`/shares/${link}/driveItem`);
+      return await (await this.getClient()).get(`/shares/${link}/driveItem`);
     } catch (e) {
-      this.log.error(e);
-      throw new StatusCodeError(e.msg, 500);
+      this.log.error(StatusCodeError.getActualError(e));
+      throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
 
@@ -282,11 +280,10 @@ class OneDrive extends EventEmitter {
   async getDriveRootItem(driveId) {
     const uri = `/drives/${driveId}/root`;
     try {
-      return (await this.getClient())
-        .get(uri);
+      return await (await this.getClient()).get(uri);
     } catch (e) {
-      this.log.error(e);
-      throw new StatusCodeError(e.msg, 500);
+      this.log.error(StatusCodeError.getActualError(e));
+      throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
 
@@ -313,11 +310,10 @@ class OneDrive extends EventEmitter {
     const rootPath = `/drives/${folderItem.parentReference.driveId}/items/${folderItem.id}`;
     const uri = !relPath ? `${rootPath}/children` : `${rootPath}:${relPath}:/children`;
     try {
-      return (await this.getClient())
-        .get(uri);
+      return await (await this.getClient()).get(uri);
     } catch (e) {
-      this.log.error(e);
-      throw new StatusCodeError(e.msg, 500);
+      this.log.error(StatusCodeError.getActualError(e));
+      throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
 
@@ -334,11 +330,10 @@ class OneDrive extends EventEmitter {
         return (await this.getClient(true))
           .get(`${uri}:/content`);
       }
-      return (await this.getClient())
-        .get(uri);
+      return await (await this.getClient()).get(uri);
     } catch (e) {
-      this.log.error(e);
-      throw new StatusCodeError(e.msg, 500);
+      this.log.error(StatusCodeError.getActualError(e));
+      throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
 
@@ -347,11 +342,10 @@ class OneDrive extends EventEmitter {
   async downloadDriveItem(driveItem) {
     const uri = `/drives/${driveItem.parentReference.driveId}/items/${driveItem.id}/content`;
     try {
-      return (await this.getClient(true))
-        .get(uri);
+      return await (await this.getClient(true)).get(uri);
     } catch (e) {
-      this.log.error(e);
-      throw new StatusCodeError(e.msg, 500);
+      this.log.error(StatusCodeError.getActualError(e));
+      throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
 
@@ -370,7 +364,7 @@ class OneDrive extends EventEmitter {
     const uri = `/drives/${driveItem.parentReference.driveId}/items/${driveItem.id}${relPath}/content`;
     try {
       const client = await this.getClient(true);
-      return client({
+      return await client({
         uri,
         method: 'PUT',
         body: buffer,
@@ -378,10 +372,9 @@ class OneDrive extends EventEmitter {
           'Content-Type': 'application/octet-stream',
         },
       });
-      // return buffer.pipe(client.put(uri));
     } catch (e) {
-      this.log.error(e);
-      throw new StatusCodeError(e.msg, 500);
+      this.log.error(StatusCodeError.getActualError(e));
+      throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
 
@@ -395,11 +388,10 @@ class OneDrive extends EventEmitter {
    */
   async listSubscriptions() {
     try {
-      return (await this.getClient())
-        .get('/subscriptions');
+      return await (await this.getClient()).get('/subscriptions');
     } catch (e) {
-      this.log.error(e);
-      throw new StatusCodeError(e.msg, 500);
+      this.log.error(StatusCodeError.getActualError(e));
+      throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
 
@@ -413,7 +405,7 @@ class OneDrive extends EventEmitter {
     expiresIn = MAX_SUBSCRIPTION_EXPIRATION_TIME,
   }) {
     try {
-      return (await this.getClient())({
+      return await (await this.getClient())({
         uri: '/subscriptions',
         method: 'POST',
         body: {
@@ -429,8 +421,8 @@ class OneDrive extends EventEmitter {
         },
       });
     } catch (e) {
-      this.log.error(e);
-      throw new StatusCodeError(e.msg, 500);
+      this.log.error(StatusCodeError.getActualError(e));
+      throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
 
@@ -439,7 +431,7 @@ class OneDrive extends EventEmitter {
   async refreshSubscription(id, expiresIn = MAX_SUBSCRIPTION_EXPIRATION_TIME) {
     this.log.debug(`refreshing expiration time of subscription ${id} by ${expiresIn} ms`);
     try {
-      return (await this.getClient())({
+      return await (await this.getClient())({
         uri: `/subscriptions/${id}`,
         method: 'PATCH',
         body: {
@@ -451,8 +443,8 @@ class OneDrive extends EventEmitter {
         },
       });
     } catch (e) {
-      this.log.error(e);
-      throw new StatusCodeError(e.msg, 500);
+      this.log.error(StatusCodeError.getActualError(e));
+      throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
 
@@ -461,13 +453,13 @@ class OneDrive extends EventEmitter {
   async deleteSubscription(id) {
     this.log.debug(`deleting subscription ${id}`);
     try {
-      return (await this.getClient())({
+      return await (await this.getClient())({
         uri: `/subscriptions/${id}`,
         method: 'DELETE',
       });
     } catch (e) {
-      this.log.error(e);
-      throw new StatusCodeError(e.msg, 500);
+      this.log.error(StatusCodeError.getActualError(e));
+      throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
 
@@ -507,8 +499,8 @@ class OneDrive extends EventEmitter {
         }
       }
     } catch (e) {
-      this.log.error(e);
-      throw new StatusCodeError(e.msg, 500);
+      this.log.error(StatusCodeError.getActualError(e));
+      throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
 }

@@ -15,6 +15,19 @@
  * @private
  */
 class StatusCodeError extends Error {
+  /**
+   * Returns the actual error, recursively descending through all error properties.
+   *
+   * @param {Error} e error caught
+   */
+  static getActualError(e) {
+    let error = e;
+    while ('error' in error) {
+      error = error.error;
+    }
+    return error;
+  }
+
   constructor(msg, statusCode) {
     super(msg);
     this.statusCode = statusCode;

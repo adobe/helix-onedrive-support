@@ -11,19 +11,6 @@
  */
 const StatusCodeError = require('./StatusCodeError.js');
 
-/**
- * Returns the actual error, recursively descending through all error properties.
- *
- * @param {Error} e error caught
- */
-function getActualError(e) {
-  let error = e;
-  while ('error' in error) {
-    error = error.error;
-  }
-  return error;
-}
-
 class Table {
   constructor(oneDrive, prefix, name, log) {
     this._oneDrive = oneDrive;
@@ -50,7 +37,7 @@ class Table {
       this._name = name;
       return result;
     } catch (e) {
-      this.log.error(getActualError(e));
+      this.log.error(StatusCodeError.getActualError(e));
       throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
@@ -61,7 +48,7 @@ class Table {
       const result = await client.get(`${this.uri}/headerRowRange`);
       return result.values[0];
     } catch (e) {
-      this.log.error(getActualError(e));
+      this.log.error(StatusCodeError.getActualError(e));
       throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
@@ -72,7 +59,7 @@ class Table {
       const result = await client.get(`${this.uri}/rows`);
       return result.value.map((v) => v.values[0]);
     } catch (e) {
-      this.log.error(getActualError(e));
+      this.log.error(StatusCodeError.getActualError(e));
       throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
@@ -98,7 +85,7 @@ class Table {
       rowValues.shift();
       return rowValues;
     } catch (e) {
-      this.log.error(getActualError(e));
+      this.log.error(StatusCodeError.getActualError(e));
       throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
@@ -109,7 +96,7 @@ class Table {
       const result = await client.get(`${this.uri}/rows/itemAt(index=${index})`);
       return result.values[0];
     } catch (e) {
-      this.log.error(getActualError(e));
+      this.log.error(StatusCodeError.getActualError(e));
       throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
@@ -136,7 +123,7 @@ class Table {
       });
       return result.index;
     } catch (e) {
-      this.log.error(getActualError(e));
+      this.log.error(StatusCodeError.getActualError(e));
       throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
@@ -156,7 +143,7 @@ class Table {
         },
       });
     } catch (e) {
-      this.log.error(getActualError(e));
+      this.log.error(StatusCodeError.getActualError(e));
       throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
@@ -169,7 +156,7 @@ class Table {
         method: 'DELETE',
       });
     } catch (e) {
-      this.log.error(getActualError(e));
+      this.log.error(StatusCodeError.getActualError(e));
       throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
@@ -180,7 +167,7 @@ class Table {
       const result = await client.get(`${this.uri}/dataBodyRange?$select=rowCount`);
       return result.rowCount;
     } catch (e) {
-      this.log.error(getActualError(e));
+      this.log.error(StatusCodeError.getActualError(e));
       throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
@@ -191,7 +178,7 @@ class Table {
       const result = await client.get(`${this.uri}/columns('${name}')`);
       return result.values;
     } catch (e) {
-      this.log.error(getActualError(e));
+      this.log.error(StatusCodeError.getActualError(e));
       throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
