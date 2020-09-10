@@ -22,7 +22,7 @@ class StatusCodeError extends Error {
    */
   static getActualError(e) {
     let error = e;
-    while ('error' in error) {
+    while (error.error) {
       error = error.error;
     }
     return error;
