@@ -1,3 +1,10 @@
+## [2.10.1](https://github.com/adobe/helix-onedrive-support/compare/v2.10.0...v2.10.1) (2020-09-10)
+
+
+### Bug Fixes
+
+* **drive:** ensure proper error is logged ([#84](https://github.com/adobe/helix-onedrive-support/issues/84)) ([8a1a415](https://github.com/adobe/helix-onedrive-support/commit/8a1a4153c4c5327375b8c9afe5b8a038cf971f94)), closes [#79](https://github.com/adobe/helix-onedrive-support/issues/79)
+
 # [2.10.0](https://github.com/adobe/helix-onedrive-support/compare/v2.9.0...v2.10.0) (2020-08-15)
 
 
