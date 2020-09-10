@@ -32,7 +32,7 @@ class Workbook extends NamedItemContainer {
       const result = await client.get(this._uri);
       return result.value;
     } catch (e) {
-      this.log.error(e);
+      this.log.error(StatusCodeError.getActualError(e));
       throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
@@ -44,7 +44,7 @@ class Workbook extends NamedItemContainer {
       const result = await client.get(`${this._uri}/worksheets`);
       return result.value.map((v) => v.name);
     } catch (e) {
-      this.log.error(e);
+      this.log.error(StatusCodeError.getActualError(e));
       throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
@@ -60,7 +60,7 @@ class Workbook extends NamedItemContainer {
       const result = await client.get(`${this._uri}/tables`);
       return result.value.map((v) => v.name);
     } catch (e) {
-      this.log.error(e);
+      this.log.error(StatusCodeError.getActualError(e));
       throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }

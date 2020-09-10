@@ -11,19 +11,6 @@
  */
 const StatusCodeError = require('./StatusCodeError.js');
 
-/**
- * Returns the actual error, recursively descending through all error properties.
- *
- * @param {Error} e error caught
- */
-function getActualError(e) {
-  let error = e;
-  while ('error' in error) {
-    error = error.error;
-  }
-  return error;
-}
-
 class Range {
   constructor(oneDrive, uri, log) {
     this._oneDrive = oneDrive;
@@ -48,7 +35,7 @@ class Range {
       }
       return this._data;
     } catch (e) {
-      this.log.error(getActualError(e));
+      this.log.error(StatusCodeError.getActualError(e));
       throw new StatusCodeError(e.message, e.statusCode || 500);
     }
   }
