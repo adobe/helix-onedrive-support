@@ -9,6 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+const OneDrive = require('./OneDrive.js');
 const Workbook = require('./Workbook.js');
 const StatusCodeError = require('./StatusCodeError.js');
 const { driveItemFromURL, driveItemToURL } = require('./utils.js');
@@ -138,10 +139,14 @@ function handleTable(sheet, segs, method, body) {
 /**
  * Mock OneDrive client that supports some of the operations the `OneDrive` class does.
  */
-class OneDriveMock {
+class OneDriveMock extends OneDrive {
   constructor() {
+    super({
+      clientId: 'mock-id',
+    });
     this.workbooks = [];
     this.sharelinks = {};
+    this.driveItems = {};
   }
 
   /**
@@ -158,6 +163,30 @@ class OneDriveMock {
       // poor mans deep clone
       data: JSON.parse(JSON.stringify(data)),
     });
+    return this;
+  }
+
+  /**
+   * Registers a mock drive item
+   * @param {string} driveId The drive id
+   * @param {string} itemId the item id
+   * @param {object} data Mock item data
+   * @returns {OneDriveMock} this
+   */
+  registerDriveItem(driveId, itemId, data) {
+    this.driveItems[`/drives/${driveId}/items/${itemId}`] = data;
+    return this;
+  }
+
+  /**
+   * Registers a mock drive item child list
+   * @param {string} driveId The drive id
+   * @param {string} itemId the item id
+   * @param {object} data Mock item data
+   * @returns {OneDriveMock} this
+   */
+  registerDriveItemChildren(driveId, itemId, data) {
+    this.driveItems[`/drives/${driveId}/items/${itemId}/children`] = data;
     return this;
   }
 
@@ -208,6 +237,9 @@ class OneDriveMock {
    */
   getClient() {
     const f = ({ method, uri, body }) => {
+      if (uri in this.driveItems) {
+        return this.driveItems[uri];
+      }
       const wb = this.workbooks.find((w) => (uri.startsWith(w.uri)));
       if (!wb) {
         throw new StatusCodeError('not found', 404);
