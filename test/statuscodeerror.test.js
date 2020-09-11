@@ -41,4 +41,24 @@ describe('StatusCodeError Tests', () => {
     error.error = null;
     assert.equal(StatusCodeError.getActualError(error), error);
   });
+
+  it('fromError gets details from inner error', async () => {
+    const error = new StatusCodeError('not found', 404);
+    error.error = {
+      code: '1234',
+    };
+    const e = StatusCodeError.fromError(error);
+    assert.deepEqual(e, { statusCode: 404, details: { code: '1234' } });
+  });
+
+  it('fromError cleans details', async () => {
+    const error = new StatusCodeError('not found', 404);
+    error.error = {
+      request: 'foo',
+      response: 'resp',
+      options: 'bar',
+    };
+    const e = StatusCodeError.fromError(error);
+    assert.deepEqual(e, { statusCode: 404 });
+  });
 });
