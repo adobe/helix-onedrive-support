@@ -16,6 +16,25 @@
  */
 class StatusCodeError extends Error {
   /**
+   * Converts a request-promise error to a status code error w/o revealing too much details.
+   * @param {Error} e The original error
+   * @returns {StatusCodeError} status code error
+   */
+  static fromError(e) {
+    const err = new StatusCodeError(e.msg, e.statusCode || 500);
+    const details = StatusCodeError.getActualError(e);
+    if (details) {
+      delete details.options;
+      delete details.request;
+      delete details.response;
+      if (Object.keys(details).length) {
+        err.details = details;
+      }
+    }
+    return err;
+  }
+
+  /**
    * Returns the actual error, recursively descending through all error properties.
    *
    * @param {Error} e error caught

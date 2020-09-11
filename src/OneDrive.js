@@ -242,8 +242,9 @@ class OneDrive extends EventEmitter {
     try {
       return await (await this.getClient()).get('/me');
     } catch (e) {
-      this.log.error(StatusCodeError.getActualError(e));
-      throw new StatusCodeError(e.message, e.statusCode || 500);
+      const error = StatusCodeError.fromError(e);
+      this.log[(error.statusCode === 404) ? 'warn' : 'error'](error);
+      throw error;
     }
   }
 
@@ -271,8 +272,9 @@ class OneDrive extends EventEmitter {
     try {
       return await (await this.getClient()).get(`/shares/${link}/driveItem`);
     } catch (e) {
-      this.log.error(StatusCodeError.getActualError(e));
-      throw new StatusCodeError(e.message, e.statusCode || 500);
+      const error = StatusCodeError.fromError(e);
+      this.log[(error.statusCode === 404) ? 'warn' : 'error'](error);
+      throw error;
     }
   }
 
@@ -283,8 +285,9 @@ class OneDrive extends EventEmitter {
     try {
       return await (await this.getClient()).get(uri);
     } catch (e) {
-      this.log.error(StatusCodeError.getActualError(e));
-      throw new StatusCodeError(e.message, e.statusCode || 500);
+      const error = StatusCodeError.fromError(e);
+      this.log[(error.statusCode === 404) ? 'warn' : 'error'](error);
+      throw error;
     }
   }
 
@@ -313,8 +316,9 @@ class OneDrive extends EventEmitter {
     try {
       return await (await this.getClient()).get(uri);
     } catch (e) {
-      this.log.error(StatusCodeError.getActualError(e));
-      throw new StatusCodeError(e.message, e.statusCode || 500);
+      const error = StatusCodeError.fromError(e);
+      this.log[(error.statusCode === 404) ? 'warn' : 'error'](error);
+      throw error;
     }
   }
 
@@ -390,8 +394,9 @@ class OneDrive extends EventEmitter {
       }
       return await (await this.getClient()).get(uri);
     } catch (e) {
-      this.log.error(StatusCodeError.getActualError(e));
-      throw new StatusCodeError(e.message, e.statusCode || 500);
+      const error = StatusCodeError.fromError(e);
+      this.log[(error.statusCode === 404) ? 'warn' : 'error'](error);
+      throw error;
     }
   }
 
@@ -402,8 +407,9 @@ class OneDrive extends EventEmitter {
     try {
       return await (await this.getClient(true)).get(uri);
     } catch (e) {
-      this.log.error(StatusCodeError.getActualError(e));
-      throw new StatusCodeError(e.message, e.statusCode || 500);
+      const error = StatusCodeError.fromError(e);
+      this.log[(error.statusCode === 404) ? 'warn' : 'error'](error);
+      throw error;
     }
   }
 
@@ -431,8 +437,9 @@ class OneDrive extends EventEmitter {
         },
       });
     } catch (e) {
-      this.log.error(StatusCodeError.getActualError(e));
-      throw new StatusCodeError(e.message, e.statusCode || 500);
+      const error = StatusCodeError.fromError(e);
+      this.log[(error.statusCode === 404) ? 'warn' : 'error'](error);
+      throw error;
     }
   }
 
@@ -448,8 +455,9 @@ class OneDrive extends EventEmitter {
     try {
       return await (await this.getClient()).get('/subscriptions');
     } catch (e) {
-      this.log.error(StatusCodeError.getActualError(e));
-      throw new StatusCodeError(e.message, e.statusCode || 500);
+      const error = StatusCodeError.fromError(e);
+      this.log[(error.statusCode === 404) ? 'warn' : 'error'](error);
+      throw error;
     }
   }
 
@@ -479,8 +487,9 @@ class OneDrive extends EventEmitter {
         },
       });
     } catch (e) {
-      this.log.error(StatusCodeError.getActualError(e));
-      throw new StatusCodeError(e.message, e.statusCode || 500);
+      const error = StatusCodeError.fromError(e);
+      this.log[(error.statusCode === 404) ? 'warn' : 'error'](error);
+      throw error;
     }
   }
 
@@ -501,8 +510,9 @@ class OneDrive extends EventEmitter {
         },
       });
     } catch (e) {
-      this.log.error(StatusCodeError.getActualError(e));
-      throw new StatusCodeError(e.message, e.statusCode || 500);
+      const error = StatusCodeError.fromError(e);
+      this.log[(error.statusCode === 404) ? 'warn' : 'error'](error);
+      throw error;
     }
   }
 
@@ -516,8 +526,9 @@ class OneDrive extends EventEmitter {
         method: 'DELETE',
       });
     } catch (e) {
-      this.log.error(StatusCodeError.getActualError(e));
-      throw new StatusCodeError(e.message, e.statusCode || 500);
+      const error = StatusCodeError.fromError(e);
+      this.log[(error.statusCode === 404) ? 'warn' : 'error'](error);
+      throw error;
     }
   }
 
@@ -557,8 +568,9 @@ class OneDrive extends EventEmitter {
         }
       }
     } catch (e) {
-      this.log.error(StatusCodeError.getActualError(e));
-      throw new StatusCodeError(e.message, e.statusCode || 500);
+      const error = StatusCodeError.fromError(e);
+      this.log[(error.statusCode === 404) ? 'warn' : 'error'](error);
+      throw error;
     }
   }
 }
