@@ -1,3 +1,10 @@
+# [2.12.0](https://github.com/adobe/helix-onedrive-support/compare/v2.11.1...v2.12.0) (2020-09-11)
+
+
+### Features
+
+* **drive:** even better error handling ([#87](https://github.com/adobe/helix-onedrive-support/issues/87)) ([0818a0c](https://github.com/adobe/helix-onedrive-support/commit/0818a0c38a6fdb56ca8e3f62eaa334257c5421d1))
+
 ## [2.11.1](https://github.com/adobe/helix-onedrive-support/compare/v2.11.0...v2.11.1) (2020-09-10)
 
 
