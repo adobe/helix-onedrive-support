@@ -146,8 +146,10 @@ export declare class OneDrive extends EventEmitter {
    * that only the files are matched 'fuzzily' but not the folders. The rules for transforming the
    * filenames to the name segment of the `relPath` are:
    * - convert to lower case
+   * - normalize all unicode characters
    * - replace all non-alphanumeric characters with a dash
    * - remove all consecutive dashes
+   * - remove all leading and trailing dashes
    * - extensions are ignored, if the given path doesn't have one
    *
    * The result is an array of drive items that match the given path. They are ordered by the edit

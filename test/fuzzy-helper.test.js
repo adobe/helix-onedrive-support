@@ -45,15 +45,27 @@ describe('splitByExtension Tests', () => {
 
 describe('sanitize Tests', () => {
   it('sanitize works for empty string', () => {
-    assert.equal('', sanitize(''));
+    assert.equal(sanitize(''), '');
   });
 
   it('sanitize transform string to lower case', () => {
-    assert.equal('mydocument', sanitize('MyDocument'));
+    assert.equal(sanitize('MyDocument'), 'mydocument');
   });
 
   it('sanitize transforms non-alpha to dashes', () => {
-    assert.equal('my-2-document', sanitize('My 2. Document'));
+    assert.equal(sanitize('My 2. Document'), 'my-2-document');
+  });
+
+  it('sanitize removes leading dashes', () => {
+    assert.equal(sanitize('.My 2. Document'), 'my-2-document');
+  });
+
+  it('sanitize removes trailing dashes', () => {
+    assert.equal(sanitize('.My 2. Document-'), 'my-2-document');
+  });
+
+  it('sanitize normalizes unicode', () => {
+    assert.equal(sanitize('Föhren Smürd'), 'fohren-smurd');
   });
 });
 
