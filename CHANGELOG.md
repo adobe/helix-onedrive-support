@@ -1,3 +1,10 @@
+## [2.12.1](https://github.com/adobe/helix-onedrive-support/compare/v2.12.0...v2.12.1) (2020-09-15)
+
+
+### Bug Fixes
+
+* **core:** normalize unicode characters ([#90](https://github.com/adobe/helix-onedrive-support/issues/90)) ([b2bfcb9](https://github.com/adobe/helix-onedrive-support/commit/b2bfcb992fe14bf07dd3dda06e40716a0e28f5f3)), closes [#83](https://github.com/adobe/helix-onedrive-support/issues/83)
+
 # [2.12.0](https://github.com/adobe/helix-onedrive-support/compare/v2.11.1...v2.12.0) (2020-09-11)
 
 
