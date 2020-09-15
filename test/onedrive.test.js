@@ -167,6 +167,9 @@ describe('OneDrive Tests', () => {
         name: 'my-1-document.docx',
       }, {
         file: { mimeType: 'dummy' },
+        name: 'my-1-document".docx',
+      }, {
+        file: { mimeType: 'dummy' },
         name: 'My-1-Document.docx',
       }],
     };
@@ -181,6 +184,12 @@ describe('OneDrive Tests', () => {
         file: { mimeType: 'dummy' },
         fuzzyDistance: 0,
         name: 'my-1-document.docx',
+      },
+      {
+        extension: 'docx',
+        file: { mimeType: 'dummy' },
+        fuzzyDistance: 1,
+        name: 'my-1-document".docx',
       },
       {
         extension: 'docx',

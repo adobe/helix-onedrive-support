@@ -25,14 +25,21 @@ function splitByExtension(name) {
 /**
  * Sanitizes the given string by :
  * - convert to lower case
+ * - normalize all unicode characters
  * - replace all non-alphanumeric characters with a dash
  * - remove all consecutive dashes
+ * - remove all leading and trailing dashes
  *
  * @param {string} name
  * @returns {string} sanitized name
  */
 function sanitize(name) {
-  return name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  return name
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
 }
 
 /**
