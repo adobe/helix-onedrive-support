@@ -255,4 +255,32 @@ describe('OneDrive Tests', () => {
       },
     ]);
   });
+
+  it('fuzzyGetDriveItem iterates over pages', async () => {
+    const folderItem = OneDrive.driveItemFromURL('onedrive:/drives/123/items/456');
+    const data = {
+      value: [],
+    };
+    for (let i = 0; i < 5000; i += 1) {
+      data.value.push({
+        file: { mimeType: 'dummy' },
+        name: `dummy-document-${i}.docx`,
+      });
+    }
+    data.value.push({
+      file: { mimeType: 'dummy' },
+      name: 'My 1. Document.docx',
+    });
+
+    const drive = new MockDrive()
+      .registerDriveItemChildren('123', '456', data);
+    const res = await drive.fuzzyGetDriveItem(folderItem, '/my-1-document');
+
+    assert.deepEqual(res, [{
+      extension: 'docx',
+      file: { mimeType: 'dummy' },
+      fuzzyDistance: 10,
+      name: 'My 1. Document.docx',
+    }]);
+  });
 });

@@ -237,8 +237,30 @@ class OneDriveMock extends OneDrive {
    */
   getClient() {
     const f = ({ method, uri, body }) => {
-      if (uri in this.driveItems) {
-        return this.driveItems[uri];
+      const url = new URL(`https://dummy.org${uri}`);
+      if (url.pathname in this.driveItems) {
+        const result = this.driveItems[url.pathname];
+        if (!Array.isArray(result.value)) {
+          return result;
+        }
+        const data = result.value;
+        const max = Number.parseInt(url.searchParams.get('$top') || 200, 10);
+        // note that we abuse the skiptoken a `skip` param here and totally ignore the real `$skip`
+        const skiptoken = Number.parseInt(url.searchParams.get('$skiptoken') || 0, 10);
+        const len = data.length - skiptoken;
+        if (len > max) {
+          url.searchParams.set('$skiptoken', skiptoken + max);
+          return {
+            value: data.slice(skiptoken, skiptoken + max),
+            '@odata.nextLink': url.toString(),
+          };
+        } else if (skiptoken) {
+          return {
+            value: data.slice(skiptoken, skiptoken + len),
+          };
+        } else {
+          return result;
+        }
       }
       const wb = this.workbooks.find((w) => (uri.startsWith(w.uri)));
       if (!wb) {

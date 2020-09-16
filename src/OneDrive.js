@@ -268,7 +268,7 @@ class OneDrive extends EventEmitter {
    */
   async resolveShareLink(sharingUrl) {
     const link = OneDrive.encodeSharingUrl(sharingUrl);
-    this.log.info(`resolving sharelink ${sharingUrl} (${link})`);
+    this.log.debug(`resolving sharelink ${sharingUrl} (${link})`);
     try {
       return await (await this.getClient()).get(`/shares/${link}/driveItem`);
     } catch (e) {
@@ -308,11 +308,15 @@ class OneDrive extends EventEmitter {
 
   /**
    */
-  async listChildren(folderItem, relPath = '') {
+  async listChildren(folderItem, relPath = '', query = {}) {
     // eslint-disable-next-line no-param-reassign
     relPath = relPath.replace(/\/+$/, '');
     const rootPath = `/drives/${folderItem.parentReference.driveId}/items/${folderItem.id}`;
-    const uri = !relPath ? `${rootPath}/children` : `${rootPath}:${relPath}:/children`;
+    let uri = !relPath ? `${rootPath}/children` : `${rootPath}:${relPath}:/children`;
+    const qry = new URLSearchParams(query).toString();
+    if (qry) {
+      uri = `${uri}?${qry}`;
+    }
     try {
       return await (await this.getClient()).get(uri);
     } catch (e) {
@@ -351,8 +355,26 @@ class OneDrive extends EventEmitter {
     const [baseName, ext] = splitByExtension(name);
     const sanitizedName = sanitize(baseName);
 
-    const fileList = await this.listChildren(folderItem, folderRelPath);
-    const items = fileList.value.filter((item) => {
+    const query = {
+      $top: 999,
+      $select: 'name,parentReference,file,id',
+    };
+    let fileList = [];
+    do {
+      // eslint-disable-next-line no-await-in-loop
+      const result = await this.listChildren(folderItem, folderRelPath, query);
+      fileList = fileList.concat(result.value);
+      if (result['@odata.nextLink']) {
+        const nextLink = new URL(result['@odata.nextLink']);
+        query.$skiptoken = nextLink.searchParams.get('$skiptoken');
+        this.log.debug(`fetching more children with skiptoken ${query.$skiptoken}`);
+      } else {
+        query.$skiptoken = null;
+      }
+    } while (query.$skiptoken);
+
+    this.log.debug(`loaded ${fileList.length} children from ${relPath}`);
+    const items = fileList.filter((item) => {
       if (!item.file) {
         return false;
       }

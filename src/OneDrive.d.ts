@@ -128,7 +128,7 @@ export declare class OneDrive extends EventEmitter {
    */
   getDriveItemFromShareLink(url: string|URL): Promise<DriveItem>;
 
-  listChildren(folderItem: DriveItem, relPath?: string): Promise<GraphResult>;
+  listChildren(folderItem: DriveItem, relPath?: string, query?: object): Promise<GraphResult>;
 
   /**
    * Returns the drive item for the given folder id and rel path.
