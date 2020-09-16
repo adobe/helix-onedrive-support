@@ -1,3 +1,10 @@
+## [2.12.2](https://github.com/adobe/helix-onedrive-support/compare/v2.12.1...v2.12.2) (2020-09-16)
+
+
+### Bug Fixes
+
+* **1d:** fuzzyGetItem should respect pagination ([#92](https://github.com/adobe/helix-onedrive-support/issues/92)) ([fe63a0e](https://github.com/adobe/helix-onedrive-support/commit/fe63a0ee422dd3c939f9c7324bd4df68b88c0a0f)), closes [#91](https://github.com/adobe/helix-onedrive-support/issues/91)
+
 ## [2.12.1](https://github.com/adobe/helix-onedrive-support/compare/v2.12.0...v2.12.1) (2020-09-15)
 
 
