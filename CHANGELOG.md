@@ -1,3 +1,19 @@
+# [3.0.0](https://github.com/adobe/helix-onedrive-support/compare/v2.12.2...v3.0.0) (2020-09-21)
+
+
+### Bug Fixes
+
+* **caching:** ensure that token cache is invalidated after password change ([#58](https://github.com/adobe/helix-onedrive-support/issues/58)) ([240230c](https://github.com/adobe/helix-onedrive-support/commit/240230cbcd9461031fdeaaff911958789859227a)), closes [#57](https://github.com/adobe/helix-onedrive-support/issues/57)
+
+
+### BREAKING CHANGES
+
+* **caching:** changed API and switched token cache to ADALs internal memory cache
+                 - the 'tokens' event now contains the all entries of the memory cache
+                 - 'accessToken' and 'expiresOn' removed from options
+                 - new method: OneDrive.loadTokenCache() to populate the memory cache
+                 - 'login()', 'getAccessToken()', 'acquireToken()' now return the entire TokenResponse
+
 ## [2.12.2](https://github.com/adobe/helix-onedrive-support/compare/v2.12.1...v2.12.2) (2020-09-16)
 
 
