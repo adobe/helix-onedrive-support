@@ -15,8 +15,13 @@
 'use strict';
 
 const assert = require('assert');
+const nock = require('nock');
 const OneDrive = require('../src/OneDrive.js');
 const MockDrive = require('../src/OneDriveMock.js');
+
+const AZ_AUTHORITY_HOST_URL = 'https://login.windows.net';
+
+const { TEST_CLIENT_ID, TEST_USER, TEST_PASSWORD } = process.env;
 
 describe('OneDrive Tests', () => {
   it('throws when required parameters are not specified.', async () => {
@@ -283,4 +288,41 @@ describe('OneDrive Tests', () => {
       name: 'My 1. Document.docx',
     }]);
   });
+
+  it('can get the user profile: me', async () => {
+    const expected = {
+      '@odata.context': 'https://graph.microsoft.com/v1.0/$metadata#users/$entity',
+      businessPhones: [],
+      displayName: 'Project Helix Integration',
+      givenName: 'Project',
+      id: 'c96b3b1f-5489-4639-8100-d67739af7d3e',
+      mail: 'helix@adobe.com',
+      surname: 'Helix Integration',
+      userPrincipalName: 'helix@adobe.com',
+    };
+
+    nock(AZ_AUTHORITY_HOST_URL)
+      .post('/common/oauth2/token?api-version=1.0')
+      .reply(200, {
+        token_type: 'Bearer',
+        refresh_token: 'dummy',
+        access_token: 'dummy',
+        expires_in: 81000,
+      })
+      .get('/common/UserRealm/test-user?api-version=1.0')
+      .reply(200, {
+        account_type: 'managed',
+      });
+    nock('https://graph.microsoft.com/v1.0')
+      .get('/me')
+      .reply(200, expected);
+
+    const od = new OneDrive({
+      clientId: TEST_CLIENT_ID || 'foobar',
+      username: TEST_USER || 'test-user',
+      password: TEST_PASSWORD || 'test-password',
+    });
+    const me = await od.me();
+    assert.deepEqual(me, expected);
+  }).timeout(5000);
 });

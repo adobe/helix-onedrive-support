@@ -11,6 +11,7 @@
  */
 import { EventEmitter } from 'events';
 import { Workbook } from './Workbook';
+import { TokenResponse } from 'adal-node';
 
 /**
  * Logger interface
@@ -23,8 +24,6 @@ export declare interface OneDriveOptions {
   clientSecret?: string;
   refreshToken?: string;
   log?: Logger;
-  accessToken?: string;
-  expiresOn?: number;
   tenant?: string;
   username?: string;
   password?: string;
@@ -102,18 +101,24 @@ export declare class OneDrive extends EventEmitter {
   authorityUrl: string;
 
   /**
+   * Adds entries to the token cache
+   * @param {TokenResponse[]} entries
+   */
+  loadTokenCache(entries: TokenResponse[]): Promise<void>;
+
+  /**
    * Performs a login using an interactive flow which prompts the user to open a browser window and
    * enter the authorization code.
    * @params {function} [onCode] - optional function that gets invoked after code was retrieved.
-   * @returns {Promise<void>}
+   * @returns {Promise<TokenResponse>}
    */
-  login(onCode: Function): Promise<any>;
+  login(onCode: Function): Promise<TokenResponse>;
 
-  getAccessToken(autoRefresh: boolean): Promise<string>;
+  getAccessToken(autoRefresh: boolean): Promise<TokenResponse>;
 
   createLoginUrl(): string;
 
-  acquireToken(redirectUri: string, code: string): Promise<void>;
+  acquireToken(redirectUri: string, code: string): Promise<TokenResponse>;
 
   getClient(): Promise<Request>;
 

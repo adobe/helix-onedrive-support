@@ -12,6 +12,7 @@
 
 // eslint-disable-next-line max-classes-per-file
 const EventEmitter = require('events');
+const util = require('util');
 const { AuthenticationContext } = require('adal-node');
 const rp = require('request-promise-native');
 
@@ -32,12 +33,6 @@ const AZ_DEFAULT_TENANT = 'common';
  * @memberOf OneDrive
  */
 const MAX_SUBSCRIPTION_EXPIRATION_TIME = 4230 * 60 * 1000;
-
-/**
- * Remember the access token for future action invocations.
- * @private
- */
-let tokenCache = {};
 
 /**
  * map that caches share item data. key is a sharing url, the value a drive item.
@@ -71,19 +66,13 @@ class OneDrive extends EventEmitter {
     this._log = opts.log || console;
     this.tenant = opts.tenant || AZ_DEFAULT_TENANT;
 
-    if (!tokenCache.accessToken) {
-      tokenCache.accessToken = opts.accessToken || '';
-      tokenCache.expiresOn = opts.expiresOn || undefined;
-    }
-    if (!tokenCache.refreshToken) {
-      tokenCache.refreshToken = this.refreshToken;
-    }
-
     if (!this.clientId) {
       throw new Error('Missing clientId.');
     }
-
     this.authContext = new AuthenticationContext(this.authorityUrl);
+    const { cache } = this.authContext;
+    cache.find.promise = util.promisify(cache.find.bind(cache));
+    cache.add.promise = util.promisify(cache.add.bind(cache));
   }
 
   /**
@@ -99,16 +88,25 @@ class OneDrive extends EventEmitter {
   /**
    * @returns {boolean}
    */
-  // eslint-disable-next-line class-methods-use-this
   get authenticated() {
-    return !!tokenCache.accessToken;
+    // eslint-disable-next-line no-underscore-dangle
+    return this.authContext.cache._entries.length > 0;
+  }
+
+  /**
+   * Adds entries to the token cache
+   * @param {TokenResponse[]} entries
+   * @return this;
+   */
+  async loadTokenCache(entries) {
+    return this.authContext.cache.add.promise(entries);
   }
 
   /**
    * Performs a login using an interactive flow which prompts the user to open a browser window and
    * enter the authorization code.
    * @params {function} [onCode] - optional function that gets invoked after code was retrieved.
-   * @returns {Promise<void>}
+   * @returns {Promise<TokenResponse>}
    */
   async login(onCode) {
     const { log, authContext: context } = this;
@@ -135,9 +133,9 @@ class OneDrive extends EventEmitter {
             log.error('Error while requesting access token with device code', err);
             reject(err);
           } else {
-            tokenCache = response;
-            this.emit('tokens', response);
-            resolve(tokenCache.accessToken);
+            // eslint-disable-next-line no-underscore-dangle
+            this.emit('tokens', context.cache._entries);
+            resolve(response);
           }
         });
     });
@@ -145,22 +143,8 @@ class OneDrive extends EventEmitter {
 
   /**
    */
-  async getAccessToken(autoRefresh = true) {
+  async getAccessToken() {
     const { log, authContext: context } = this;
-
-    if (!tokenCache.accessToken) {
-      if (!autoRefresh) {
-        return '';
-      }
-    } else {
-      const expires = Date.parse(tokenCache.expiresOn);
-      if (expires >= (Date.now())) {
-        log.debug('access token still valid.');
-        return tokenCache.accessToken;
-      }
-      log.info('access token is expired. Requesting new one.');
-    }
-
     return new Promise((resolve, reject) => {
       const callback = (err, response) => {
         if (err) {
@@ -168,14 +152,14 @@ class OneDrive extends EventEmitter {
           reject(err);
         } else {
           log.debug('Token acquired.');
-          tokenCache = response;
-          this.emit('tokens', response);
-          resolve(tokenCache.accessToken);
+          // eslint-disable-next-line no-underscore-dangle
+          this.emit('tokens', context.cache._entries);
+          resolve(response);
         }
       };
-      if (tokenCache.refreshToken) {
+      if (this.refreshToken) {
         log.debug('acquire token with refresh token.');
-        context.acquireTokenWithRefreshToken(tokenCache.refreshToken, this.clientId,
+        context.acquireTokenWithRefreshToken(this.refreshToken, this.clientId,
           this.clientSecret, AZ_RESOURCE, callback);
       } else if (this.username && this.password) {
         log.debug('acquire token with ROPC.');
@@ -206,14 +190,29 @@ class OneDrive extends EventEmitter {
         AZ_RESOURCE,
         this.clientId,
         this.clientSecret,
-        (err, response) => {
+        async (err, response) => {
           if (err) {
             log.error('Error while getting token with authorization code.', err);
             reject(err);
           } else {
-            tokenCache = response;
-            this.emit('tokens', response);
-            resolve();
+            // somehow adal doesn't add the clientId and authority to the this
+            // eslint-disable-next-line no-underscore-dangle
+            if (!response._clientId) {
+              // eslint-disable-next-line no-underscore-dangle
+              response._clientId = this.clientId;
+              // eslint-disable-next-line no-underscore-dangle
+              response._authority = this.authorityUrl;
+            }
+            const { cache } = context;
+            const found = await cache.find.promise({
+              refreshToken: response.refreshToken,
+            });
+            if (!found.length) {
+              await cache.add.promise([response]);
+            }
+            // eslint-disable-next-line no-underscore-dangle
+            this.emit('tokens', context.cache._entries);
+            resolve(response);
           }
         },
       );
@@ -223,12 +222,12 @@ class OneDrive extends EventEmitter {
   /**
    */
   async getClient(raw = false) {
-    const token = await this.getAccessToken();
+    const { accessToken } = await this.getAccessToken();
     const opts = {
       baseUrl: 'https://graph.microsoft.com/v1.0',
       json: true,
       auth: {
-        bearer: token,
+        bearer: accessToken,
       },
     };
     if (raw) {
