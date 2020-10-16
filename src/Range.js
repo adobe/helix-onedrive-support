@@ -53,7 +53,8 @@ class Range {
   }
 
   async getRowsAsObjects() {
-    const { values } = await this.getData();
+    const values = await this.getValues();
+
     const columnNames = values[0];
     const rows = values.map((row) => columnNames.reduce((obj, name, index) => {
       // eslint-disable-next-line no-param-reassign
@@ -63,6 +64,25 @@ class Range {
     // discard first row
     rows.shift();
     return rows;
+  }
+
+  async getValues() {
+    if (!this._values) {
+      if (this._data) {
+        this._values = this._data.values;
+      } else {
+        // optimization: ask for the values, only, not the complete range object
+        try {
+          const client = await this._oneDrive.getClient();
+          this.log.debug(`get range values from ${this.uri}`);
+          this._values = (await client.get(`${this.uri}?$select=values`)).values;
+        } catch (e) {
+          this.log.error(StatusCodeError.getActualError(e));
+          throw new StatusCodeError(e.message, e.statusCode || 500);
+        }
+      }
+    }
+    return this._values;
   }
 }
 
