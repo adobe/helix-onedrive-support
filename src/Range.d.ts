@@ -46,4 +46,9 @@ export declare interface Range {
    * and the row values as value.
    */
   getRowsAsObjects(): Promise<Array<object>>;
+
+  /**
+   * Returns the values of the range.
+   */
+  getValues(): Promise<Array<object>>;
 }
