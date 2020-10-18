@@ -1,3 +1,10 @@
+## [3.0.1](https://github.com/adobe/helix-onedrive-support/compare/v3.0.0...v3.0.1) (2020-10-18)
+
+
+### Bug Fixes
+
+* asking for values first should just request those ([#100](https://github.com/adobe/helix-onedrive-support/issues/100)) ([591ed9d](https://github.com/adobe/helix-onedrive-support/commit/591ed9dd9864164c7aa4d5104078cfa142d5a748))
+
 # [3.0.0](https://github.com/adobe/helix-onedrive-support/compare/v2.12.2...v3.0.0) (2020-09-21)
 
 
