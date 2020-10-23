@@ -1,3 +1,10 @@
+# [3.1.0](https://github.com/adobe/helix-onedrive-support/compare/v3.0.1...v3.1.0) (2020-10-23)
+
+
+### Features
+
+* **1d:** add filesize ([#103](https://github.com/adobe/helix-onedrive-support/issues/103)) ([9ec27c8](https://github.com/adobe/helix-onedrive-support/commit/9ec27c8e5507dac103b05dd250507716e201b476)), closes [#102](https://github.com/adobe/helix-onedrive-support/issues/102)
+
 ## [3.0.1](https://github.com/adobe/helix-onedrive-support/compare/v3.0.0...v3.0.1) (2020-10-18)
 
 
