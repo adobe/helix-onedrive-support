@@ -356,7 +356,7 @@ class OneDrive extends EventEmitter {
 
     const query = {
       $top: 999,
-      $select: 'name,parentReference,file,id',
+      $select: 'name,parentReference,file,id,size',
     };
     let fileList = [];
     do {
