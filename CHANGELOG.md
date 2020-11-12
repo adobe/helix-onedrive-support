@@ -1,3 +1,10 @@
+## [3.1.1](https://github.com/adobe/helix-onedrive-support/compare/v3.1.0...v3.1.1) (2020-11-12)
+
+
+### Bug Fixes
+
+* **1d:** fuzzyGetDriveItem should sort by edit distance on base name ([#108](https://github.com/adobe/helix-onedrive-support/issues/108)) ([84df580](https://github.com/adobe/helix-onedrive-support/commit/84df58095d8267863cd9bef8b7ab65467448822e))
+
 # [3.1.0](https://github.com/adobe/helix-onedrive-support/compare/v3.0.1...v3.1.0) (2020-10-23)
 
 
