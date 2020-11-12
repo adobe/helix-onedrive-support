@@ -391,12 +391,18 @@ class OneDrive extends EventEmitter {
       }
       // compute edit distance
       // eslint-disable-next-line no-param-reassign
-      item.fuzzyDistance = editDistance(name, item.name);
+      item.fuzzyDistance = editDistance(baseName, itemName);
       return true;
     });
 
-    // sort items by edit distance
-    items.sort((i0, i1) => i0.fuzzyDistance - i1.fuzzyDistance);
+    // sort items by edit distance first and 2nd by item name
+    items.sort((i0, i1) => {
+      let c = i0.fuzzyDistance - i1.fuzzyDistance;
+      if (c === 0) {
+        c = i0.name.localeCompare(i1.name);
+      }
+      return c;
+    });
     return items;
   }
 
