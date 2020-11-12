@@ -235,27 +235,27 @@ describe('OneDrive Tests', () => {
 
     assert.deepEqual(res, [
       {
+        extension: 'docx',
+        file: { mimeType: 'dummy' },
+        fuzzyDistance: 0,
+        name: 'my-1-document.docx',
+      },
+      {
         extension: 'md',
         file: { mimeType: 'dummy' },
-        fuzzyDistance: 3,
+        fuzzyDistance: 0,
         name: 'my-1-document.md',
       },
       {
         extension: 'docx',
         file: { mimeType: 'dummy' },
-        fuzzyDistance: 5,
-        name: 'my-1-document.docx',
-      },
-      {
-        extension: 'docx',
-        file: { mimeType: 'dummy' },
-        fuzzyDistance: 7,
+        fuzzyDistance: 2,
         name: 'My-1-Document.docx',
       },
       {
         extension: 'docx',
         file: { mimeType: 'dummy' },
-        fuzzyDistance: 10,
+        fuzzyDistance: 5,
         name: 'My 1. Document.docx',
       },
     ]);
@@ -284,7 +284,7 @@ describe('OneDrive Tests', () => {
     assert.deepEqual(res, [{
       extension: 'docx',
       file: { mimeType: 'dummy' },
-      fuzzyDistance: 10,
+      fuzzyDistance: 5,
       name: 'My 1. Document.docx',
     }]);
   });
