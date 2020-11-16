@@ -10,19 +10,19 @@ commands:
   setup:
     steps:
     - checkout
-    # - restore_cache:
-    #     keys:
-    #     - v1-dependencies-{{ arch }}-{{ checksum "package-lock.json" }}
+     - restore_cache:
+         keys:
+         - v2-dependencies-{{ arch }}-{{ checksum "package-lock.json" }}
     - run:
-        name: install npm 6.13.6
-        command: sudo npm -g install npm@6.13.6
+        name: install latest npm
+        command: sudo npm -g install npm@
     - run:
         name: Installing Dependencies
         command: npm ci
-    # - save_cache:
-    #     paths:
-    #     - node_modules
-    #     key: v1-dependencies-{{ arch }}-{{ checksum "package-lock.json" }}
+     - save_cache:
+         paths:
+         - node_modules
+         key: v2-dependencies-{{ arch }}-{{ checksum "package-lock.json" }}
     - run:
         name: prepare test git user
         command: git config --global user.email "circleci@example.com" && git config --global user.name "CircleCi Build"
@@ -48,35 +48,8 @@ jobs:
     - store_artifacts:
         path: junit
 
-  release:
-    executor: node10
-
-    steps:
-      - setup
-      - run:
-          name: revert changes to package-lock.json
-          command: git checkout -- package-lock.json
-
-      - run:
-          name: Check for Updated Package name
-          command: node -e "if (require('./package.json').name=='@adobe/helix-library') { process.exit(1) };"
-
-      - run:
-          name: Semantic Release
-          command: npm run semantic-release
-
 workflows:
   version: 2
   build:
     jobs:
     - build
-    # the release jobs needs a $NPM_TOKEN and $GH_TOKEN environment to be setup
-    # but this should be covered by the CircleCI contexts setting below
-    - release:
-        context: Project Helix
-        requires:
-        - build
-        filters:
-          branches:
-            # rename to `main` once the tokens have been setup
-            only: main
