@@ -126,7 +126,7 @@ class OneDrive extends EventEmitter {
       await onCode(code);
     }
 
-    await new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       context.acquireTokenWithDeviceCode(AZ_RESOURCE, this.clientId, code,
         (err, response) => {
           if (err) {
@@ -135,6 +135,7 @@ class OneDrive extends EventEmitter {
           } else {
             // eslint-disable-next-line no-underscore-dangle
             this.emit('tokens', context.cache._entries);
+            this.refreshToken = response.refreshToken;
             resolve(response);
           }
         });
