@@ -1,3 +1,10 @@
+## [3.1.2](https://github.com/adobe/helix-onedrive-support/compare/v3.1.1...v3.1.2) (2020-11-16)
+
+
+### Bug Fixes
+
+* **login:** set refresh token after device login ([#110](https://github.com/adobe/helix-onedrive-support/issues/110)) ([1d9b9ce](https://github.com/adobe/helix-onedrive-support/commit/1d9b9ce661d795f2e25d95b1d24ff7c18a90a81b))
+
 ## [3.1.1](https://github.com/adobe/helix-onedrive-support/compare/v3.1.0...v3.1.1) (2020-11-12)
 
 
