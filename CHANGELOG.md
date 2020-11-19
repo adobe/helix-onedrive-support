@@ -1,3 +1,10 @@
+## [3.1.3](https://github.com/adobe/helix-onedrive-support/compare/v3.1.2...v3.1.3) (2020-11-19)
+
+
+### Bug Fixes
+
+* **onedrive:** include webUrl in fuzzyGetDriveItem results ([#114](https://github.com/adobe/helix-onedrive-support/issues/114)) ([6cb3ec1](https://github.com/adobe/helix-onedrive-support/commit/6cb3ec1f9fdeb34797af5608dec2f3f062710f51))
+
 ## [3.1.2](https://github.com/adobe/helix-onedrive-support/compare/v3.1.1...v3.1.2) (2020-11-16)
 
 
