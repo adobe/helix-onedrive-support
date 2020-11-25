@@ -151,9 +151,7 @@ class OneDrive extends EventEmitter {
     }
 
     try {
-      const response = await context.acquireTokenWithDeviceCode(AZ_RESOURCE, this.clientId, code);
-      this.refreshToken = response.refreshToken;
-      return response;
+      return await context.acquireTokenWithDeviceCode(AZ_RESOURCE, this.clientId, code);
     } catch (e) {
       log.error('Error while requesting access token with device code', e);
       throw e;
