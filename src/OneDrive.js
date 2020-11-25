@@ -164,13 +164,8 @@ class OneDrive extends EventEmitter {
    */
   async getAccessToken() {
     const { log, authContext: context } = this;
-    // check if cached token is still valid
     try {
-      const response = await context.acquireToken(AZ_RESOURCE, this.username, this.clientId);
-      if (response) {
-        // todo: check validity
-        return response;
-      }
+      return await context.acquireToken(AZ_RESOURCE, this.username, this.clientId);
     } catch (e) {
       log.warn(`Unable to acquire token from cache: ${e}`);
     }
