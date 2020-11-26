@@ -1,3 +1,10 @@
+## [3.1.4](https://github.com/adobe/helix-onedrive-support/compare/v3.1.3...v3.1.4) (2020-11-26)
+
+
+### Bug Fixes
+
+* **auth:** ensure cached access token is reused ([09d7849](https://github.com/adobe/helix-onedrive-support/commit/09d7849fb7a4de08557f9f9ce4a76d68ad8f4e61))
+
 ## [3.1.3](https://github.com/adobe/helix-onedrive-support/compare/v3.1.2...v3.1.3) (2020-11-19)
 
 
