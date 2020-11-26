@@ -12,7 +12,7 @@
 
 // eslint-disable-next-line max-classes-per-file
 const EventEmitter = require('events');
-const util = require('util');
+const { promisify } = require('util');
 const { AuthenticationContext } = require('adal-node');
 const rp = require('request-promise-native');
 
@@ -70,9 +70,35 @@ class OneDrive extends EventEmitter {
       throw new Error('Missing clientId.');
     }
     this.authContext = new AuthenticationContext(this.authorityUrl);
+    [
+      'acquireUserCode',
+      'acquireToken',
+      'acquireTokenWithDeviceCode',
+      'acquireTokenWithRefreshToken',
+      'acquireTokenWithUsernamePassword',
+      'acquireTokenWithClientCredentials',
+    ].forEach((m) => {
+      this.authContext[m] = promisify(this.authContext[m].bind(this.authContext));
+    });
     const { cache } = this.authContext;
-    cache.find.promise = util.promisify(cache.find.bind(cache));
-    cache.add.promise = util.promisify(cache.add.bind(cache));
+    const originalAdd = cache.add;
+    cache.add = (entries, cb) => {
+      originalAdd.call(cache, entries, (...args) => {
+        // eslint-disable-next-line no-underscore-dangle
+        this.emit('tokens', cache._entries);
+        cb(...args);
+      });
+    };
+    const originalRemove = cache.remove;
+    cache.remove = (entries, cb) => {
+      originalRemove.call(cache, entries, (...args) => {
+        // eslint-disable-next-line no-underscore-dangle
+        this.emit('tokens', cache._entries);
+        cb(...args);
+      });
+    };
+    cache.add.promise = promisify(cache.add.bind(cache));
+    cache.find.promise = promisify(cache.find.bind(cache));
   }
 
   /**
@@ -110,68 +136,64 @@ class OneDrive extends EventEmitter {
    */
   async login(onCode) {
     const { log, authContext: context } = this;
-    const code = await new Promise((resolve, reject) => {
-      context.acquireUserCode(AZ_RESOURCE, this.clientId, 'en', (err, response) => {
-        if (err) {
-          log.error('Error while requesting user code', err);
-          reject(err);
-        } else {
-          resolve(response);
-        }
-      });
-    });
+
+    let code;
+    try {
+      code = await context.acquireUserCode(AZ_RESOURCE, this.clientId, 'en');
+    } catch (e) {
+      log.error('Error while requesting user code', e);
+      throw e;
+    }
 
     log.info(code.message);
     if (typeof onCode === 'function') {
       await onCode(code);
     }
 
-    return new Promise((resolve, reject) => {
-      context.acquireTokenWithDeviceCode(AZ_RESOURCE, this.clientId, code,
-        (err, response) => {
-          if (err) {
-            log.error('Error while requesting access token with device code', err);
-            reject(err);
-          } else {
-            // eslint-disable-next-line no-underscore-dangle
-            this.emit('tokens', context.cache._entries);
-            this.refreshToken = response.refreshToken;
-            resolve(response);
-          }
-        });
-    });
+    try {
+      return await context.acquireTokenWithDeviceCode(AZ_RESOURCE, this.clientId, code);
+    } catch (e) {
+      log.error('Error while requesting access token with device code', e);
+      throw e;
+    }
   }
 
   /**
    */
   async getAccessToken() {
     const { log, authContext: context } = this;
-    return new Promise((resolve, reject) => {
-      const callback = (err, response) => {
-        if (err) {
-          log.error('Error while refreshing access token', err);
-          reject(err);
-        } else {
-          log.debug('Token acquired.');
-          // eslint-disable-next-line no-underscore-dangle
-          this.emit('tokens', context.cache._entries);
-          resolve(response);
-        }
-      };
+    try {
+      return await context.acquireToken(AZ_RESOURCE, this.username, this.clientId);
+    } catch (e) {
+      log.warn(`Unable to acquire token from cache: ${e}`);
+    }
+
+    try {
       if (this.refreshToken) {
         log.debug('acquire token with refresh token.');
-        context.acquireTokenWithRefreshToken(this.refreshToken, this.clientId,
-          this.clientSecret, AZ_RESOURCE, callback);
+        const resp = await context.acquireTokenWithRefreshToken(
+          this.refreshToken, this.clientId, this.clientSecret, AZ_RESOURCE,
+        );
+        return await this.augmentAndCacheResponse(resp);
       } else if (this.username && this.password) {
         log.debug('acquire token with ROPC.');
-        context.acquireTokenWithUsernamePassword(AZ_RESOURCE, this.username, this.password,
-          this.clientId, callback);
-      } else {
+        return await context.acquireTokenWithUsernamePassword(
+          AZ_RESOURCE, this.username, this.password, this.clientId,
+        );
+      } else if (this.clientSecret) {
         log.debug('acquire token with client credentials.');
-        context.acquireTokenWithClientCredentials(AZ_RESOURCE, this.clientId, this.clientSecret,
-          callback);
+        return await context.acquireTokenWithClientCredentials(
+          AZ_RESOURCE, this.clientId, this.clientSecret,
+        );
+      } else {
+        const err = new StatusCodeError('No valid authentication credentials supplied.');
+        err.statusCode = 401;
+        throw err;
       }
-    });
+    } catch (e) {
+      log.error(`Error while refreshing access token ${e}`);
+      throw e;
+    }
   }
 
   /**
@@ -180,44 +202,38 @@ class OneDrive extends EventEmitter {
     return `${this.authorityUrl}/oauth2/authorize?response_type=code&scope=/.default&client_id=${this.clientId}&redirect_uri=${redirectUri}&state=${state}&resource=${AZ_RESOURCE}`;
   }
 
+  async augmentAndCacheResponse(response) {
+    // somehow adal doesn't add the clientId and authority to response
+    // eslint-disable-next-line no-underscore-dangle
+    if (!response._clientId) {
+      // eslint-disable-next-line no-underscore-dangle
+      response._clientId = this.clientId;
+      // eslint-disable-next-line no-underscore-dangle
+      response._authority = this.authorityUrl;
+    }
+    const found = await this.authContext.cache.find.promise({
+      refreshToken: response.refreshToken,
+    });
+    if (found.length) {
+      await this.authContext.cache.remove.promise(found);
+    }
+    await this.authContext.cache.add.promise([response]);
+    return response;
+  }
+
   /**
    */
   async acquireToken(redirectUri, code) {
     const { log, authContext: context } = this;
-    return new Promise((resolve, reject) => {
-      context.acquireTokenWithAuthorizationCode(
-        code,
-        redirectUri,
-        AZ_RESOURCE,
-        this.clientId,
-        this.clientSecret,
-        async (err, response) => {
-          if (err) {
-            log.error('Error while getting token with authorization code.', err);
-            reject(err);
-          } else {
-            // somehow adal doesn't add the clientId and authority to the this
-            // eslint-disable-next-line no-underscore-dangle
-            if (!response._clientId) {
-              // eslint-disable-next-line no-underscore-dangle
-              response._clientId = this.clientId;
-              // eslint-disable-next-line no-underscore-dangle
-              response._authority = this.authorityUrl;
-            }
-            const { cache } = context;
-            const found = await cache.find.promise({
-              refreshToken: response.refreshToken,
-            });
-            if (!found.length) {
-              await cache.add.promise([response]);
-            }
-            // eslint-disable-next-line no-underscore-dangle
-            this.emit('tokens', context.cache._entries);
-            resolve(response);
-          }
-        },
+    try {
+      const resp = await context.acquireTokenWithAuthorizationCode(
+        code, redirectUri, AZ_RESOURCE, this.clientId, this.clientSecret,
       );
-    });
+      return await this.augmentAndCacheResponse(resp);
+    } catch (e) {
+      log.error('Error while getting token with authorization code.', e);
+      throw e;
+    }
   }
 
   /**
