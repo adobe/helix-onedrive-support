@@ -98,6 +98,7 @@ class OneDrive extends EventEmitter {
       });
     };
     cache.add.promise = promisify(cache.add.bind(cache));
+    cache.remove.promise = promisify(cache.remove.bind(cache));
     cache.find.promise = promisify(cache.find.bind(cache));
   }
 
