@@ -1,3 +1,10 @@
+## [3.1.5](https://github.com/adobe/helix-onedrive-support/compare/v3.1.4...v3.1.5) (2020-11-26)
+
+
+### Bug Fixes
+
+* **auth:** cache.remove.promise is missing ([#118](https://github.com/adobe/helix-onedrive-support/issues/118)) ([cca3af3](https://github.com/adobe/helix-onedrive-support/commit/cca3af35197613d4debf8f8a88eeff85dc495b13))
+
 ## [3.1.4](https://github.com/adobe/helix-onedrive-support/compare/v3.1.3...v3.1.4) (2020-11-26)
 
 
