@@ -129,9 +129,10 @@ export declare class OneDrive extends EventEmitter {
   /**
    * Returns a drive item from the given share link or onedrive uri.
    * @param {string|URL} url The share link url or a onedrive uri.
+   * @param {boolean} [fetchInfo=false] If {@code true} fetch detailed information about item
    * @see OneDrive.driveItemToURL
    */
-  getDriveItemFromShareLink(url: string|URL): Promise<DriveItem>;
+  getDriveItemFromShareLink(url: string|URL, fetchInfo?: boolean): Promise<DriveItem>;
 
   listChildren(folderItem: DriveItem, relPath?: string, query?: object): Promise<GraphResult>;
 

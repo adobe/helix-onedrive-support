@@ -310,9 +310,19 @@ class OneDrive extends EventEmitter {
 
   /**
    */
-  async getDriveItemFromShareLink(sharingUrl) {
+  async getDriveItemFromShareLink(sharingUrl, fetchInfo = false) {
     let driveItem = OneDrive.driveItemFromURL(sharingUrl);
     if (driveItem) {
+      if (fetchInfo) {
+        try {
+          const uri = `/drives/${driveItem.parentReference.driveId}/items/${driveItem.id}`;
+          return await (await this.getClient()).get(uri);
+        } catch (e) {
+          const error = StatusCodeError.fromError(e);
+          this.log[(error.statusCode === 404) ? 'warn' : 'error'](error);
+          throw error;
+        }
+      }
       return driveItem;
     }
     driveItem = shareItemCache.get(sharingUrl);
