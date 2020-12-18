@@ -168,6 +168,8 @@ class OneDrive extends EventEmitter {
     } catch (e) {
       if (e.message !== 'Entry not found in cache.') {
         log.warn(`Unable to acquire token from cache: ${e}`);
+      } else {
+        log.debug(`Unable to acquire token from cache: ${e}`);
       }
     }
 
