@@ -1,3 +1,10 @@
+## [3.1.6](https://github.com/adobe/helix-onedrive-support/compare/v3.1.5...v3.1.6) (2020-12-18)
+
+
+### Bug Fixes
+
+* not finding a cached entry should not log a warning ([#125](https://github.com/adobe/helix-onedrive-support/issues/125)) ([5dcde19](https://github.com/adobe/helix-onedrive-support/commit/5dcde19e491d0977b641ec64b831f825daa56308))
+
 ## [3.1.5](https://github.com/adobe/helix-onedrive-support/compare/v3.1.4...v3.1.5) (2020-11-26)
 
 
