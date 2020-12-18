@@ -166,7 +166,11 @@ class OneDrive extends EventEmitter {
     try {
       return await context.acquireToken(AZ_RESOURCE, this.username, this.clientId);
     } catch (e) {
-      log.warn(`Unable to acquire token from cache: ${e}`);
+      if (e.message !== 'Entry not found in cache.') {
+        log.warn(`Unable to acquire token from cache: ${e}`);
+      } else {
+        log.debug(`Unable to acquire token from cache: ${e}`);
+      }
     }
 
     try {
