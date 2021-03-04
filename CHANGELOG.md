@@ -1,3 +1,10 @@
+## [3.1.7](https://github.com/adobe/helix-onedrive-support/compare/v3.1.6...v3.1.7) (2021-03-04)
+
+
+### Bug Fixes
+
+* return lastModifiedDateTime from fuzzyGetDriveItem ([#139](https://github.com/adobe/helix-onedrive-support/issues/139)) ([0ff000f](https://github.com/adobe/helix-onedrive-support/commit/0ff000f03b23ad2ddbae0bd19944b308697e5ed3))
+
 ## [3.1.6](https://github.com/adobe/helix-onedrive-support/compare/v3.1.5...v3.1.6) (2020-12-18)
 
 
