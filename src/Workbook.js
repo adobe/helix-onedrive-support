@@ -27,26 +27,14 @@ class Workbook extends NamedItemContainer {
   }
 
   async getData() {
-    try {
-      const client = await this._oneDrive.getClient();
-      const result = await client.get(this._uri);
-      return result.value;
-    } catch (e) {
-      this.log.error(StatusCodeError.getActualError(e));
-      throw new StatusCodeError(e.message, e.statusCode || 500);
-    }
+    const result = await this._oneDrive.doFetch(this._uri);
+    return result.value;
   }
 
   async getWorksheetNames() {
-    try {
-      const client = await this._oneDrive.getClient();
-      this.log.debug(`get worksheet names from ${this._uri}/worksheets`);
-      const result = await client.get(`${this._uri}/worksheets`);
-      return result.value.map((v) => v.name);
-    } catch (e) {
-      this.log.error(StatusCodeError.getActualError(e));
-      throw new StatusCodeError(e.message, e.statusCode || 500);
-    }
+    this.log.debug(`get worksheet names from ${this._uri}/worksheets`);
+    const result = await this._oneDrive.doFetch(`${this._uri}/worksheets`);
+    return result.value.map((v) => v.name);
   }
 
   worksheet(name) {
@@ -54,15 +42,9 @@ class Workbook extends NamedItemContainer {
   }
 
   async getTableNames() {
-    try {
-      const client = await this._oneDrive.getClient();
-      this.log.debug(`get table names from ${this._uri}/tables`);
-      const result = await client.get(`${this._uri}/tables`);
-      return result.value.map((v) => v.name);
-    } catch (e) {
-      this.log.error(StatusCodeError.getActualError(e));
-      throw new StatusCodeError(e.message, e.statusCode || 500);
-    }
+    this.log.debug(`get table names from ${this._uri}/tables`);
+    const result = await this._oneDrive.doFetch(`${this._uri}/tables`);
+    return result.value.map((v) => v.name);
   }
 
   table(name) {

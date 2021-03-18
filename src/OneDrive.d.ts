@@ -120,7 +120,7 @@ export declare class OneDrive extends EventEmitter {
 
   acquireToken(redirectUri: string, code: string): Promise<TokenResponse>;
 
-  getClient(): Promise<Request>;
+  doFetch(relUrl: string, rawResponseBody: boolean = false, options: object = {}): Promise<object|Buffer>
 
   me(): Promise<GraphResult>;
 

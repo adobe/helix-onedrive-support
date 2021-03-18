@@ -27,17 +27,11 @@ class Range {
   }
 
   async getData() {
-    try {
-      if (!this._data) {
-        const client = await this._oneDrive.getClient();
-        this.log.debug(`get range data from ${this.uri}`);
-        this._data = await client.get(this.uri);
-      }
-      return this._data;
-    } catch (e) {
-      this.log.error(StatusCodeError.getActualError(e));
-      throw new StatusCodeError(e.message, e.statusCode || 500);
+    if (!this._data) {
+      this.log.debug(`get range data from ${this.uri}`);
+      this._data = await this._oneDrive.doFetch(this.uri);
     }
+    return this._data;
   }
 
   async getAddress() {
@@ -72,14 +66,8 @@ class Range {
         this._values = this._data.values;
       } else {
         // optimization: ask for the values, only, not the complete range object
-        try {
-          const client = await this._oneDrive.getClient();
-          this.log.debug(`get range values from ${this.uri}`);
-          this._values = (await client.get(`${this.uri}?$select=values`)).values;
-        } catch (e) {
-          this.log.error(StatusCodeError.getActualError(e));
-          throw new StatusCodeError(e.message, e.statusCode || 500);
-        }
+        this.log.debug(`get range values from ${this.uri}`);
+        this._values = (await this._oneDrive.doFetch(`${this.uri}?$select=values`)).values;
       }
     }
     return this._values;

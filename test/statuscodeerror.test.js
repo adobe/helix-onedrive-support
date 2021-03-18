@@ -23,42 +23,24 @@ describe('StatusCodeError Tests', () => {
     assert.equal(error.statusCode, 404);
   });
 
-  it('getActualError unwraps the underlying error', async () => {
-    const origError = new StatusCodeError('not found', 404);
-    const newError = new Error('An error happened');
-    newError.error = origError;
-    assert.equal(StatusCodeError.getActualError(newError), origError);
-  });
-
-  it('getActualError is robust against `undefined`', async () => {
-    const error = new StatusCodeError('not found', 404);
-    error.error = undefined;
-    assert.equal(StatusCodeError.getActualError(error), error);
-  });
-
-  it('getActualError is robust against `null`', async () => {
-    const error = new StatusCodeError('not found', 404);
-    error.error = null;
-    assert.equal(StatusCodeError.getActualError(error), error);
+  it('fromError defaults to 500', async () => {
+    const error = new Error('what the heck?!?');
+    const e = StatusCodeError.fromError(error);
+    assert.equal(e.statusCode, 500);
   });
 
   it('fromError gets details from inner error', async () => {
-    const error = new StatusCodeError('not found', 404);
-    error.error = {
-      code: '1234',
-    };
-    const e = StatusCodeError.fromError(error);
-    assert.deepEqual(e, { statusCode: 404, details: { code: '1234' } });
+    const error = new Error('what the heck?!?');
+    const e = StatusCodeError.fromErrorResponse(error, 404);
+    assert.deepEqual(e.details, error);
   });
 
-  it('fromError cleans details', async () => {
-    const error = new StatusCodeError('not found', 404);
-    error.error = {
-      request: 'foo',
-      response: 'resp',
-      options: 'bar',
+  it('fromErrorResponse gets details from inner error', async () => {
+    const error = {
+      code: 'itemNotFound',
     };
-    const e = StatusCodeError.fromError(error);
-    assert.deepEqual(e, { statusCode: 404 });
+    const e = StatusCodeError.fromErrorResponse(error, 404);
+    assert.equal(e.statusCode, 404);
+    assert.deepEqual(e.details, { code: 'itemNotFound' });
   });
 });

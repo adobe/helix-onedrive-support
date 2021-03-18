@@ -233,82 +233,78 @@ class OneDriveMock extends OneDrive {
   }
 
   /**
-   * @see OneDrive#getClient
+   * @see OneDrive#doFetch
    */
-  getClient() {
-    const f = ({ method, uri, body }) => {
-      const url = new URL(`https://dummy.org${uri}`);
-      if (url.pathname in this.driveItems) {
-        const result = this.driveItems[url.pathname];
-        if (!Array.isArray(result.value)) {
-          return result;
-        }
-        const data = result.value;
-        const max = Number.parseInt(url.searchParams.get('$top') || 200, 10);
-        // note that we abuse the skiptoken a `skip` param here and totally ignore the real `$skip`
-        const skiptoken = Number.parseInt(url.searchParams.get('$skiptoken') || 0, 10);
-        const len = data.length - skiptoken;
-        if (len > max) {
-          url.searchParams.set('$skiptoken', skiptoken + max);
-          return {
-            value: data.slice(skiptoken, skiptoken + max),
-            '@odata.nextLink': url.toString(),
-          };
-        } else if (skiptoken) {
-          return {
-            value: data.slice(skiptoken, skiptoken + len),
-          };
-        } else {
-          return result;
-        }
+  doFetch(uri, _, { method = 'GET', body } = {}) {
+    const url = new URL(`https://dummy.org${uri}`);
+    if (url.pathname in this.driveItems) {
+      const result = this.driveItems[url.pathname];
+      if (!Array.isArray(result.value)) {
+        return result;
       }
-      const wb = this.workbooks.find((w) => (uri.startsWith(w.uri)));
-      if (!wb) {
-        throw new StatusCodeError('not found', 404);
+      const data = result.value;
+      const max = Number.parseInt(url.searchParams.get('$top') || 200, 10);
+      // note that we abuse the skiptoken a `skip` param here and totally ignore the real `$skip`
+      const skiptoken = Number.parseInt(url.searchParams.get('$skiptoken') || 0, 10);
+      const len = data.length - skiptoken;
+      if (len > max) {
+        url.searchParams.set('$skiptoken', skiptoken + max);
+        return {
+          value: data.slice(skiptoken, skiptoken + max),
+          '@odata.nextLink': url.toString(),
+        };
+      } else if (skiptoken) {
+        return {
+          value: data.slice(skiptoken, skiptoken + len),
+        };
+      } else {
+        return result;
       }
-      const { data } = wb;
+    }
+    const wb = this.workbooks.find((w) => (uri.startsWith(w.uri)));
+    if (!wb) {
+      throw new StatusCodeError('not found', 404);
+    }
+    const { data } = wb;
 
-      // eslint-disable-next-line no-unused-vars
-      const [path, query] = uri.substring(wb.uri.length).split('?');
-      const segs = path.split('/');
+    // eslint-disable-next-line no-unused-vars
+    const [path, query] = uri.substring(wb.uri.length).split('?');
+    const segs = path.split('/');
+    segs.shift();
+
+    // default the sheet to the entire data
+    let sheet = data;
+
+    // handle the '/workbook/worksheets/:name' portion
+    if (segs[0] === 'worksheets') {
       segs.shift();
-
-      // default the sheet to the entire data
-      let sheet = data;
-
-      // handle the '/workbook/worksheets/:name' portion
-      if (segs[0] === 'worksheets') {
-        segs.shift();
-        if (segs[0]) {
-          const sheetName = segs.shift();
-          sheet = data.sheets.find((s) => (s.name === sheetName));
-          if (!sheet) {
-            throw new StatusCodeError(sheetName, 404);
-          }
-          if (!segs[0]) {
-            // if no more segments, return the sheet data
-            return { value: sheet };
-          }
-        } else {
-          return { value: data.sheets.map((st) => ({ name: st.name })) };
+      if (segs[0]) {
+        const sheetName = segs.shift();
+        sheet = data.sheets.find((s) => (s.name === sheetName));
+        if (!sheet) {
+          throw new StatusCodeError(sheetName, 404);
         }
+        if (!segs[0]) {
+          // if no more segments, return the sheet data
+          return { value: sheet };
+        }
+      } else {
+        return { value: data.sheets.map((st) => ({ name: st.name })) };
       }
+    }
 
-      // handle the operations on the workbook / worksheet
-      switch (segs.shift()) {
-        case 'usedRange':
-          return sheet.usedRange;
-        case 'tables':
-          return handleTable(sheet, segs, method, body);
-        case 'names':
-          return handleNamedItems(sheet, segs, method, body);
-        default:
-          // default return the data
-          return { value: data };
-      }
-    };
-    f.get = (uri) => f({ method: 'GET', uri });
-    return f;
+    // handle the operations on the workbook / worksheet
+    switch (segs.shift()) {
+      case 'usedRange':
+        return sheet.usedRange;
+      case 'tables':
+        return handleTable(sheet, segs, method, body);
+      case 'names':
+        return handleNamedItems(sheet, segs, method, body);
+      default:
+        // default return the data
+        return { value: data };
+    }
   }
 }
 

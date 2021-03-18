@@ -14,6 +14,8 @@
 
 'use strict';
 
+process.env.HELIX_FETCH_FORCE_HTTP1 = 'true';
+
 const assert = require('assert');
 const nock = require('nock');
 const OneDrive = require('../src/OneDrive.js');
