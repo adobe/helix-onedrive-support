@@ -278,7 +278,8 @@ class OneDrive extends EventEmitter {
         }
         throw err;
       }
-      return rawResponseBody ? resp.buffer() : resp.json();
+      // await result in order to be able to catch any error
+      return await (rawResponseBody ? resp.buffer() : resp.json());
     } catch (e) {
       if (e instanceof StatusCodeError) {
         throw e;
