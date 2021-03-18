@@ -13,7 +13,6 @@
 'use strict';
 
 const NamedItemContainer = require('./NamedItemContainer.js');
-const StatusCodeError = require('./StatusCodeError.js');
 const Table = require('./Table.js');
 const Range = require('./Range.js');
 
