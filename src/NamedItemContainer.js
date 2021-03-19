@@ -27,7 +27,8 @@ class NamedItemContaner {
 
   async getNamedItem(name) {
     try {
-      return this._oneDrive.doFetch(`${this.uri}/names/${name}`);
+      // await result in order to be able to catch errors
+      return await this._oneDrive.doFetch(`${this.uri}/names/${name}`);
     } catch (e) {
       if (e.statusCode === 404) {
         return null;
@@ -38,7 +39,8 @@ class NamedItemContaner {
 
   async addNamedItem(name, reference, comment) {
     try {
-      return this._oneDrive.doFetch(`${this.uri}/names/add`, false, {
+      // await result in order to be able to catch errors
+      return await this._oneDrive.doFetch(`${this.uri}/names/add`, false, {
         method: 'POST',
         body: {
           name,
@@ -56,7 +58,8 @@ class NamedItemContaner {
 
   async deleteNamedItem(name) {
     try {
-      return this._oneDrive.doFetch(`${this.uri}/names/${name}`, false, {
+      // await result in order to be able to catch errors
+      return await this._oneDrive.doFetch(`${this.uri}/names/${name}`, false, {
         method: 'DELETE',
       });
     } catch (e) {
