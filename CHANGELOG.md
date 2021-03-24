@@ -1,3 +1,15 @@
+# [4.0.0](https://github.com/adobe/helix-onedrive-support/compare/v3.1.7...v4.0.0) (2021-03-24)
+
+
+### Features
+
+* request is deprecated; replace with helix-fetch ([#142](https://github.com/adobe/helix-onedrive-support/issues/142)) ([2c40072](https://github.com/adobe/helix-onedrive-support/commit/2c400724bd5e65a8953c0258d4f676e6b566d145)), closes [#60](https://github.com/adobe/helix-onedrive-support/issues/60)
+
+
+### BREAKING CHANGES
+
+* `OneDrive.getClient()` has been removed. Use `OneDrive.doFetch()` instead.
+
 ## [3.1.7](https://github.com/adobe/helix-onedrive-support/compare/v3.1.6...v3.1.7) (2021-03-04)
 
 
