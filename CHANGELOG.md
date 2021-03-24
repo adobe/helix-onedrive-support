@@ -1,3 +1,10 @@
+## [4.0.2](https://github.com/adobe/helix-onedrive-support/compare/v4.0.1...v4.0.2) (2021-03-24)
+
+
+### Bug Fixes
+
+* **fetch:** don't assume error is json ([#145](https://github.com/adobe/helix-onedrive-support/issues/145)) ([b8d8327](https://github.com/adobe/helix-onedrive-support/commit/b8d83275528dc735f6dd012a245d357b85f625d6))
+
 ## [4.0.1](https://github.com/adobe/helix-onedrive-support/compare/v4.0.0...v4.0.1) (2021-03-24)
 
 
