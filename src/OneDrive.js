@@ -14,12 +14,20 @@
 const EventEmitter = require('events');
 const { promisify } = require('util');
 const { AuthenticationContext } = require('adal-node');
-const rp = require('request-promise-native');
+const fetchAPI = require('@adobe/helix-fetch');
 
 const Workbook = require('./Workbook.js');
 const StatusCodeError = require('./StatusCodeError.js');
 const { driveItemFromURL, driveItemToURL } = require('./utils.js');
 const { splitByExtension, sanitize, editDistance } = require('./fuzzy-helper.js');
+
+const { fetch, reset } = process.env.HELIX_FETCH_FORCE_HTTP1
+  ? fetchAPI.context({
+    alpnProtocols: [fetchAPI.ALPN_HTTP1_1],
+    userAgent: 'helix-fetch', // static user agent for test recordings
+  })
+  /* istanbul ignore next */
+  : fetchAPI;
 
 const AZ_AUTHORITY_HOST_URL = 'https://login.windows.net';
 const AZ_RESOURCE = 'https://graph.microsoft.com'; // '00000002-0000-0000-c000-000000000000'; ??
@@ -100,6 +108,14 @@ class OneDrive extends EventEmitter {
     cache.add.promise = promisify(cache.add.bind(cache));
     cache.remove.promise = promisify(cache.remove.bind(cache));
     cache.find.promise = promisify(cache.find.bind(cache));
+  }
+
+  /**
+   */
+  // eslint-disable-next-line class-methods-use-this
+  async dispose() {
+    // TODO: clear other state?
+    return reset();
   }
 
   /**
@@ -243,30 +259,39 @@ class OneDrive extends EventEmitter {
 
   /**
    */
-  async getClient(raw = false) {
+  async doFetch(relUrl, rawResponseBody = false, options = {}) {
+    const opts = { ...options };
     const { accessToken } = await this.getAccessToken();
-    const opts = {
-      baseUrl: 'https://graph.microsoft.com/v1.0',
-      json: true,
-      auth: {
-        bearer: accessToken,
-      },
-    };
-    if (raw) {
-      delete opts.json;
-      opts.encoding = null;
+    if (!opts.headers) {
+      opts.headers = {};
     }
-    return rp.defaults(opts);
+    opts.headers.authorization = `Bearer ${accessToken}`;
+    const url = `https://graph.microsoft.com/v1.0${relUrl}`;
+    try {
+      const resp = await fetch(url, opts);
+      if (!resp.ok) {
+        const err = StatusCodeError.fromErrorResponse(await resp.json(), resp.status);
+        if (err.statusCode === 404) {
+          this.log.warn(`${relUrl} : ${err.statusCode} - ${err.message}`);
+        } else {
+          this.log.error(`${relUrl} : ${err.statusCode} - ${err.message} - ${err.details}`);
+        }
+        throw err;
+      }
+      // await result in order to be able to catch any error
+      return await (rawResponseBody ? resp.buffer() : resp.json());
+    } catch (e) {
+      if (e instanceof StatusCodeError) {
+        throw e;
+      }
+      const err = StatusCodeError.fromError(e);
+      this.log.error(`${relUrl} : ${err.statusCode} - ${err.message} - ${err.details}`);
+      throw err;
+    }
   }
 
   async me() {
-    try {
-      return await (await this.getClient()).get('/me');
-    } catch (e) {
-      const error = StatusCodeError.fromError(e);
-      this.log[(error.statusCode === 404) ? 'warn' : 'error'](error);
-      throw error;
-    }
+    return this.doFetch('/me');
   }
 
   /**
@@ -290,26 +315,13 @@ class OneDrive extends EventEmitter {
   async resolveShareLink(sharingUrl) {
     const link = OneDrive.encodeSharingUrl(sharingUrl);
     this.log.debug(`resolving sharelink ${sharingUrl} (${link})`);
-    try {
-      return await (await this.getClient()).get(`/shares/${link}/driveItem`);
-    } catch (e) {
-      const error = StatusCodeError.fromError(e);
-      this.log[(error.statusCode === 404) ? 'warn' : 'error'](error);
-      throw error;
-    }
+    return this.doFetch(`/shares/${link}/driveItem`);
   }
 
   /**
    */
   async getDriveRootItem(driveId) {
-    const uri = `/drives/${driveId}/root`;
-    try {
-      return await (await this.getClient()).get(uri);
-    } catch (e) {
-      const error = StatusCodeError.fromError(e);
-      this.log[(error.statusCode === 404) ? 'warn' : 'error'](error);
-      throw error;
-    }
+    return this.doFetch(`/drives/${driveId}/root`);
   }
 
   /**
@@ -338,13 +350,7 @@ class OneDrive extends EventEmitter {
     if (qry) {
       uri = `${uri}?${qry}`;
     }
-    try {
-      return await (await this.getClient()).get(uri);
-    } catch (e) {
-      const error = StatusCodeError.fromError(e);
-      this.log[(error.statusCode === 404) ? 'warn' : 'error'](error);
-      throw error;
-    }
+    return this.doFetch(uri);
   }
 
   /**
@@ -436,30 +442,14 @@ class OneDrive extends EventEmitter {
     const uri = relPath
       ? `/drives/${folderItem.parentReference.driveId}/items/${folderItem.id}:${relPath}`
       : `/drives/${folderItem.parentReference.driveId}/items/${folderItem.id}`;
-    try {
-      if (download) {
-        return (await this.getClient(true))
-          .get(`${uri}:/content`);
-      }
-      return await (await this.getClient()).get(uri);
-    } catch (e) {
-      const error = StatusCodeError.fromError(e);
-      this.log[(error.statusCode === 404) ? 'warn' : 'error'](error);
-      throw error;
-    }
+    return download ? this.doFetch(`${uri}:/content`, true) : this.doFetch(uri);
   }
 
   /**
    */
   async downloadDriveItem(driveItem) {
     const uri = `/drives/${driveItem.parentReference.driveId}/items/${driveItem.id}/content`;
-    try {
-      return await (await this.getClient(true)).get(uri);
-    } catch (e) {
-      const error = StatusCodeError.fromError(e);
-      this.log[(error.statusCode === 404) ? 'warn' : 'error'](error);
-      throw error;
-    }
+    return this.doFetch(uri, true);
   }
 
   /**
@@ -475,21 +465,14 @@ class OneDrive extends EventEmitter {
 
     // PUT /drives/{drive-id}/items/{parent-id}:/{filename}:/content
     const uri = `/drives/${driveItem.parentReference.driveId}/items/${driveItem.id}${relPath}/content`;
-    try {
-      const client = await this.getClient(true);
-      return await client({
-        uri,
-        method: 'PUT',
-        body: buffer,
-        headers: {
-          'Content-Type': 'application/octet-stream',
-        },
-      });
-    } catch (e) {
-      const error = StatusCodeError.fromError(e);
-      this.log[(error.statusCode === 404) ? 'warn' : 'error'](error);
-      throw error;
-    }
+    const opts = {
+      method: 'PUT',
+      body: buffer,
+      headers: {
+        'Content-Type': 'application/octet-stream',
+      },
+    };
+    return this.doFetch(uri, true, opts);
   }
 
   /**
@@ -501,13 +484,7 @@ class OneDrive extends EventEmitter {
   /**
    */
   async listSubscriptions() {
-    try {
-      return await (await this.getClient()).get('/subscriptions');
-    } catch (e) {
-      const error = StatusCodeError.fromError(e);
-      this.log[(error.statusCode === 404) ? 'warn' : 'error'](error);
-      throw error;
-    }
+    return this.doFetch('/subscriptions');
   }
 
   /**
@@ -519,66 +496,41 @@ class OneDrive extends EventEmitter {
     changeType = 'updated',
     expiresIn = MAX_SUBSCRIPTION_EXPIRATION_TIME,
   }) {
-    try {
-      return await (await this.getClient())({
-        uri: '/subscriptions',
-        method: 'POST',
-        body: {
-          changeType,
-          notificationUrl,
-          resource,
-          expirationDateTime: new Date(Date.now() + expiresIn).toISOString(),
-          clientState,
-        },
-        json: true,
-        headers: {
-          'content-type': 'application/json',
-        },
-      });
-    } catch (e) {
-      const error = StatusCodeError.fromError(e);
-      this.log[(error.statusCode === 404) ? 'warn' : 'error'](error);
-      throw error;
-    }
+    const opts = {
+      method: 'POST',
+      body: {
+        changeType,
+        notificationUrl,
+        resource,
+        expirationDateTime: new Date(Date.now() + expiresIn).toISOString(),
+        clientState,
+      },
+    };
+    return this.doFetch('/subscriptions', false, opts);
   }
 
   /**
    */
   async refreshSubscription(id, expiresIn = MAX_SUBSCRIPTION_EXPIRATION_TIME) {
     this.log.debug(`refreshing expiration time of subscription ${id} by ${expiresIn} ms`);
-    try {
-      return await (await this.getClient())({
-        uri: `/subscriptions/${id}`,
-        method: 'PATCH',
-        body: {
-          expirationDateTime: new Date(Date.now() + expiresIn).toISOString(),
-        },
-        json: true,
-        headers: {
-          'content-type': 'application/json',
-        },
-      });
-    } catch (e) {
-      const error = StatusCodeError.fromError(e);
-      this.log[(error.statusCode === 404) ? 'warn' : 'error'](error);
-      throw error;
-    }
+    const opts = {
+      uri: `/subscriptions/${id}`,
+      method: 'PATCH',
+      body: {
+        expirationDateTime: new Date(Date.now() + expiresIn).toISOString(),
+      },
+    };
+    return this.doFetch(`/subscriptions/${id}`, false, opts);
   }
 
   /**
    */
   async deleteSubscription(id) {
     this.log.debug(`deleting subscription ${id}`);
-    try {
-      return await (await this.getClient())({
-        uri: `/subscriptions/${id}`,
-        method: 'DELETE',
-      });
-    } catch (e) {
-      const error = StatusCodeError.fromError(e);
-      this.log[(error.statusCode === 404) ? 'warn' : 'error'](error);
-      throw error;
-    }
+    const opts = {
+      method: 'DELETE',
+    };
+    return this.doFetch(`/subscriptions/${id}`, false, opts);
   }
 
   /**
@@ -592,34 +544,29 @@ class OneDrive extends EventEmitter {
     let next = token ? `${resource}/delta?token=${token}` : `${resource}/delta`;
     let items = [];
 
-    try {
-      const client = await this.getClient();
-      for (; ;) {
-        const {
-          value,
-          '@odata.nextLink': nextLink,
-          '@odata.deltaLink': deltaLink,
-          // eslint-disable-next-line no-await-in-loop
-        } = await client.get(next);
-        items = items.concat(value);
-        if (nextLink) {
-          // not the last page, we have a next link
-          const nextToken = new URL(nextLink).searchParams.get('token');
-          next = `${resource}/delta?token=${nextToken}`;
-        } else if (deltaLink) {
-          // last page, we have a next link
-          return {
-            changes: items,
-            token: new URL(deltaLink).searchParams.get('token'),
-          };
-        } else {
-          throw new Error('Received response with neither next nor delta link.');
-        }
+    for (; ;) {
+      const {
+        value,
+        '@odata.nextLink': nextLink,
+        '@odata.deltaLink': deltaLink,
+        // eslint-disable-next-line no-await-in-loop
+      } = await this.doFetch(next);
+      items = items.concat(value);
+      if (nextLink) {
+        // not the last page, we have a next link
+        const nextToken = new URL(nextLink).searchParams.get('token');
+        next = `${resource}/delta?token=${nextToken}`;
+      } else if (deltaLink) {
+        // last page, we have a next link
+        return {
+          changes: items,
+          token: new URL(deltaLink).searchParams.get('token'),
+        };
+      } else {
+        const error = new StatusCodeError('Received response with neither next nor delta link.', 500);
+        this.log.error(error);
+        throw error;
       }
-    } catch (e) {
-      const error = StatusCodeError.fromError(e);
-      this.log[(error.statusCode === 404) ? 'warn' : 'error'](error);
-      throw error;
     }
   }
 }

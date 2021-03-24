@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Adobe. All rights reserved.
+ * Copyright 2020 Adobe. All rights reserved.
  * This file is licensed to you under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License. You may obtain a copy
  * of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -10,46 +10,53 @@
  * governing permissions and limitations under the License.
  */
 
+const { AbortError, FetchError } = require('@adobe/helix-fetch');
+
 /**
  * Internal error class
  * @private
  */
 class StatusCodeError extends Error {
   /**
-   * Converts a request-promise error to a status code error w/o revealing too much details.
-   * @param {Error} e The original error
+   * Converts a fetch error to a status code error.
+   * @param {Error} err The original error
    * @returns {StatusCodeError} status code error
    */
-  static fromError(e) {
-    const err = new StatusCodeError(e.msg, e.statusCode || 500);
-    const details = StatusCodeError.getActualError(e);
-    if (details) {
-      delete details.options;
-      delete details.request;
-      delete details.response;
-      if (Object.keys(details).length) {
-        err.details = details;
+  static fromError(err) {
+    let statusCode = 500;
+    if (err instanceof AbortError) {
+      statusCode = 504;
+    }
+    if (err instanceof FetchError) {
+      if (err.code === 'ECONNRESET' || err.code === 'ETIMEDOUT') {
+        statusCode = 504;
       }
     }
-    return err;
+    return new StatusCodeError(err.message, statusCode, err);
   }
 
   /**
-   * Returns the actual error, recursively descending through all error properties.
-   *
-   * @param {Error} e error caught
+   * Converts a Graph API error response to a status code error.
+   * @param {object} errorBody The parsed error response body
+   * @param {number} statusCode The status code of the error response
+   * @param {object} details The underlying error
+   * @returns {StatusCodeError} status code error
    */
-  static getActualError(e) {
-    let error = e;
-    while (error.error) {
-      error = error.error;
-    }
-    return error;
+  static fromErrorResponse(errorBody, statusCode) {
+    return new StatusCodeError(errorBody.message, statusCode, errorBody);
   }
 
-  constructor(msg, statusCode) {
+  /**
+   * Constructs a ne StatusCodeError.
+   * @constructor
+   * @param {string} msg Error message
+   * @param {number} statusCode Status code of the error response
+   * @param {object} details underlying error
+   */
+  constructor(msg, statusCode, details) {
     super(msg);
     this.statusCode = statusCode;
+    this.details = details;
   }
 }
 

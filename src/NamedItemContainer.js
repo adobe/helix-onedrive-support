@@ -17,73 +17,56 @@ class NamedItemContaner {
   }
 
   async getNamedItems() {
-    try {
-      const client = await this._oneDrive.getClient();
-      const result = await client.get(`${this.uri}/names`);
-      return result.value.map((v) => ({
-        name: v.name,
-        value: v.value,
-        comment: v.comment,
-      }));
-    } catch (e) {
-      this.log.error(StatusCodeError.getActualError(e));
-      throw new StatusCodeError(e.message, e.statusCode || 500);
-    }
+    const result = await this._oneDrive.doFetch(`${this.uri}/names`);
+    return result.value.map((v) => ({
+      name: v.name,
+      value: v.value,
+      comment: v.comment,
+    }));
   }
 
   async getNamedItem(name) {
     try {
-      const client = await this._oneDrive.getClient(false);
-      return await client.get(`${this.uri}/names/${name}`);
+      // await result in order to be able to catch errors
+      return await this._oneDrive.doFetch(`${this.uri}/names/${name}`);
     } catch (e) {
       if (e.statusCode === 404) {
         return null;
       }
-      this.log.error(StatusCodeError.getActualError(e));
-      throw new StatusCodeError(e.message, e.statusCode || 500);
+      throw e;
     }
   }
 
   async addNamedItem(name, reference, comment) {
     try {
-      const client = await this._oneDrive.getClient();
-      await client({
-        uri: `${this.uri}/names/add`,
+      // await result in order to be able to catch errors
+      return await this._oneDrive.doFetch(`${this.uri}/names/add`, false, {
         method: 'POST',
         body: {
           name,
           reference,
           comment,
         },
-        json: true,
-        headers: {
-          'content-type': 'application/json',
-        },
       });
     } catch (e) {
-      const actual = StatusCodeError.getActualError(e);
-      if (actual.code === 'ItemAlreadyExists') {
-        throw new StatusCodeError(e.message, 409);
+      if ((e.details && e.details.code === 'ItemAlreadyExists') && e.statusCode !== 409) {
+        throw new StatusCodeError(e.message, 409, e.code, e);
       }
-      this.log.error(actual);
-      throw new StatusCodeError(e.message, e.statusCode || 500);
+      throw e;
     }
   }
 
   async deleteNamedItem(name) {
     try {
-      const client = await this._oneDrive.getClient();
-      await client({
-        uri: `${this.uri}/names/${name}`,
+      // await result in order to be able to catch errors
+      return await this._oneDrive.doFetch(`${this.uri}/names/${name}`, false, {
         method: 'DELETE',
       });
     } catch (e) {
-      const actual = StatusCodeError.getActualError(e);
-      if (actual.code === 'ItemNotFound') {
-        throw new StatusCodeError(e.message, 404);
+      if ((e.details && e.details.code === 'ItemNotFound') && e.statusCode !== 404) {
+        throw new StatusCodeError(e.message, 404, e.code, e);
       }
-      this.log.error(actual);
-      throw new StatusCodeError(e.message, e.statusCode || 500);
+      throw e;
     }
   }
 }

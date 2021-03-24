@@ -12,20 +12,28 @@
 ## Functions
 
 <dl>
-<dt><a href="#getActualError">getActualError(e)</a></dt>
-<dd><p>Returns the actual error, recursively descending through all error properties.</p>
+<dt><a href="#splitByExtension">splitByExtension(name)</a> ⇒ <code>Array.&lt;string&gt;</code></dt>
+<dd><p>Splits the given name at the last &#39;.&#39;, returning the extension and the base name.</p>
+</dd>
+<dt><a href="#sanitize">sanitize(name)</a> ⇒ <code>string</code></dt>
+<dd><p>Sanitizes the given string by :</p>
+<ul>
+<li>convert to lower case</li>
+<li>normalize all unicode characters</li>
+<li>replace all non-alphanumeric characters with a dash</li>
+<li>remove all consecutive dashes</li>
+<li>remove all leading and trailing dashes</li>
+</ul>
+</dd>
+<dt><a href="#editDistance">editDistance(s0, s1)</a> ⇒ <code>number</code> | <code>*</code></dt>
+<dd><p>Compute the edit distance using a recursive algorithm. since we only expect to have relative
+short filenames, the algorithm shouldn&#39;t be too expensive.</p>
 </dd>
 <dt><a href="#handleNamedItems">handleNamedItems(sheet, segs, method, body)</a> ⇒ <code>object</code></dt>
 <dd><p>Handle the <code>namedItems</code> operation on a workbook / worksheet</p>
 </dd>
 <dt><a href="#handleTable">handleTable(sheet, segs, method, body)</a> ⇒ <code>object</code></dt>
 <dd><p>Handle the <code>table</code> operation on a workbook / worksheet</p>
-</dd>
-<dt><a href="#getActualError">getActualError(e)</a></dt>
-<dd><p>Returns the actual error, recursively descending through all error properties.</p>
-</dd>
-<dt><a href="#getActualError">getActualError(e)</a></dt>
-<dd><p>Returns the actual error, recursively descending through all error properties.</p>
 </dd>
 <dt><a href="#driveItemToURL">driveItemToURL(driveItem)</a> ⇒ <code>URL</code></dt>
 <dd><p>Returns a onedrive uri for the given drive item. the uri has the format:
@@ -50,15 +58,18 @@ Helper class that facilitates accessing one drive.
     * _instance_
         * [.log](#OneDrive+log)
         * [.authenticated](#OneDrive+authenticated) ⇒ <code>boolean</code>
-        * [.login()](#OneDrive+login) ⇒ <code>Promise.&lt;void&gt;</code>
+        * [.dispose()](#OneDrive+dispose)
+        * [.loadTokenCache(entries)](#OneDrive+loadTokenCache) ⇒
+        * [.login()](#OneDrive+login) ⇒ <code>Promise.&lt;TokenResponse&gt;</code>
         * [.getAccessToken()](#OneDrive+getAccessToken)
         * [.createLoginUrl()](#OneDrive+createLoginUrl)
         * [.acquireToken()](#OneDrive+acquireToken)
-        * [.getClient()](#OneDrive+getClient)
+        * [.doFetch()](#OneDrive+doFetch)
         * [.resolveShareLink()](#OneDrive+resolveShareLink)
         * [.getDriveRootItem()](#OneDrive+getDriveRootItem)
         * [.getDriveItemFromShareLink()](#OneDrive+getDriveItemFromShareLink)
         * [.listChildren()](#OneDrive+listChildren)
+        * [.fuzzyGetDriveItem(folderItem, relPath)](#OneDrive+fuzzyGetDriveItem) ⇒ <code>Promise.&lt;Array.&lt;DriveItem&gt;&gt;</code>
         * [.getDriveItem()](#OneDrive+getDriveItem)
         * [.downloadDriveItem()](#OneDrive+downloadDriveItem)
         * [.uploadDriveItem()](#OneDrive+uploadDriveItem)
@@ -96,9 +107,25 @@ Helper class that facilitates accessing one drive.
 
 ### oneDrive.authenticated ⇒ <code>boolean</code>
 **Kind**: instance property of [<code>OneDrive</code>](#OneDrive)  
+<a name="OneDrive+dispose"></a>
+
+### oneDrive.dispose()
+**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)  
+<a name="OneDrive+loadTokenCache"></a>
+
+### oneDrive.loadTokenCache(entries) ⇒
+Adds entries to the token cache
+
+**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)  
+**Returns**: this;  
+
+| Param | Type |
+| --- | --- |
+| entries | <code>Array.&lt;TokenResponse&gt;</code> | 
+
 <a name="OneDrive+login"></a>
 
-### oneDrive.login() ⇒ <code>Promise.&lt;void&gt;</code>
+### oneDrive.login() ⇒ <code>Promise.&lt;TokenResponse&gt;</code>
 Performs a login using an interactive flow which prompts the user to open a browser window and
 enter the authorization code.
 
@@ -116,9 +143,9 @@ enter the authorization code.
 
 ### oneDrive.acquireToken()
 **Kind**: instance method of [<code>OneDrive</code>](#OneDrive)  
-<a name="OneDrive+getClient"></a>
+<a name="OneDrive+doFetch"></a>
 
-### oneDrive.getClient()
+### oneDrive.doFetch()
 **Kind**: instance method of [<code>OneDrive</code>](#OneDrive)  
 <a name="OneDrive+resolveShareLink"></a>
 
@@ -136,6 +163,28 @@ enter the authorization code.
 
 ### oneDrive.listChildren()
 **Kind**: instance method of [<code>OneDrive</code>](#OneDrive)  
+<a name="OneDrive+fuzzyGetDriveItem"></a>
+
+### oneDrive.fuzzyGetDriveItem(folderItem, relPath) ⇒ <code>Promise.&lt;Array.&lt;DriveItem&gt;&gt;</code>
+Tries to get the drive items for the given folder and relative path, by loading the files of
+the respective directory and returning the item with the best matching filename. Please note,
+that only the files are matched 'fuzzily' but not the folders. The rules for transforming the
+filenames to the name segment of the `relPath` are:
+- convert to lower case
+- replace all non-alphanumeric characters with a dash
+- remove all consecutive dashes
+- extensions are ignored, if the given path doesn't have one
+
+The result is an array of drive items that match the given path. They are ordered by the edit
+distance to the original name and then alphanumerically.
+
+**Kind**: instance method of [<code>OneDrive</code>](#OneDrive)  
+
+| Param | Type |
+| --- | --- |
+| folderItem | <code>DriveItem</code> | 
+| relPath | <code>string</code> | 
+
 <a name="OneDrive+getDriveItem"></a>
 
 ### oneDrive.getDriveItem()
@@ -212,10 +261,12 @@ Mock OneDrive client that supports some of the operations the `OneDrive` class d
 
 * [OneDriveMock](#OneDriveMock)
     * [.registerWorkbook(driveId, itemId, data)](#OneDriveMock+registerWorkbook) ⇒ [<code>OneDriveMock</code>](#OneDriveMock)
+    * [.registerDriveItem(driveId, itemId, data)](#OneDriveMock+registerDriveItem) ⇒ [<code>OneDriveMock</code>](#OneDriveMock)
+    * [.registerDriveItemChildren(driveId, itemId, data)](#OneDriveMock+registerDriveItemChildren) ⇒ [<code>OneDriveMock</code>](#OneDriveMock)
     * [.registerShareLink(uri, driveId, itemId)](#OneDriveMock+registerShareLink) ⇒ [<code>OneDriveMock</code>](#OneDriveMock)
     * [.getDriveItemFromShareLink()](#OneDriveMock+getDriveItemFromShareLink)
     * [.getWorkbook()](#OneDriveMock+getWorkbook)
-    * [.getClient()](#OneDriveMock+getClient)
+    * [.doFetch()](#OneDriveMock+doFetch)
 
 <a name="OneDriveMock+registerWorkbook"></a>
 
@@ -230,6 +281,34 @@ Register a mock workbook.
 | driveId | <code>string</code> | The drive id |
 | itemId | <code>string</code> | the item id |
 | data | <code>object</code> | Mock workbook data |
+
+<a name="OneDriveMock+registerDriveItem"></a>
+
+### oneDriveMock.registerDriveItem(driveId, itemId, data) ⇒ [<code>OneDriveMock</code>](#OneDriveMock)
+Registers a mock drive item
+
+**Kind**: instance method of [<code>OneDriveMock</code>](#OneDriveMock)  
+**Returns**: [<code>OneDriveMock</code>](#OneDriveMock) - this  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| driveId | <code>string</code> | The drive id |
+| itemId | <code>string</code> | the item id |
+| data | <code>object</code> | Mock item data |
+
+<a name="OneDriveMock+registerDriveItemChildren"></a>
+
+### oneDriveMock.registerDriveItemChildren(driveId, itemId, data) ⇒ [<code>OneDriveMock</code>](#OneDriveMock)
+Registers a mock drive item child list
+
+**Kind**: instance method of [<code>OneDriveMock</code>](#OneDriveMock)  
+**Returns**: [<code>OneDriveMock</code>](#OneDriveMock) - this  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| driveId | <code>string</code> | The drive id |
+| itemId | <code>string</code> | the item id |
+| data | <code>object</code> | Mock item data |
 
 <a name="OneDriveMock+registerShareLink"></a>
 
@@ -255,21 +334,52 @@ Register a mock sharelink.
 ### oneDriveMock.getWorkbook()
 **Kind**: instance method of [<code>OneDriveMock</code>](#OneDriveMock)  
 **See**: OneDrive#getWorkbook  
-<a name="OneDriveMock+getClient"></a>
+<a name="OneDriveMock+doFetch"></a>
 
-### oneDriveMock.getClient()
+### oneDriveMock.doFetch()
 **Kind**: instance method of [<code>OneDriveMock</code>](#OneDriveMock)  
-**See**: OneDrive#getClient  
-<a name="getActualError"></a>
+**See**: OneDrive#doFetch  
+<a name="splitByExtension"></a>
 
-## getActualError(e)
-Returns the actual error, recursively descending through all error properties.
+## splitByExtension(name) ⇒ <code>Array.&lt;string&gt;</code>
+Splits the given name at the last '.', returning the extension and the base name.
+
+**Kind**: global function  
+**Returns**: <code>Array.&lt;string&gt;</code> - Returns an array containing the base name and extension.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>string</code> | Filename |
+
+<a name="sanitize"></a>
+
+## sanitize(name) ⇒ <code>string</code>
+Sanitizes the given string by :
+- convert to lower case
+- normalize all unicode characters
+- replace all non-alphanumeric characters with a dash
+- remove all consecutive dashes
+- remove all leading and trailing dashes
+
+**Kind**: global function  
+**Returns**: <code>string</code> - sanitized name  
+
+| Param | Type |
+| --- | --- |
+| name | <code>string</code> | 
+
+<a name="editDistance"></a>
+
+## editDistance(s0, s1) ⇒ <code>number</code> \| <code>\*</code>
+Compute the edit distance using a recursive algorithm. since we only expect to have relative
+short filenames, the algorithm shouldn't be too expensive.
 
 **Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| e | <code>Error</code> | error caught |
+| s0 | <code>string</code> | Input string |
+| s1 | <code>string</code> | Input string |
 
 <a name="handleNamedItems"></a>
 
@@ -300,28 +410,6 @@ Handle the `table` operation on a workbook / worksheet
 | segs | <code>Array.&lt;string&gt;</code> | Array of path segments |
 | method | <code>string</code> | Request method |
 | body | <code>object</code> | Request body |
-
-<a name="getActualError"></a>
-
-## getActualError(e)
-Returns the actual error, recursively descending through all error properties.
-
-**Kind**: global function  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| e | <code>Error</code> | error caught |
-
-<a name="getActualError"></a>
-
-## getActualError(e)
-Returns the actual error, recursively descending through all error properties.
-
-**Kind**: global function  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| e | <code>Error</code> | error caught |
 
 <a name="driveItemToURL"></a>
 
