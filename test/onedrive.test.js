@@ -20,6 +20,7 @@ const assert = require('assert');
 const nock = require('nock');
 const OneDrive = require('../src/OneDrive.js');
 const MockDrive = require('../src/OneDriveMock.js');
+const StatusCodeError = require('../src/StatusCodeError');
 
 const AZ_AUTHORITY_HOST_URL = 'https://login.windows.net';
 
@@ -326,5 +327,30 @@ describe('OneDrive Tests', () => {
     });
     const me = await od.me();
     assert.deepEqual(me, expected);
+  }).timeout(5000);
+
+  it('propagates errors', async () => {
+    nock(AZ_AUTHORITY_HOST_URL)
+      .post('/common/oauth2/token?api-version=1.0')
+      .reply(200, {
+        token_type: 'Bearer',
+        refresh_token: 'dummy',
+        access_token: 'dummy',
+        expires_in: 81000,
+      })
+      .get('/common/UserRealm/test-user?api-version=1.0')
+      .reply(200, {
+        account_type: 'managed',
+      });
+    nock('https://graph.microsoft.com/v1.0')
+      .get('/me')
+      .reply(400, 'wrong input');
+
+    const od = new OneDrive({
+      clientId: TEST_CLIENT_ID || 'foobar',
+      username: TEST_USER || 'test-user',
+      password: TEST_PASSWORD || 'test-password',
+    });
+    await assert.rejects(od.me(), new StatusCodeError('wrong input', 400));
   }).timeout(5000);
 });

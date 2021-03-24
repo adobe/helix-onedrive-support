@@ -270,7 +270,14 @@ class OneDrive extends EventEmitter {
     try {
       const resp = await fetch(url, opts);
       if (!resp.ok) {
-        const err = StatusCodeError.fromErrorResponse(await resp.json(), resp.status);
+        const text = await resp.text();
+        let err;
+        try {
+          // try to parse json
+          err = StatusCodeError.fromErrorResponse(JSON.parse(text), resp.status);
+        } catch {
+          err = new StatusCodeError(text, resp.status);
+        }
         if (err.statusCode === 404) {
           this.log.warn(`${relUrl} : ${err.statusCode} - ${err.message}`);
         } else {
