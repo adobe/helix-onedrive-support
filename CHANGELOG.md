@@ -1,3 +1,10 @@
+## [4.0.3](https://github.com/adobe/helix-onedrive-support/compare/v4.0.2...v4.0.3) (2021-03-25)
+
+
+### Bug Fixes
+
+* **deps:** update helix-fetch to 2.1.9 ([#146](https://github.com/adobe/helix-onedrive-support/issues/146)) ([a16bd9d](https://github.com/adobe/helix-onedrive-support/commit/a16bd9d39fede2200a91cc6e1af38fb9037dfc29))
+
 ## [4.0.2](https://github.com/adobe/helix-onedrive-support/compare/v4.0.1...v4.0.2) (2021-03-24)
 
 
