@@ -285,8 +285,10 @@ class OneDrive extends EventEmitter {
         }
         throw err;
       }
+      const contentType = resp.headers.get('content-type');
+      const json = contentType && contentType.startsWith('application/json');
       // await result in order to be able to catch any error
-      return await (rawResponseBody ? resp.buffer() : resp.json());
+      return await (rawResponseBody || !json ? resp.buffer() : resp.json());
     } catch (e) {
       if (e instanceof StatusCodeError) {
         throw e;
