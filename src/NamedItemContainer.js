@@ -59,7 +59,7 @@ class NamedItemContaner {
   async deleteNamedItem(name) {
     try {
       // await result in order to be able to catch errors
-      return await this._oneDrive.doFetch(`${this.uri}/names/${name}`, false, {
+      return await this._oneDrive.doFetch(`${this.uri}/names/${name}`, true, {
         method: 'DELETE',
       });
     } catch (e) {
