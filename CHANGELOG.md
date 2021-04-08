@@ -1,3 +1,10 @@
+## [4.0.5](https://github.com/adobe/helix-onedrive-support/compare/v4.0.4...v4.0.5) (2021-04-08)
+
+
+### Bug Fixes
+
+* **onedrive:** check response content type before trying to parse JSON ([#152](https://github.com/adobe/helix-onedrive-support/issues/152)) ([b44a0eb](https://github.com/adobe/helix-onedrive-support/commit/b44a0eb6be37280866ad18250048cd933de65cbb))
+
 ## [4.0.4](https://github.com/adobe/helix-onedrive-support/compare/v4.0.3...v4.0.4) (2021-03-26)
 
 
