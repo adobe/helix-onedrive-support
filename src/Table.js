@@ -90,7 +90,7 @@ class Table {
   }
 
   async deleteRow(index) {
-    return this._oneDrive.doFetch(`${this.uri}/rows/itemAt(index=${index})`, false, {
+    return this._oneDrive.doFetch(`${this.uri}/rows/itemAt(index=${index})`, true, {
       method: 'DELETE',
     });
   }
