@@ -41,6 +41,13 @@ describe('StatusCodeError Tests', () => {
     assert.equal(e.statusCode, 503);
   });
 
+  it('fromError uses 503 if connect refused on fetch error', async () => {
+    const error = new FetchError();
+    error.code = 'ECONNREFUSED';
+    const e = StatusCodeError.fromError(error);
+    assert.equal(e.statusCode, 503);
+  });
+
   it('fromError uses 504 if timeout on fetch error', async () => {
     const error = new FetchError();
     error.code = 'ETIMEDOUT';
