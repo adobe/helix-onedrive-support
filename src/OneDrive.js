@@ -13,7 +13,7 @@
 // eslint-disable-next-line max-classes-per-file
 const EventEmitter = require('events');
 const { promisify } = require('util');
-const { AuthenticationContext } = require('adal-node');
+const { AuthenticationContext, MemoryCache } = require('adal-node');
 const fetchAPI = require('@adobe/helix-fetch');
 
 const Workbook = require('./Workbook.js');
@@ -55,14 +55,15 @@ const shareItemCache = new Map();
 class OneDrive extends EventEmitter {
   /**
    * @param {OneDriveOptions} opts Options
-   * @param {string} opts.clientId The client id of the app
-   * @param {string} [opts.clientSecret] The client secret of the app
-   * @param {string} [opts.refreshToken] The refresh token.
-   * @param {string} [opts.accessToken] The access token.
-   * @param {string} [opts.username] Username for username/password authentication.
-   * @param {string} [opts.password] Password for username/password authentication.
-   * @param {number} [opts.expiresOn] Expiration time.
-   * @param {Logger} [opts.log] A logger.
+   * @param {string}  opts.clientId The client id of the app
+   * @param {string}  [opts.clientSecret] The client secret of the app
+   * @param {string}  [opts.refreshToken] The refresh token.
+   * @param {string}  [opts.accessToken] The access token.
+   * @param {string}  [opts.username] Username for username/password authentication.
+   * @param {string}  [opts.password] Password for username/password authentication.
+   * @param {number}  [opts.expiresOn] Expiration time.
+   * @param {Logger}  [opts.log] A logger.
+   * @param {boolean} [opts.localAuthCache] Whether to use local auth cache
    */
   constructor(opts) {
     super(opts);
@@ -77,7 +78,11 @@ class OneDrive extends EventEmitter {
     if (!this.clientId) {
       throw new Error('Missing clientId.');
     }
-    this.authContext = new AuthenticationContext(this.authorityUrl);
+    this.authContext = new AuthenticationContext(
+      this.authorityUrl,
+      undefined,
+      opts.localAuthCache ? new MemoryCache() : undefined,
+    );
     [
       'acquireUserCode',
       'acquireToken',
