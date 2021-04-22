@@ -12,9 +12,8 @@
 
 /* eslint-env mocha */
 
-'use strict';
-
 const assert = require('assert');
+const { AbortError, FetchError } = require('@adobe/helix-fetch');
 const StatusCodeError = require('../src/StatusCodeError.js');
 
 describe('StatusCodeError Tests', () => {
@@ -25,6 +24,32 @@ describe('StatusCodeError Tests', () => {
 
   it('fromError defaults to 500', async () => {
     const error = new Error('what the heck?!?');
+    const e = StatusCodeError.fromError(error);
+    assert.equal(e.statusCode, 500);
+  });
+
+  it('fromError uses 504 if aborted', async () => {
+    const error = new AbortError();
+    const e = StatusCodeError.fromError(error);
+    assert.equal(e.statusCode, 504);
+  });
+
+  it('fromError uses 503 if connect reset on fetch error', async () => {
+    const error = new FetchError();
+    error.code = 'ECONNRESET';
+    const e = StatusCodeError.fromError(error);
+    assert.equal(e.statusCode, 503);
+  });
+
+  it('fromError uses 504 if timeout on fetch error', async () => {
+    const error = new FetchError();
+    error.code = 'ETIMEDOUT';
+    const e = StatusCodeError.fromError(error);
+    assert.equal(e.statusCode, 504);
+  });
+
+  it('fromError uses 500 on fetch error', async () => {
+    const error = new FetchError();
     const e = StatusCodeError.fromError(error);
     assert.equal(e.statusCode, 500);
   });
