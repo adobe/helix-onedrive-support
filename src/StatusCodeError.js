@@ -28,7 +28,7 @@ class StatusCodeError extends Error {
       statusCode = 504;
     }
     if (err instanceof FetchError) {
-      if (err.code === 'ECONNRESET' || err.code === 'ECONNREFUSED') {
+      if (err.code === 'ECONNRESET') {
         statusCode = 503;
       } else if (err.code === 'ETIMEDOUT') {
         statusCode = 504;
