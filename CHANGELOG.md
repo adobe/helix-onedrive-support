@@ -1,3 +1,10 @@
+# [4.1.0](https://github.com/adobe/helix-onedrive-support/compare/v4.0.5...v4.1.0) (2021-04-22)
+
+
+### Features
+
+* allow to use local access token cache ([#156](https://github.com/adobe/helix-onedrive-support/issues/156)) ([6b65d34](https://github.com/adobe/helix-onedrive-support/commit/6b65d3493c23fd0440884bdd744f9ebcbdb910cf))
+
 ## [4.0.5](https://github.com/adobe/helix-onedrive-support/compare/v4.0.4...v4.0.5) (2021-04-08)
 
 
