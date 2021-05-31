@@ -94,22 +94,24 @@ class OneDrive extends EventEmitter {
       this.authContext[m] = promisify(this.authContext[m].bind(this.authContext));
     });
     const { cache } = this.authContext;
-    const originalAdd = cache.add;
-    cache.add = (entries, cb) => {
-      originalAdd.call(cache, entries, (...args) => {
-        // eslint-disable-next-line no-underscore-dangle
-        this.emit('tokens', cache._entries);
-        cb(...args);
-      });
-    };
-    const originalRemove = cache.remove;
-    cache.remove = (entries, cb) => {
-      originalRemove.call(cache, entries, (...args) => {
-        // eslint-disable-next-line no-underscore-dangle
-        this.emit('tokens', cache._entries);
-        cb(...args);
-      });
-    };
+    if (opts.localAuthCache) {
+      const originalAdd = cache.add;
+      cache.add = (entries, cb) => {
+        originalAdd.call(cache, entries, (...args) => {
+          // eslint-disable-next-line no-underscore-dangle
+          this.emit('tokens', cache._entries);
+          cb(...args);
+        });
+      };
+      const originalRemove = cache.remove;
+      cache.remove = (entries, cb) => {
+        originalRemove.call(cache, entries, (...args) => {
+          // eslint-disable-next-line no-underscore-dangle
+          this.emit('tokens', cache._entries);
+          cb(...args);
+        });
+      };
+    }
     cache.add.promise = promisify(cache.add.bind(cache));
     cache.remove.promise = promisify(cache.remove.bind(cache));
     cache.find.promise = promisify(cache.find.bind(cache));
