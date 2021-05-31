@@ -18,7 +18,11 @@ const OneDrive = require('../src/OneDrive.js');
 require('dotenv').config();
 
 describe('Excel Integration Tests', () => {
-  it('Get the sheet data', async () => {
+  it('Get the sheet data', async function test() {
+    if (!process.env.AZURE_WORD2MD_CLIENT_ID) {
+      this.skip();
+      return;
+    }
     const drive = new OneDrive({
       clientId: process.env.AZURE_WORD2MD_CLIENT_ID,
       username: process.env.AZURE_HELIX_USER,
@@ -32,7 +36,11 @@ describe('Excel Integration Tests', () => {
     assert.deepEqual(names, ['Sheet1', 'Config']);
   }).timeout(10000);
 
-  it('Test pre authenticate fetch', async () => {
+  it('Test pre authenticate fetch', async function test() {
+    if (!process.env.AZURE_WORD2MD_CLIENT_ID) {
+      this.skip();
+      return;
+    }
     const drive = new OneDrive({
       clientId: process.env.AZURE_WORD2MD_CLIENT_ID,
       username: process.env.AZURE_HELIX_USER,
