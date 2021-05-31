@@ -1,3 +1,15 @@
+# [5.0.0](https://github.com/adobe/helix-onedrive-support/compare/v4.1.1...v5.0.0) (2021-05-31)
+
+
+### Bug Fixes
+
+* only emit tokens events for local cache ([ba2cc92](https://github.com/adobe/helix-onedrive-support/commit/ba2cc92fb37ae49ea18391dbe9d2a2db58270117)), closes [#166](https://github.com/adobe/helix-onedrive-support/issues/166)
+
+
+### BREAKING CHANGES
+
+* the 'tokens' event is only emitted for local caches, since dealing with event emitters on global objects bears risks.
+
 ## [4.1.1](https://github.com/adobe/helix-onedrive-support/compare/v4.1.0...v4.1.1) (2021-05-17)
 
 
