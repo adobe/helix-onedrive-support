@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/adobe/helix-onedrive-support#readme",
   "dependencies": {
-    "@adobe/helix-fetch": "2.2.1",
+    "@adobe/helix-fetch": "2.3.0",
     "adal-node": "https://github.com/adobe-rnd/azure-activedirectory-library-for-nodejs.git#adobe"
   },
   "devDependencies": {
