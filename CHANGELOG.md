@@ -1,3 +1,10 @@
+# [5.1.0](https://github.com/adobe/helix-onedrive-support/compare/v5.0.3...v5.1.0) (2021-08-31)
+
+
+### Features
+
+* add option to disable share link cache (for testing) ([#186](https://github.com/adobe/helix-onedrive-support/issues/186)) ([a8e6af2](https://github.com/adobe/helix-onedrive-support/commit/a8e6af229f70014e12772e4a2c19d657ba68fdde))
+
 ## [5.0.3](https://github.com/adobe/helix-onedrive-support/compare/v5.0.2...v5.0.3) (2021-08-18)
 
 
