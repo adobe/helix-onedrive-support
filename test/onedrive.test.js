@@ -26,7 +26,18 @@ const AZ_AUTHORITY_HOST_URL = 'https://login.windows.net';
 
 const { TEST_CLIENT_ID, TEST_USER, TEST_PASSWORD } = process.env;
 
+const DEFAULT_AUTH = {
+  token_type: 'Bearer',
+  refresh_token: 'dummy',
+  access_token: 'dummy',
+  expires_in: 81000,
+};
+
 describe('OneDrive Tests', () => {
+  afterEach(() => {
+    delete process.env.HELIX_ONEDRIVE_NO_SHARE_LINK_CACHE;
+  });
+
   it('throws when required parameters are not specified.', async () => {
     assert.throws(() => new OneDrive({}));
   });
@@ -328,6 +339,126 @@ describe('OneDrive Tests', () => {
     const me = await od.me();
     assert.deepEqual(me, expected);
   }).timeout(5000);
+
+  it('uses global share link cache by default', async () => {
+    const scope0 = nock(AZ_AUTHORITY_HOST_URL)
+      .post('/common/oauth2/token?api-version=1.0')
+      .reply(200, DEFAULT_AUTH);
+    const scope1 = nock('https://graph.microsoft.com/v1.0')
+      .get('/shares/u!aHR0cHM6Ly9vbmVkcml2ZS5jb20vYS9iL2MvZDA/driveItem')
+      .reply(200, {
+        id: 'some-id',
+      });
+
+    const od = new OneDrive({
+      clientId: 'foobar',
+      refreshToken: 'dummy',
+      localAuthCache: true,
+    });
+    const item1 = await od.getDriveItemFromShareLink('https://onedrive.com/a/b/c/d0');
+    assert.deepStrictEqual(item1, {
+      id: 'some-id',
+    });
+    const item2 = await od.getDriveItemFromShareLink('https://onedrive.com/a/b/c/d0');
+    assert.strictEqual(item1, item2);
+
+    scope0.done();
+    scope1.done();
+  });
+
+  it('share link cache can be disabled via option', async () => {
+    const scope0 = nock(AZ_AUTHORITY_HOST_URL)
+      .post('/common/oauth2/token?api-version=1.0')
+      .twice()
+      .reply(200, DEFAULT_AUTH);
+    const scope1 = nock('https://graph.microsoft.com/v1.0')
+      .get('/shares/u!aHR0cHM6Ly9vbmVkcml2ZS5jb20vYS9iL2MvZDAx/driveItem')
+      .twice()
+      .reply(200, {
+        id: 'some-id',
+      });
+
+    const od = new OneDrive({
+      clientId: 'foobar',
+      refreshToken: 'dummy',
+      localAuthCache: true,
+      noShareLinkCache: true,
+    });
+    const item1 = await od.getDriveItemFromShareLink('https://onedrive.com/a/b/c/d01');
+    assert.deepStrictEqual(item1, {
+      id: 'some-id',
+    });
+    const item2 = await od.getDriveItemFromShareLink('https://onedrive.com/a/b/c/d01');
+    assert.deepEqual(item1, item2);
+    assert.notStrictEqual(item1, item2);
+
+    scope0.done();
+    scope1.done();
+  });
+
+  it('share link cache can be disabled via env', async () => {
+    process.env.HELIX_ONEDRIVE_NO_SHARE_LINK_CACHE = true;
+    const scope0 = nock(AZ_AUTHORITY_HOST_URL)
+      .post('/common/oauth2/token?api-version=1.0')
+      .twice()
+      .reply(200, DEFAULT_AUTH);
+    const scope1 = nock('https://graph.microsoft.com/v1.0')
+      .get('/shares/u!aHR0cHM6Ly9vbmVkcml2ZS5jb20vYS9iL2MvZDE/driveItem')
+      .twice()
+      .reply(200, {
+        id: 'some-id',
+      });
+
+    const od = new OneDrive({
+      clientId: 'foobar',
+      refreshToken: 'dummy',
+      localAuthCache: true,
+    });
+    const item1 = await od.getDriveItemFromShareLink('https://onedrive.com/a/b/c/d1');
+    assert.deepStrictEqual(item1, {
+      id: 'some-id',
+    });
+    const item2 = await od.getDriveItemFromShareLink('https://onedrive.com/a/b/c/d1');
+    assert.deepEqual(item1, item2);
+    assert.notStrictEqual(item1, item2);
+
+    scope0.done();
+    scope1.done();
+  });
+
+  it('share link cache can be supplied via opts', async () => {
+    const scope0 = nock(AZ_AUTHORITY_HOST_URL)
+      .post('/common/oauth2/token?api-version=1.0')
+      .reply(200, DEFAULT_AUTH);
+    const scope1 = nock('https://graph.microsoft.com/v1.0')
+      .get('/shares/u!aHR0cHM6Ly9vbmVkcml2ZS5jb20vYS9iL2MvZDI/driveItem')
+      .reply(200, {
+        id: 'some-id',
+      });
+
+    const shareLinkCache = new Map();
+
+    const od = new OneDrive({
+      clientId: 'foobar',
+      refreshToken: 'dummy',
+      localAuthCache: true,
+      shareLinkCache,
+    });
+    const item1 = await od.getDriveItemFromShareLink('https://onedrive.com/a/b/c/d2');
+    assert.deepStrictEqual(item1, {
+      id: 'some-id',
+    });
+    const item2 = await od.getDriveItemFromShareLink('https://onedrive.com/a/b/c/d2');
+    assert.strictEqual(item1, item2);
+
+    assert.deepStrictEqual(Object.fromEntries(shareLinkCache.entries()), {
+      'https://onedrive.com/a/b/c/d2': {
+        id: 'some-id',
+      },
+    });
+    scope0.done();
+    scope1.done();
+  });
 
   it('propagates errors', async () => {
     nock(AZ_AUTHORITY_HOST_URL)

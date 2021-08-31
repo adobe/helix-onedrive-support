@@ -47,7 +47,7 @@ const MAX_SUBSCRIPTION_EXPIRATION_TIME = 4230 * 60 * 1000;
  * @type {Map<string, *>}
  * @private
  */
-const shareItemCache = new Map();
+const globalShareLinkCache = new Map();
 
 /**
  * Helper class that facilitates accessing one drive.
@@ -74,6 +74,10 @@ class OneDrive extends EventEmitter {
     this.password = opts.password || '';
     this._log = opts.log || console;
     this.tenant = opts.tenant || AZ_DEFAULT_TENANT;
+
+    if (!opts.noShareLinkCache && !process.env.HELIX_ONEDRIVE_NO_SHARE_LINK_CACHE) {
+      this.shareLinkCache = opts.shareLinkCache || globalShareLinkCache;
+    }
 
     if (!this.clientId) {
       throw new Error('Missing clientId.');
@@ -349,10 +353,14 @@ class OneDrive extends EventEmitter {
     if (driveItem) {
       return driveItem;
     }
-    driveItem = shareItemCache.get(sharingUrl);
+    if (this.shareLinkCache) {
+      driveItem = this.shareLinkCache.get(sharingUrl);
+    }
     if (!driveItem) {
       driveItem = await this.resolveShareLink(sharingUrl);
-      shareItemCache.set(sharingUrl, driveItem);
+      if (this.shareLinkCache) {
+        this.shareLinkCache.set(sharingUrl, driveItem);
+      }
     }
     return driveItem;
   }

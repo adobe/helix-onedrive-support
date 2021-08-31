@@ -27,6 +27,23 @@ export declare interface OneDriveOptions {
   tenant?: string;
   username?: string;
   password?: string;
+
+  /**
+   * Uses a local auth cache for access tokens.
+   */
+  localAuthCache?: boolean,
+
+  /**
+   * Disables the cache for the share link lookup.
+   * @default process.env.HELIX_ONEDRIVE_NO_SHARE_LINK_CACHE
+   */
+  noShareLinkCache?: boolean;
+
+  /**
+   * Map to use for the share link lookup cache. If empty, a module-global cache will be used.
+   * Note that the cache is only used, if the `noShareLinkCache` flag is `falsy`
+   */
+  shareLinkCache?: Map<string, DriveItem>,
 }
 
 export declare interface GraphResult {
@@ -120,8 +137,8 @@ export declare class OneDrive extends EventEmitter {
 
   acquireToken(redirectUri: string, code: string): Promise<TokenResponse>;
 
-  dispose() : Promise;
-  
+  dispose() : Promise<void>;
+
   doFetch(relUrl: string, rawResponseBody: boolean = false, options: object = {}): Promise<object|Buffer>
 
   me(): Promise<GraphResult>;
