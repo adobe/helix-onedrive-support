@@ -43,6 +43,10 @@ class StatusCodeError extends Error {
    * @returns {StatusCodeError} status code error
    */
   static fromErrorResponse(errorBody, statusCode) {
+    if (errorBody.error && errorBody.error.message) {
+      // eslint-disable-next-line no-param-reassign
+      errorBody = errorBody.error;
+    }
     return new StatusCodeError(errorBody.message, statusCode, errorBody);
   }
 

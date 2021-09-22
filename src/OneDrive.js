@@ -292,7 +292,7 @@ class OneDrive extends EventEmitter {
         if (err.statusCode === 404) {
           this.log.warn(`${relUrl} : ${err.statusCode} - ${err.message}`);
         } else {
-          this.log.error(`${relUrl} : ${err.statusCode} - ${err.message} - ${err.details}`);
+          this.log.error(`${relUrl} : ${err.statusCode} - ${err.message}`, err.details);
         }
         throw err;
       }
