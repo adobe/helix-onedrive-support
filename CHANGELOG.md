@@ -1,3 +1,10 @@
+## [5.1.1](https://github.com/adobe/helix-onedrive-support/compare/v5.1.0...v5.1.1) (2021-09-22)
+
+
+### Bug Fixes
+
+* better error report ([#191](https://github.com/adobe/helix-onedrive-support/issues/191)) ([a63bb4f](https://github.com/adobe/helix-onedrive-support/commit/a63bb4f2819d7764885a5a1ad99923ba172f6d93)), closes [#190](https://github.com/adobe/helix-onedrive-support/issues/190)
+
 # [5.1.0](https://github.com/adobe/helix-onedrive-support/compare/v5.0.3...v5.1.0) (2021-08-31)
 
 
