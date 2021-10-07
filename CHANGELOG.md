@@ -1,3 +1,10 @@
+# [5.2.0](https://github.com/adobe/helix-onedrive-support/compare/v5.1.1...v5.2.0) (2021-10-07)
+
+
+### Features
+
+* provide support for adding columns and changing range values ([#195](https://github.com/adobe/helix-onedrive-support/issues/195)) ([264aaab](https://github.com/adobe/helix-onedrive-support/commit/264aaab25afc95563808621f129752ade3ee2b89))
+
 ## [5.1.1](https://github.com/adobe/helix-onedrive-support/compare/v5.1.0...v5.1.1) (2021-09-22)
 
 
