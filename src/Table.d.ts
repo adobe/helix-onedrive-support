@@ -9,7 +9,14 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { GraphResult } from './OneDrive';
+import {DriveItem, GraphResult} from './OneDrive';
+
+export declare interface FormatOptions {
+  /**
+   * Trims the object names and values and strips zero-width unicode characters.
+   */
+  trim?:boolean;
+}
 
 /**
  * Excel Table
@@ -37,7 +44,7 @@ export declare interface Table {
    * Returns the rows as a list of objects. the rows have the columns names as property names
    * and the row values as value.
    */
-  getRowsAsObjects(): Promise<Array<object>>;
+  getRowsAsObjects(opts?:FormatOptions): Promise<Array<object>>;
 
   /**
    * Return a row given its index
@@ -85,5 +92,5 @@ export declare interface Table {
    * @param index zero-based index or missing to add at end
    * @returns new column
    */
-   addColumn(name, index?): Promise<DriveItem>;
+   addColumn(name:string, index?:number): Promise<DriveItem>;
 }

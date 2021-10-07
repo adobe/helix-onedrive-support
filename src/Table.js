@@ -41,7 +41,7 @@ class Table {
     return result.value.map((v) => v.values[0]);
   }
 
-  async getRowsAsObjects() {
+  async getRowsAsObjects({ trim = false } = {}) {
     const { log } = this;
     this.log.debug(`get columns from ${this.uri}/columns`);
     const result = await this._oneDrive.doFetch(`${this.uri}/columns`);
@@ -51,8 +51,13 @@ class Table {
     const rowValues = result.value[0].values
       .map((_, rownum) => columnNames.reduce((row, name, column) => {
         const [value] = result.value[column].values[rownum];
-        // eslint-disable-next-line no-param-reassign
-        row[superTrim(name)] = superTrim(value);
+        if (trim) {
+          // eslint-disable-next-line no-param-reassign
+          row[superTrim(name)] = superTrim(value);
+        } else {
+          // eslint-disable-next-line no-param-reassign
+          row[name] = value;
+        }
         return row;
       }, {}));
 

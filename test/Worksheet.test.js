@@ -43,17 +43,17 @@ describe('Worksheet Tests', () => {
 
   it('Get named items', async () => {
     const values = await sheet.getNamedItems();
-    assert.deepEqual(values, [{ name: 'alice', value: '$A2', comment: 'none' }]);
+    assert.deepStrictEqual(values, [{ name: 'alice', value: '$A2', comment: 'none' }]);
   });
   it('Get named item', async () => {
     const name = 'alice';
     const values = await sheet.getNamedItem(name);
-    assert.deepEqual(values, { name: 'alice', value: '$A2', comment: 'none' });
+    assert.deepStrictEqual(values, { name: 'alice', value: '$A2', comment: 'none' });
   });
   it('Add named item', async () => {
     const namedItem = { name: 'bob', value: '$B2', comment: 'none' };
     await sheet.addNamedItem(namedItem.name, namedItem.value, namedItem.comment);
-    assert.deepEqual(namedItem, {
+    assert.deepStrictEqual(namedItem, {
       comment: 'none',
       name: 'bob',
       value: '$B2',
@@ -68,7 +68,7 @@ describe('Worksheet Tests', () => {
   });
   it('Get table names', async () => {
     const values = await sheet.getTableNames();
-    assert.deepEqual(values, ['table']);
+    assert.deepStrictEqual(values, ['table']);
   });
   it('Get used range address', async () => {
     const range = sheet.usedRange();
@@ -83,17 +83,27 @@ describe('Worksheet Tests', () => {
   it('Get all data', async () => {
     const range = sheet.usedRange();
     const address = await range.getData();
-    assert.deepEqual(address, oneDrive.workbooks[0].data.sheets[0].usedRange);
+    assert.deepStrictEqual(address, oneDrive.workbooks[0].data.sheets[0].usedRange);
   });
   it('Get column names', async () => {
     const range = sheet.usedRange();
     const names = await range.getColumnNames();
-    assert.deepEqual(names, ['project', '  c r e a t e d  ']);
+    assert.deepStrictEqual(names, ['project', '  c r e a t e d  ']);
   });
   it('Get rows as objects', async () => {
     const range = sheet.usedRange();
     const data = await range.getRowsAsObjects();
-    assert.deepEqual(data, [
+    assert.deepStrictEqual(data, [
+      { '  c r e a t e d  ': 2018, project: 'Helix' },
+      { '  c r e a t e d  ': 2019, project: 'What' },
+      { '  c r e a t e d  ': 2020, project: 'this' },
+      { '  c r e a t e d  ': '\t 2021 ', project: ' Space\u200B ' },
+    ]);
+  });
+  it('Get rows as objects (trimmed)', async () => {
+    const range = sheet.usedRange();
+    const data = await range.getRowsAsObjects({ trim: true });
+    assert.deepStrictEqual(data, [
       { 'c r e a t e d': '2018', project: 'Helix' },
       { 'c r e a t e d': '2019', project: 'What' },
       { 'c r e a t e d': '2020', project: 'this' },

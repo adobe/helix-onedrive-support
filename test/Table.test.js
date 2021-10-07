@@ -65,6 +65,21 @@ describe('Table Tests', () => {
   it('Get rows as objects', async () => {
     const data = await table.getRowsAsObjects();
     assert.deepEqual(data, [
+      { ' F i r s t n a m e ': 'Albert', Name: 'Einstein' },
+      { ' F i r s t n a m e ': 'Marie', Name: 'Curie' },
+      { ' F i r s t n a m e ': 'Steven', Name: 'Hawking' },
+      { ' F i r s t n a m e ': 'Isaac', Name: 'Newton' },
+      { ' F i r s t n a m e ': 'Niels', Name: 'Bohr' },
+      { ' F i r s t n a m e ': 'Michael', Name: 'Faraday' },
+      { ' F i r s t n a m e ': 'Galileo', Name: 'Galilei' },
+      { ' F i r s t n a m e ': 'Johannes', Name: 'Kepler' },
+      { ' F i r s t n a m e ': 'Nikolaus', Name: 'Kopernikus' },
+      { ' F i r s t n a m e ': '\t Balls ', Name: ' Space\u200B' },
+    ]);
+  });
+  it('Get rows as objects (trimmed)', async () => {
+    const data = await table.getRowsAsObjects({ trim: true });
+    assert.deepEqual(data, [
       { 'F i r s t n a m e': 'Albert', Name: 'Einstein' },
       { 'F i r s t n a m e': 'Marie', Name: 'Curie' },
       { 'F i r s t n a m e': 'Steven', Name: 'Hawking' },

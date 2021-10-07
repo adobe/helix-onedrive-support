@@ -11,6 +11,7 @@
  */
 
 import { GraphResult, Logger } from './OneDrive'
+import { FormatOptions } from "./Table";
 
 /**
  * Excel Range
@@ -45,7 +46,7 @@ export declare interface Range {
    * Returns the rows as a list of objects. the rows have the columns names as property names
    * and the row values as value.
    */
-  getRowsAsObjects(): Promise<Array<object>>;
+  getRowsAsObjects(opts?:FormatOptions): Promise<Array<object>>;
 
   /**
    * Returns the values of the range.
