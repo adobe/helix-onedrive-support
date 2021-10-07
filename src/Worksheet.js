@@ -52,6 +52,10 @@ class Worksheet extends NamedItemContainer {
   usedRange() {
     return new Range(this._oneDrive, `${this._uri}/usedRange`, this._log);
   }
+
+  range(address) {
+    return new Range(this._oneDrive, `${this._uri}/range(address='${address}')`, this._log);
+  }
 }
 
 module.exports = Worksheet;

@@ -70,6 +70,14 @@ class Range {
     }
     return this._values;
   }
+
+  async update(newValues) {
+    const result = await this._oneDrive.doFetch(this.uri, false, {
+      method: 'PATCH',
+      body: newValues,
+    });
+    this._values = result.values;
+  }
 }
 
 module.exports = Range;

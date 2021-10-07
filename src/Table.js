@@ -105,6 +105,19 @@ class Table {
     return result.values;
   }
 
+  async addColumn(name, index) {
+    const body = {
+      name,
+    };
+    if (index) {
+      body.index = index;
+    }
+    return this._oneDrive.doFetch(`${this.uri}/columns`, false, {
+      method: 'POST',
+      body,
+    });
+  }
+
   get uri() {
     return `${this._prefix}/${this._name}`;
   }

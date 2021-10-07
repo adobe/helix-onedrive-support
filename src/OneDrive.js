@@ -337,7 +337,15 @@ class OneDrive extends EventEmitter {
   async resolveShareLink(sharingUrl) {
     const link = OneDrive.encodeSharingUrl(sharingUrl);
     this.log.debug(`resolving sharelink ${sharingUrl} (${link})`);
-    return this.doFetch(`/shares/${link}/driveItem`);
+    try {
+      return this.doFetch(`/shares/${link}/driveItem`);
+    } catch (e) {
+      if (e.statusCode === 401) {
+        // a inexistant share returns 401, we prefer to just say it wasn't found
+        throw new StatusCodeError(e.message, 404);
+      }
+      throw e;
+    }
   }
 
   /**

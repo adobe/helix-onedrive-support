@@ -51,4 +51,12 @@ export declare interface Range {
    * Returns the values of the range.
    */
   getValues(): Promise<Array<object>>;
+
+  /**
+   * Updates the range with new values.
+   * @param values new values, that may contain a combination of properties values,
+   *               formulas and numberFormat. Those properties should have the same
+   *               array dimension as the range addressed
+   */
+  update(values: object): Promise<void>;
 }
