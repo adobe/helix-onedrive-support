@@ -1,3 +1,10 @@
+## [5.2.1](https://github.com/adobe/helix-onedrive-support/compare/v5.2.0...v5.2.1) (2021-10-07)
+
+
+### Bug Fixes
+
+* doFetch() must be awaited ([4aa63ac](https://github.com/adobe/helix-onedrive-support/commit/4aa63ac7a28804e0dcf5ae0f6f5826dfd38fccd5))
+
 # [5.2.0](https://github.com/adobe/helix-onedrive-support/compare/v5.1.1...v5.2.0) (2021-10-07)
 
 
