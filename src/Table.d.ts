@@ -71,4 +71,19 @@ export declare interface Table {
    * @returns number of rows
    */
   getRowCount(): Promise<number>;
+
+  /**
+   * Return column values of a column
+   * @param name name or id of column
+   * @returns column values
+   */
+   getColumn(name: string): Promise<string[]>;
+
+   /**
+   * Add a column to an existing table
+   * @param name name of new column
+   * @param index zero-based index or missing to add at end
+   * @returns new column
+   */
+   addColumn(name, index?): Promise<DriveItem>;
 }

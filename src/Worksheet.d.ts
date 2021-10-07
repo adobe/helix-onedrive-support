@@ -66,4 +66,10 @@ export declare interface Worksheet {
    * Returns a new range object that reflects the `usedRange` of a work sheet.
    */
   usedRange(): Range;
+
+  /**
+   * Returns a new range object that spans the address given
+   * @param address address, e.g. A1:C2
+   */
+   range(address): Range;
 }
