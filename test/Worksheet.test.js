@@ -88,15 +88,16 @@ describe('Worksheet Tests', () => {
   it('Get column names', async () => {
     const range = sheet.usedRange();
     const names = await range.getColumnNames();
-    assert.deepEqual(names, ['project', 'created']);
+    assert.deepEqual(names, ['project', '  c r e a t e d  ']);
   });
   it('Get rows as objects', async () => {
     const range = sheet.usedRange();
     const data = await range.getRowsAsObjects();
     assert.deepEqual(data, [
-      { created: 2018, project: 'Helix' },
-      { created: 2019, project: 'What' },
-      { created: 2020, project: 'this' },
+      { 'c r e a t e d': '2018', project: 'Helix' },
+      { 'c r e a t e d': '2019', project: 'What' },
+      { 'c r e a t e d': '2020', project: 'this' },
+      { 'c r e a t e d': '2021', project: 'Space' },
     ]);
   });
 });

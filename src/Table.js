@@ -9,6 +9,8 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+const { superTrim } = require('./utils.js');
+
 class Table {
   constructor(oneDrive, prefix, name, log) {
     this._oneDrive = oneDrive;
@@ -50,7 +52,7 @@ class Table {
       .map((_, rownum) => columnNames.reduce((row, name, column) => {
         const [value] = result.value[column].values[rownum];
         // eslint-disable-next-line no-param-reassign
-        row[name] = value;
+        row[superTrim(name)] = superTrim(value);
         return row;
       }, {}));
 
