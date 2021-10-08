@@ -9,6 +9,8 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+const { superTrim } = require('./utils.js');
+
 class Range {
   constructor(oneDrive, uri, log) {
     this._oneDrive = oneDrive;
@@ -44,13 +46,18 @@ class Range {
     return (await this.getData()).values[0];
   }
 
-  async getRowsAsObjects() {
+  async getRowsAsObjects({ trim = false } = {}) {
     const values = await this.getValues();
 
     const columnNames = values[0];
     const rows = values.map((row) => columnNames.reduce((obj, name, index) => {
-      // eslint-disable-next-line no-param-reassign
-      obj[name] = row[index];
+      if (trim) {
+        // eslint-disable-next-line no-param-reassign
+        obj[superTrim(name)] = superTrim(row[index]);
+      } else {
+        // eslint-disable-next-line no-param-reassign
+        obj[name] = row[index];
+      }
       return obj;
     }, {}));
     // discard first row

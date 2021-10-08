@@ -11,7 +11,7 @@
  */
 const tables = [{
   name: 'table',
-  headerNames: ['Name', 'Firstname'],
+  headerNames: ['Name', ' F i r s t n a m e '],
   rows: [
     ['Einstein', 'Albert'],
     ['Curie', 'Marie'],
@@ -22,6 +22,7 @@ const tables = [{
     ['Galilei', 'Galileo'],
     ['Kepler', 'Johannes'],
     ['Kopernikus', 'Nikolaus'],
+    [' Space\u200B', '\t Balls '],
   ],
 }];
 
@@ -44,10 +45,11 @@ module.exports = {
       address: 'Sheet1!A1:B4',
       addressLocal: 'A1:B4',
       values: [
-        ['project', 'created'],
+        ['project', '  c r e a t e d  '],
         ['Helix', 2018],
         ['What', 2019],
-        ['this', 2020]],
+        ['this', 2020],
+        [' Space\u200B ', '\t 2021 ']],
     },
   },
   ],

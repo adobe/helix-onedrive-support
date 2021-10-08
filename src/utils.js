@@ -11,6 +11,23 @@
  */
 
 /**
+ * Trims the string at both ends and removes the zero width unicode chars:
+ *
+ * - U+200B zero width space
+ * - U+200C zero width non-joiner Unicode code point
+ * - U+200D zero width joiner Unicode code point
+ * - U+FEFF zero width no-break space Unicode code point
+ *
+ * @param {string} str input string
+ * @return {string} trimmed and stripped string
+ */
+function superTrim(str) {
+  return String(str)
+    .replace(/[\u200B-\u200D\uFEFF]/g, '')
+    .trim();
+}
+
+/**
  * Returns a onedrive uri for the given drive item. the uri has the format:
  * `onedrive:/drives/<driveId>/items/<itemId>`
  *
@@ -55,4 +72,5 @@ function driveItemFromURL(url) {
 module.exports = {
   driveItemFromURL,
   driveItemToURL,
+  superTrim,
 };
