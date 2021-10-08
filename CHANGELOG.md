@@ -1,3 +1,10 @@
+## [5.2.2](https://github.com/adobe/helix-onedrive-support/compare/v5.2.1...v5.2.2) (2021-10-08)
+
+
+### Bug Fixes
+
+* trim object names and values ([#196](https://github.com/adobe/helix-onedrive-support/issues/196)) ([f117175](https://github.com/adobe/helix-onedrive-support/commit/f117175f63316ed8a3b60f4e74870114134b9ef7))
+
 ## [5.2.1](https://github.com/adobe/helix-onedrive-support/compare/v5.2.0...v5.2.1) (2021-10-07)
 
 
