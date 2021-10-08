@@ -489,7 +489,15 @@ class OneDrive extends EventEmitter {
   /**
    * @see https://docs.microsoft.com/en-us/graph/api/driveitem-put-content?view=graph-rest-1.0&tabs=http
    */
-  async uploadDriveItem(buffer, driveItem, relPath = '') {
+  async uploadDriveItem(buffer, driveItem, relPath = '', conflictBehaviour = 'replace') {
+    const validConflictBehaviours = [
+      'replace',
+      'rename',
+      'fail',
+    ];
+    if (!validConflictBehaviours.includes(conflictBehaviour)) {
+      throw new Error(`Bad confict behaviour: ${conflictBehaviour}, must be one of: ${validConflictBehaviours.join('/')}`);
+    }
     // eslint-disable-next-line no-param-reassign
     relPath = relPath.replace(/\/+$/, '');
     if (relPath) {
@@ -498,7 +506,7 @@ class OneDrive extends EventEmitter {
     }
 
     // PUT /drives/{drive-id}/items/{parent-id}:/{filename}:/content
-    const uri = `/drives/${driveItem.parentReference.driveId}/items/${driveItem.id}${relPath}/content`;
+    const uri = `/drives/${driveItem.parentReference.driveId}/items/${driveItem.id}${relPath}/content?@microsoft.graph.conflictBehavior=${conflictBehaviour}`;
     const opts = {
       method: 'PUT',
       body: buffer,
@@ -506,7 +514,7 @@ class OneDrive extends EventEmitter {
         'Content-Type': 'application/octet-stream',
       },
     };
-    return this.doFetch(uri, true, opts);
+    return this.doFetch(uri, false, opts);
   }
 
   /**

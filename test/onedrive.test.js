@@ -484,4 +484,14 @@ describe('OneDrive Tests', () => {
     });
     await assert.rejects(od.me(), new StatusCodeError('wrong input', 400));
   }).timeout(5000);
+
+  it('uploadDriveItem fails with bad conflict behaviour', async () => {
+    const drive = new OneDrive({
+      clientId: 'foo', clientSecret: 'bar',
+    });
+    await assert.rejects(
+      async () => drive.uploadDriveItem(Buffer.alloc(0), 'item', '', 'guess'),
+      /Error: Bad confict behaviour/,
+    );
+  });
 });
