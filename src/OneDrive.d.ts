@@ -203,7 +203,15 @@ export declare class OneDrive extends EventEmitter {
 
   deleteSubscription(id: string): Promise<GraphResult>;
 
-  uploadDriveItem(buffer: Buffer, driveItem: string, relPath?: string);
+  /**
+   * Uploads a drive item.
+   *
+   * @param buffer contents of file
+   * @param driveItem parent item in combination with relPath or item itself
+   * @param relPath relative path
+   * @param conflictBehaviour replace, rename or fail, default is replace
+   */
+  uploadDriveItem(buffer: Buffer, driveItem: string, relPath?: string, conflictBehaviour?: string);
 
   /**
    * Returns the root item for a drive given its id.
