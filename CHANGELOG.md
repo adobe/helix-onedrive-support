@@ -1,3 +1,15 @@
+# [6.0.0](https://github.com/adobe/helix-onedrive-support/compare/v5.2.2...v6.0.0) (2021-10-08)
+
+
+* Support conflict behaviour (#197) ([b4a5c72](https://github.com/adobe/helix-onedrive-support/commit/b4a5c72ed76062c558ea175aaedff3475e892c34)), closes [#197](https://github.com/adobe/helix-onedrive-support/issues/197)
+
+
+### BREAKING CHANGES
+
+* uploadDriveItem return value changed
+
+* fix: test behaviour values
+
 ## [5.2.2](https://github.com/adobe/helix-onedrive-support/compare/v5.2.1...v5.2.2) (2021-10-08)
 
 
