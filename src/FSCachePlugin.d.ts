@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Adobe. All rights reserved.
+ * Copyright 2021 Adobe. All rights reserved.
  * This file is licensed to you under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License. You may obtain a copy
  * of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -9,12 +9,15 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-const OneDrive = require('./OneDrive.js');
-const FSCachePlugin = require('./FSCachePlugin.js');
-const OneDriveMock = require('./OneDriveMock.js');
 
-module.exports = {
-  OneDrive,
-  OneDriveMock,
-  FSCachePlugin,
-};
+import { ICachePlugin, TokenCacheContext } from  '@azure/msal-node';
+
+import { Logger } from "./OneDrive";
+
+export declare class FSCachePlugin implements ICachePlugin {
+  withLogger(logger: Logger): FSCachePlugin;
+
+  afterCacheAccess(tokenCacheContext: TokenCacheContext): Promise<void>;
+
+  beforeCacheAccess(tokenCacheContext: TokenCacheContext): Promise<void>;
+}

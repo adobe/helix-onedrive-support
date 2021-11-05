@@ -11,10 +11,8 @@
  */
 
 // eslint-disable-next-line max-classes-per-file
-const EventEmitter = require('events');
-const { promisify } = require('util');
-const { AuthenticationContext, MemoryCache } = require('adal-node');
 const fetchAPI = require('@adobe/helix-fetch');
+const { PublicClientApplication, ConfidentialClientApplication, LogLevel } = require('@azure/msal-node');
 
 const Workbook = require('./Workbook.js');
 const StatusCodeError = require('./StatusCodeError.js');
@@ -32,6 +30,14 @@ const { fetch, reset } = process.env.HELIX_FETCH_FORCE_HTTP1
 const AZ_AUTHORITY_HOST_URL = 'https://login.windows.net';
 const AZ_RESOURCE = 'https://graph.microsoft.com'; // '00000002-0000-0000-c000-000000000000'; ??
 const AZ_DEFAULT_TENANT = 'common';
+
+const MSAL_LOG_LEVELS = [
+  'error',
+  'warn',
+  'info',
+  'debug',
+  'trace',
+];
 
 /**
  * the maximum subscription time in milliseconds
@@ -51,8 +57,11 @@ const globalShareLinkCache = new Map();
 
 /**
  * Helper class that facilitates accessing one drive.
+ *
+ * @class
+ * @field {ConfidentialClientApplication|PublicClientApplication} app
  */
-class OneDrive extends EventEmitter {
+class OneDrive {
   /**
    * @param {OneDriveOptions} opts Options
    * @param {string}  opts.clientId The client id of the app
@@ -66,7 +75,6 @@ class OneDrive extends EventEmitter {
    * @param {boolean} [opts.localAuthCache] Whether to use local auth cache
    */
   constructor(opts) {
-    super(opts);
     this.clientId = opts.clientId;
     this.clientSecret = opts.clientSecret || '';
     this.refreshToken = opts.refreshToken || '';
@@ -74,51 +82,50 @@ class OneDrive extends EventEmitter {
     this.password = opts.password || '';
     this._log = opts.log || console;
     this.tenant = opts.tenant || AZ_DEFAULT_TENANT;
-
+    this.localAuthCache = opts.localAuthCache;
     if (!opts.noShareLinkCache && !process.env.HELIX_ONEDRIVE_NO_SHARE_LINK_CACHE) {
       this.shareLinkCache = opts.shareLinkCache || globalShareLinkCache;
     }
-
+    this.daemon = opts.daemon;
     if (!this.clientId) {
       throw new Error('Missing clientId.');
     }
-    this.authContext = new AuthenticationContext(
-      this.authorityUrl,
-      undefined,
-      opts.localAuthCache ? new MemoryCache() : undefined,
-    );
-    [
-      'acquireUserCode',
-      'acquireToken',
-      'acquireTokenWithDeviceCode',
-      'acquireTokenWithRefreshToken',
-      'acquireTokenWithUsernamePassword',
-      'acquireTokenWithClientCredentials',
-    ].forEach((m) => {
-      this.authContext[m] = promisify(this.authContext[m].bind(this.authContext));
-    });
-    const { cache } = this.authContext;
-    if (opts.localAuthCache) {
-      const originalAdd = cache.add;
-      cache.add = (entries, cb) => {
-        originalAdd.call(cache, entries, (...args) => {
-          // eslint-disable-next-line no-underscore-dangle
-          this.emit('tokens', cache._entries);
-          cb(...args);
-        });
+  }
+
+  get app() {
+    if (!this._app) {
+      const { log, localAuthCache } = this;
+      const msalConfig = {
+        auth: {
+          clientId: this.clientId,
+          clientSecret: this.clientSecret,
+          authority: this.authorityUrl,
+        },
+        system: {
+          loggerOptions: {
+            loggerCallback(loglevel, message) {
+              log[MSAL_LOG_LEVELS[loglevel]](message);
+            },
+            piiLoggingEnabled: false,
+            logLevel: LogLevel.Verbose,
+          },
+        },
       };
-      const originalRemove = cache.remove;
-      cache.remove = (entries, cb) => {
-        originalRemove.call(cache, entries, (...args) => {
-          // eslint-disable-next-line no-underscore-dangle
-          this.emit('tokens', cache._entries);
-          cb(...args);
-        });
-      };
+
+      if (localAuthCache) {
+        if ('plugin' in localAuthCache) {
+          msalConfig.cache = {
+            cachePlugin: localAuthCache.plugin,
+          };
+        }
+      }
+      if (this.daemon) {
+        this._app = new ConfidentialClientApplication(msalConfig);
+      } else {
+        this._app = new PublicClientApplication(msalConfig);
+      }
     }
-    cache.add.promise = promisify(cache.add.bind(cache));
-    cache.remove.promise = promisify(cache.remove.bind(cache));
-    cache.find.promise = promisify(cache.find.bind(cache));
+    return this._app;
   }
 
   /**
@@ -141,19 +148,30 @@ class OneDrive extends EventEmitter {
 
   /**
    * @returns {boolean}
+   * @deprecated use `isAuthenticated()`
    */
+  // eslint-disable-next-line class-methods-use-this
   get authenticated() {
-    // eslint-disable-next-line no-underscore-dangle
-    return this.authContext.cache._entries.length > 0;
+    throw new Error('deprecated. use isAuthenticated()');
+  }
+
+  /**
+   * @returns {boolean}
+   */
+  async isAuthenticated() {
+    const accounts = await this.app.getTokenCache().getAllAccounts();
+    return accounts.length > 0;
   }
 
   /**
    * Adds entries to the token cache
    * @param {TokenResponse[]} entries
    * @return this;
+   * @deprecated this is now handled via the token cache plugin
    */
+  // eslint-disable-next-line no-unused-vars,class-methods-use-this
   async loadTokenCache(entries) {
-    return this.authContext.cache.add.promise(entries);
+    throw new Error('deprecated. use cache plugin');
   }
 
   /**
@@ -163,23 +181,17 @@ class OneDrive extends EventEmitter {
    * @returns {Promise<TokenResponse>}
    */
   async login(onCode) {
-    const { log, authContext: context } = this;
-
-    let code;
+    const { log, app } = this;
     try {
-      code = await context.acquireUserCode(AZ_RESOURCE, this.clientId, 'en');
-    } catch (e) {
-      log.error('Error while requesting user code', e);
-      throw e;
-    }
-
-    log.info(code.message);
-    if (typeof onCode === 'function') {
-      await onCode(code);
-    }
-
-    try {
-      return await context.acquireTokenWithDeviceCode(AZ_RESOURCE, this.clientId, code);
+      return await app.acquireTokenByDeviceCode({
+        deviceCodeCallback: async (code) => {
+          log.info(code.message);
+          if (typeof onCode === 'function') {
+            await onCode(code);
+          }
+        },
+        scopes: ['user.read'],
+      });
     } catch (e) {
       log.error('Error while requesting access token with device code', e);
       throw e;
@@ -189,34 +201,39 @@ class OneDrive extends EventEmitter {
   /**
    */
   async getAccessToken() {
-    const { log, authContext: context } = this;
-    try {
-      return await context.acquireToken(AZ_RESOURCE, this.username, this.clientId);
-    } catch (e) {
-      if (e.message !== 'Entry not found in cache.') {
-        log.warn(`Unable to acquire token from cache: ${e}`);
-      } else {
-        log.debug(`Unable to acquire token from cache: ${e}`);
+    const { log, app } = this;
+    const accounts = await app.getTokenCache().getAllAccounts();
+    if (accounts.length > 0) {
+      try {
+        return await app.acquireTokenSilent({
+          account: accounts[0],
+        });
+      } catch (e) {
+        if (e.message !== 'Entry not found in cache.') {
+          log.warn(`Unable to acquire token from cache: ${e}`);
+        } else {
+          log.debug(`Unable to acquire token from cache: ${e}`);
+        }
       }
     }
 
     try {
       if (this.refreshToken) {
         log.debug('acquire token with refresh token.');
-        const resp = await context.acquireTokenWithRefreshToken(
-          this.refreshToken, this.clientId, this.clientSecret, AZ_RESOURCE,
-        );
+        const resp = await app.acquireTokenByRefreshToken({
+          refreshToken: this.refreshToken,
+        });
         return await this.augmentAndCacheResponse(resp);
       } else if (this.username && this.password) {
         log.debug('acquire token with ROPC.');
-        return await context.acquireTokenWithUsernamePassword(
-          AZ_RESOURCE, this.username, this.password, this.clientId,
-        );
+        return await app.acquireTokenByUsernamePassword({
+          username: this.username,
+          password: this.password,
+          // scopes: ['user.read', 'openid', 'profile', 'offline_access'],
+        });
       } else if (this.clientSecret) {
         log.debug('acquire token with client credentials.');
-        return await context.acquireTokenWithClientCredentials(
-          AZ_RESOURCE, this.clientId, this.clientSecret,
-        );
+        return await app.acquireTokenByClientCredential({});
       } else {
         const err = new StatusCodeError('No valid authentication credentials supplied.');
         err.statusCode = 401;
