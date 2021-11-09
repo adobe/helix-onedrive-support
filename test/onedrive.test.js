@@ -50,13 +50,17 @@ describe('OneDrive Tests', () => {
   });
 
   it('can encode a share link', () => {
-    assert.deepEqual(OneDrive.encodeSharingUrl('https://onedrive.com/a/b/c/d'),
-      'u!aHR0cHM6Ly9vbmVkcml2ZS5jb20vYS9iL2MvZA=');
+    assert.deepEqual(
+      OneDrive.encodeSharingUrl('https://onedrive.com/a/b/c/d'),
+      'u!aHR0cHM6Ly9vbmVkcml2ZS5jb20vYS9iL2MvZA=',
+    );
   });
 
   it('can encode a share link as url', () => {
-    assert.deepEqual(OneDrive.encodeSharingUrl(new URL('https://onedrive.com/a/b/c/d')),
-      'u!aHR0cHM6Ly9vbmVkcml2ZS5jb20vYS9iL2MvZA=');
+    assert.deepEqual(
+      OneDrive.encodeSharingUrl(new URL('https://onedrive.com/a/b/c/d')),
+      'u!aHR0cHM6Ly9vbmVkcml2ZS5jb20vYS9iL2MvZA=',
+    );
   });
 
   it('can convert a drive item to a uri', () => {
@@ -91,13 +95,17 @@ describe('OneDrive Tests', () => {
   });
 
   it('throws an error for onedrive with wrong format (missing drives)', () => {
-    assert.throws(() => OneDrive.driveItemFromURL('onedrive:/drive-id/items/item-id'),
-      new Error('URI not supported (missing \'drives\' segment): onedrive:/drive-id/items/item-id'));
+    assert.throws(
+      () => OneDrive.driveItemFromURL('onedrive:/drive-id/items/item-id'),
+      new Error('URI not supported (missing \'drives\' segment): onedrive:/drive-id/items/item-id'),
+    );
   });
 
   it('throws an error for onedrive with wrong format (missing items)', () => {
-    assert.throws(() => OneDrive.driveItemFromURL('onedrive:/drives/drive-id/item-id'),
-      new Error('URI not supported (missing \'items\' segment): onedrive:/drives/drive-id/item-id'));
+    assert.throws(
+      () => OneDrive.driveItemFromURL('onedrive:/drives/drive-id/item-id'),
+      new Error('URI not supported (missing \'items\' segment): onedrive:/drives/drive-id/item-id'),
+    );
   });
 
   it('fuzzyGetDriveItem returns folder item when relpath is missing', async () => {

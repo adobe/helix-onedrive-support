@@ -204,18 +204,26 @@ class OneDrive extends EventEmitter {
       if (this.refreshToken) {
         log.debug('acquire token with refresh token.');
         const resp = await context.acquireTokenWithRefreshToken(
-          this.refreshToken, this.clientId, this.clientSecret, AZ_RESOURCE,
+          this.refreshToken,
+          this.clientId,
+          this.clientSecret,
+          AZ_RESOURCE,
         );
         return await this.augmentAndCacheResponse(resp);
       } else if (this.username && this.password) {
         log.debug('acquire token with ROPC.');
         return await context.acquireTokenWithUsernamePassword(
-          AZ_RESOURCE, this.username, this.password, this.clientId,
+          AZ_RESOURCE,
+          this.username,
+          this.password,
+          this.clientId,
         );
       } else if (this.clientSecret) {
         log.debug('acquire token with client credentials.');
         return await context.acquireTokenWithClientCredentials(
-          AZ_RESOURCE, this.clientId, this.clientSecret,
+          AZ_RESOURCE,
+          this.clientId,
+          this.clientSecret,
         );
       } else {
         const err = new StatusCodeError('No valid authentication credentials supplied.');
@@ -259,7 +267,11 @@ class OneDrive extends EventEmitter {
     const { log, authContext: context } = this;
     try {
       const resp = await context.acquireTokenWithAuthorizationCode(
-        code, redirectUri, AZ_RESOURCE, this.clientId, this.clientSecret,
+        code,
+        redirectUri,
+        AZ_RESOURCE,
+        this.clientId,
+        this.clientSecret,
       );
       return await this.augmentAndCacheResponse(resp);
     } catch (e) {
