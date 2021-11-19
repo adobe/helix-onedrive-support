@@ -31,6 +31,8 @@ const AZ_AUTHORITY_HOST_URL = 'https://login.windows.net';
 const AZ_RESOURCE = 'https://graph.microsoft.com'; // '00000002-0000-0000-c000-000000000000'; ??
 const AZ_DEFAULT_TENANT = 'common';
 
+const DEFAULT_SCOPES = ['user.read', 'openid', 'profile', 'offline_access'];
+
 const MSAL_LOG_LEVELS = [
   'error',
   'warn',
@@ -86,7 +88,6 @@ class OneDrive {
     if (!opts.noShareLinkCache && !process.env.HELIX_ONEDRIVE_NO_SHARE_LINK_CACHE) {
       this.shareLinkCache = opts.shareLinkCache || globalShareLinkCache;
     }
-    this.daemon = opts.daemon;
     if (!this.clientId) {
       throw new Error('Missing clientId.');
     }
@@ -119,11 +120,7 @@ class OneDrive {
           };
         }
       }
-      if (this.daemon) {
-        this._app = new ConfidentialClientApplication(msalConfig);
-      } else {
-        this._app = new PublicClientApplication(msalConfig);
-      }
+      this._app = new ConfidentialClientApplication(msalConfig);
     }
     return this._app;
   }
@@ -190,7 +187,7 @@ class OneDrive {
             await onCode(code);
           }
         },
-        scopes: ['user.read'],
+        scopes: DEFAULT_SCOPES,
       });
     } catch (e) {
       log.error('Error while requesting access token with device code', e);
@@ -200,7 +197,7 @@ class OneDrive {
 
   /**
    */
-  async getAccessToken() {
+  async getAccessToken(silentOnly) {
     const { log, app } = this;
     const accounts = await app.getTokenCache().getAllAccounts();
     if (accounts.length > 0) {
@@ -216,6 +213,9 @@ class OneDrive {
         }
       }
     }
+    if (silentOnly) {
+      return null;
+    }
 
     try {
       if (this.refreshToken) {
@@ -229,7 +229,7 @@ class OneDrive {
         return await app.acquireTokenByUsernamePassword({
           username: this.username,
           password: this.password,
-          // scopes: ['user.read', 'openid', 'profile', 'offline_access'],
+          scopes: DEFAULT_SCOPES,
         });
       } else if (this.clientSecret) {
         log.debug('acquire token with client credentials.');
