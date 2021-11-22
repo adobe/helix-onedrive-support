@@ -31,9 +31,11 @@ module.exports = class FSCachePlugin {
     const { log, filePath } = this;
     try {
       cacheContext.tokenCache.deserialize(await fs.readFile(filePath, 'utf-8'));
+      return true;
     } catch (e) {
-      log.warn('unable to deserialize', e);
+      log.warn('FSCachePlugin: unable to deserialize', e);
     }
+    return false;
   }
 
   async afterCacheAccess(cacheContext) {
@@ -42,6 +44,8 @@ module.exports = class FSCachePlugin {
       // reparse and create a nice formatted JSON
       const tokens = JSON.parse(cacheContext.tokenCache.serialize());
       await fs.writeFile(filePath, JSON.stringify(tokens, null, 2), 'utf-8');
+      return true;
     }
+    return false;
   }
 };
