@@ -13,6 +13,7 @@
 const fetchAPI = require('@adobe/helix-fetch');
 const StatusCodeError = require('./StatusCodeError.js');
 
+/* istanbul ignore next */
 const { fetch } = process.env.HELIX_FETCH_FORCE_HTTP1
   ? fetchAPI.context({
     alpnProtocols: [fetchAPI.ALPN_HTTP1_1],
@@ -39,22 +40,15 @@ class SharePointSite {
     const { log } = this;
     if (!this._accessToken || Date.now() >= this._expires) {
       const url = `https://login.microsoftonline.com/${this._tenantId}/oauth2/v2.0/token`;
-      let resp;
-
-      try {
-        resp = await fetch(url, {
-          method: 'POST',
-          body: new URLSearchParams({
-            client_id: this._clientId,
-            refresh_token: this._refreshToken,
-            grant_type: 'refresh_token',
-            scope: `https://${this._owner}.sharepoint.com/Sites.ReadWrite.All`,
-          }),
-        });
-      } catch (e) {
-        log.error(`Error while getting a SharePoint API token: ${e}`);
-        throw e;
-      }
+      const resp = await fetch(url, {
+        method: 'POST',
+        body: new URLSearchParams({
+          client_id: this._clientId,
+          refresh_token: this._refreshToken,
+          grant_type: 'refresh_token',
+          scope: `https://${this._owner}.sharepoint.com/Sites.ReadWrite.All`,
+        }),
+      });
       if (!resp.ok) {
         const text = await resp.text();
         log.error(`Error while getting a SharePoint API token: ${text}}`);
@@ -67,83 +61,41 @@ class SharePointSite {
     return this._accessToken;
   }
 
-  static splitDirAndBase(file) {
+  _splitDirAndBase(file) {
     const idx = file.lastIndexOf('/');
-    if (idx < 0) {
-      return ['', file];
-    }
-    return [file.substring(0, idx), file.substring(idx + 1)];
+    const [dir, base] = (idx < 0)
+      ? ['', file]
+      : [file.substring(0, idx), file.substring(idx + 1)];
+    return dir ? [`${this._root}/${dir}`, base] : [this._root, base];
+  }
+
+  _getRelativePath(folder) {
+    return folder ? `${this._root}/${folder}` : this._root;
   }
 
   async getFile(file) {
-    const [dir, base] = SharePointSite.splitDirAndBase(file);
-    const folder = dir ? `${this._root}/${dir}` : this._root;
-
-    try {
-      const result = await this.doFetch(`/GetFolderByServerRelativeUrl('${folder}')/Files('${base}')?$expand=ModifiedBy`);
-      return result;
-    } catch (e) {
-      if (e.statusCode === 401) {
-        // an inexistant share returns 401, we prefer to just say it wasn't found
-        throw new StatusCodeError(e.message, 404, e.details);
-      }
-      throw e;
-    }
+    const [dir, base] = this._splitDirAndBase(file);
+    return this.doFetch(`/GetFolderByServerRelativeUrl('${dir}')/Files('${base}')?$expand=ModifiedBy`);
   }
 
   async getFolder(folder) {
-    try {
-      const relPath = folder ? `${this._root}/${folder}` : this._root;
-      const result = await this.doFetch(`/GetFolderByServerRelativeUrl('${relPath}')`);
-      return result;
-    } catch (e) {
-      if (e.statusCode === 401) {
-        // an inexistant share returns 401, we prefer to just say it wasn't found
-        throw new StatusCodeError(e.message, 404, e.details);
-      }
-      if (e.statusCode === 404) {
-        return null;
-      }
-      throw e;
-    }
+    const dir = this._getRelativePath(folder);
+    return this.doFetch(`/GetFolderByServerRelativeUrl('${dir}')`);
   }
 
   async getFileContents(file) {
-    const [dir, base] = SharePointSite.splitDirAndBase(file);
-    const folder = dir ? `${this._root}/${dir}` : this._root;
-
-    try {
-      const result = await this.doFetch(`/GetFolderByServerRelativeUrl('${folder}')/Files('${base}')/$value`, true);
-      return result;
-    } catch (e) {
-      if (e.statusCode === 401) {
-        // an inexistant share returns 401, we prefer to just say it wasn't found
-        throw new StatusCodeError(e.message, 404, e.details);
-      }
-      throw e;
-    }
+    const [dir, base] = this._splitDirAndBase(file);
+    return this.doFetch(`/GetFolderByServerRelativeUrl('${dir}')/Files('${base}')/$value`, true);
   }
 
   async getFilesAndFolders(folder) {
-    try {
-      const relPath = folder ? `${this._root}/${folder}` : this._root;
-      const result = await this.doFetch(`/GetFolderByServerRelativeUrl('${relPath}')?$expand=Files/ModifiedBy,Folders`);
-      return result;
-    } catch (e) {
-      if (e.statusCode === 401) {
-        // an inexistant share returns 401, we prefer to just say it wasn't found
-        throw new StatusCodeError(e.message, 404, e.details);
-      }
-      throw e;
-    }
+    const dir = this._getRelativePath(folder);
+    return this.doFetch(`/GetFolderByServerRelativeUrl('${dir}')?$expand=Files/ModifiedBy,Folders`);
   }
 
-  async doFetch(relUrl, rawResponseBody = false, options = {}) {
-    const opts = { ...options };
+  async doFetch(relUrl, rawResponseBody = false) {
+    const opts = { headers: {} };
     const accessToken = await this.getAccessToken();
-    if (!opts.headers) {
-      opts.headers = {};
-    }
     opts.headers.authorization = `Bearer ${accessToken}`;
     if (!rawResponseBody) {
       opts.headers.accept = 'application/json;odata=verbose';
@@ -170,9 +122,11 @@ class SharePointSite {
       // await result in order to be able to catch any error
       return await (rawResponseBody || !json ? resp.buffer() : resp.json());
     } catch (e) {
+      /* istanbul ignore else */
       if (e instanceof StatusCodeError) {
         throw e;
       }
+      /* istanbul ignore next */
       throw StatusCodeError.fromError(e);
     }
   }

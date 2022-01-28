@@ -58,7 +58,7 @@ class StatusCodeError extends Error {
    * @param {object} details underlying error
    */
   constructor(msg, statusCode, details) {
-    super(msg);
+    super(msg?.value ?? msg);
     this.statusCode = statusCode;
     this.details = details;
   }
