@@ -1,3 +1,10 @@
+# [6.1.0](https://github.com/adobe/helix-onedrive-support/compare/v6.0.1...v6.1.0) (2022-01-28)
+
+
+### Features
+
+* add API for SP API ([#227](https://github.com/adobe/helix-onedrive-support/issues/227)) ([6ce5938](https://github.com/adobe/helix-onedrive-support/commit/6ce59387a777d4549964a8fb90b2e0ca2a4fd86e))
+
 ## [6.0.1](https://github.com/adobe/helix-onedrive-support/compare/v6.0.0...v6.0.1) (2021-10-18)
 
 
