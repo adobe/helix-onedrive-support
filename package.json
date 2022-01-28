@@ -5,8 +5,8 @@
   "main": "src/index.js",
   "types": "src/index.d.ts",
   "scripts": {
-    "test": " nyc --reporter=text --reporter=lcov --check-coverage --branches 19 --statements 15 --lines 15 mocha",
-    "test-ci": "nyc --reporter=text --reporter=lcov --check-coverage --branches 19 --statements 15 --lines 15 mocha --reporter xunit --reporter-options output=./junit/test-results.xml && codecov",
+    "test": "nyc mocha",
+    "test-ci": "nyc mocha && codecov",
     "lint": "./node_modules/.bin/eslint .",
     "semantic-release": "semantic-release",
     "docs": "npx jsdoc2md -c .jsdoc.json --files 'src/*.js'  > docs/API.md",
@@ -42,6 +42,7 @@
     "junit-report-builder": "3.0.0",
     "lint-staged": "12.3.1",
     "mocha": "9.1.4",
+    "mocha-multi-reporters": "1.5.1",
     "nock": "13.2.2",
     "nyc": "15.1.0",
     "semantic-release": "19.0.2"
@@ -56,5 +57,11 @@
     "ghooks": {
       "pre-commit": "npx lint-staged"
     }
+  },
+  "mocha": {
+    "spec": "test/**/*.test.js",
+    "require": "test/setup-env.js",
+    "reporter": "mocha-multi-reporters",
+    "reporter-options": "configFile=.mocha-multi.json"
   }
 }

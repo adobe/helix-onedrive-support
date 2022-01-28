@@ -20,6 +20,7 @@ const Workbook = require('./Workbook.js');
 const StatusCodeError = require('./StatusCodeError.js');
 const { driveItemFromURL, driveItemToURL } = require('./utils.js');
 const { splitByExtension, sanitize, editDistance } = require('./fuzzy-helper.js');
+const SharePointSite = require('./SharePointSite.js');
 
 const { fetch, reset } = process.env.HELIX_FETCH_FORCE_HTTP1
   ? fetchAPI.context({
@@ -621,6 +622,35 @@ class OneDrive extends EventEmitter {
         this.log.error(error);
         throw error;
       }
+    }
+  }
+
+  async getSite(siteURL) {
+    this.log.debug(`getting site: (${siteURL})`);
+
+    const match = siteURL.match(/^https:\/\/(\S+).sharepoint.com\/sites\/([^/]+)\/(\S+)$/);
+    if (!match) {
+      throw new Error(`Site URL does not match (*.sharepoint.com/sites/.*): ${match}`);
+    }
+    const [, owner, site, root] = match;
+
+    try {
+      const accessToken = await this.getAccessToken();
+      return new SharePointSite({
+        owner,
+        site,
+        root,
+        clientId: this.clientId,
+        tenantId: accessToken.tenantId,
+        refreshToken: accessToken.refreshToken,
+        log: this.log,
+      });
+    } catch (e) {
+      if (e.statusCode === 401) {
+        // an inexistant share returns 401, we prefer to just say it wasn't found
+        throw new StatusCodeError(e.message, 404, e.details);
+      }
+      throw e;
     }
   }
 }

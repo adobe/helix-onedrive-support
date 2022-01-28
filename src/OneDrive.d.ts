@@ -60,6 +60,36 @@ export declare interface SubscriptionOptions {
   expiresIn?: number;
 }
 
+export declare interface SharePointSite {
+  /**
+   * Return a file's properties.
+   * @param file file name
+   * @returns file properties
+   */
+  getFile(file: string): Promise<GraphResult>;
+
+  /**
+   * Return a folder's properties.
+   * @param folder folder name
+   * @returns folder properties
+   */
+  getFolder(folder: string): Promise<GraphResult>;
+
+  /**
+   * Return a file's contents, as a binary buffer.
+   * @param file file name
+   * @returns file contents
+   */
+  getFileContents(file: string): Promise<Buffer>;
+
+  /**
+   * Returns a list of children items in a folder
+   * @param folder folder name
+   * @returns list of files and folders
+   */
+  getFilesAndFolders(folder: string): Promise<GraphResult>;
+}
+
 /**
  * Helper class that facilitates accessing one drive.
  */
@@ -228,4 +258,11 @@ export declare class OneDrive extends EventEmitter {
    * @returns {Promise<Array>} A return object with the values and a `@odata.deltaLink`.
    */
   fetchChanges(resource: string, token?: string);
+
+  /**
+   * Returns a site object exposing the SharePoint API (now called Graph API V1).
+   * @param siteURL site URL, in the format https://<tenant>.sharepoint.com/sites/<site>
+   * @return {Promise<SharePointSite} site object
+   */
+  getSite(siteURL: string): Promise<SharePointSite>;
 }
