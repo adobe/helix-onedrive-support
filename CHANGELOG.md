@@ -1,3 +1,10 @@
+## [6.1.4](https://github.com/adobe/helix-onedrive-support/compare/v6.1.3...v6.1.4) (2022-02-21)
+
+
+### Bug Fixes
+
+* turn 403 in resolve into 404 ([#242](https://github.com/adobe/helix-onedrive-support/issues/242)) ([0fb36c3](https://github.com/adobe/helix-onedrive-support/commit/0fb36c35888f5c66e8841e5d6674ff2d36f87c81))
+
 ## [6.1.3](https://github.com/adobe/helix-onedrive-support/compare/v6.1.2...v6.1.3) (2022-02-14)
 
 
