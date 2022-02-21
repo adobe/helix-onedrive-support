@@ -353,8 +353,8 @@ class OneDrive extends EventEmitter {
     try {
       return await this.doFetch(`/shares/${link}/driveItem`);
     } catch (e) {
-      if (e.statusCode === 401) {
-        // an inexistant share returns 401, we prefer to just say it wasn't found
+      if (e.statusCode === 401 || e.statusCode === 403) {
+        // an inexistent share returns either 401 or 403, we prefer to just say it wasn't found
         throw new StatusCodeError(e.message, 404, e.details);
       }
       throw e;
