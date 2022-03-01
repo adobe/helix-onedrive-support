@@ -31,7 +31,7 @@ const { fetch, reset } = process.env.HELIX_FETCH_FORCE_HTTP1
   : fetchAPI;
 
 const AZ_AUTHORITY_HOST_URL = 'https://login.windows.net';
-const AZ_RESOURCE = 'https://graph.microsoft.com'; // '00000002-0000-0000-c000-000000000000'; ??
+const AZ_DEFAULT_RESOURCE = 'https://graph.microsoft.com'; // '00000002-0000-0000-c000-000000000000'; ??
 const AZ_DEFAULT_TENANT = 'common';
 
 /**
@@ -65,6 +65,7 @@ class OneDrive extends EventEmitter {
    * @param {number}  [opts.expiresOn] Expiration time.
    * @param {Logger}  [opts.log] A logger.
    * @param {boolean} [opts.localAuthCache] Whether to use local auth cache
+   * @param {string}  [opts.resource] Azure resource to authenticate against. defaults to MS Graph.
    */
   constructor(opts) {
     super(opts);
@@ -75,6 +76,7 @@ class OneDrive extends EventEmitter {
     this.password = opts.password || '';
     this._log = opts.log || console;
     this.tenant = opts.tenant || AZ_DEFAULT_TENANT;
+    this.resource = opts.resource || AZ_DEFAULT_RESOURCE;
 
     if (!opts.noShareLinkCache && !process.env.HELIX_ONEDRIVE_NO_SHARE_LINK_CACHE) {
       this.shareLinkCache = opts.shareLinkCache || globalShareLinkCache;
@@ -168,7 +170,7 @@ class OneDrive extends EventEmitter {
 
     let code;
     try {
-      code = await context.acquireUserCode(AZ_RESOURCE, this.clientId, 'en');
+      code = await context.acquireUserCode(this.resource, this.clientId, 'en');
     } catch (e) {
       log.error('Error while requesting user code', e);
       throw e;
@@ -180,7 +182,7 @@ class OneDrive extends EventEmitter {
     }
 
     try {
-      return await context.acquireTokenWithDeviceCode(AZ_RESOURCE, this.clientId, code);
+      return await context.acquireTokenWithDeviceCode(this.resource, this.clientId, code);
     } catch (e) {
       log.error('Error while requesting access token with device code', e);
       throw e;
@@ -192,7 +194,7 @@ class OneDrive extends EventEmitter {
   async getAccessToken() {
     const { log, authContext: context } = this;
     try {
-      return await context.acquireToken(AZ_RESOURCE, this.username, this.clientId);
+      return await context.acquireToken(this.resource, this.username, this.clientId);
     } catch (e) {
       if (e.message !== 'Entry not found in cache.') {
         log.warn(`Unable to acquire token from cache: ${e}`);
@@ -208,13 +210,13 @@ class OneDrive extends EventEmitter {
           this.refreshToken,
           this.clientId,
           this.clientSecret,
-          AZ_RESOURCE,
+          this.resource,
         );
         return await this.augmentAndCacheResponse(resp);
       } else if (this.username && this.password) {
         log.debug('acquire token with ROPC.');
         return await context.acquireTokenWithUsernamePassword(
-          AZ_RESOURCE,
+          this.resource,
           this.username,
           this.password,
           this.clientId,
@@ -222,7 +224,7 @@ class OneDrive extends EventEmitter {
       } else if (this.clientSecret) {
         log.debug('acquire token with client credentials.');
         return await context.acquireTokenWithClientCredentials(
-          AZ_RESOURCE,
+          this.resource,
           this.clientId,
           this.clientSecret,
         );
@@ -240,7 +242,7 @@ class OneDrive extends EventEmitter {
   /**
    */
   createLoginUrl(redirectUri, state) {
-    return `${this.authorityUrl}/oauth2/authorize?response_type=code&scope=/.default&client_id=${this.clientId}&redirect_uri=${redirectUri}&state=${state}&resource=${AZ_RESOURCE}`;
+    return `${this.authorityUrl}/oauth2/authorize?response_type=code&scope=/.default&client_id=${this.clientId}&redirect_uri=${redirectUri}&state=${state}&resource=${this.resource}`;
   }
 
   async augmentAndCacheResponse(response) {
@@ -270,7 +272,7 @@ class OneDrive extends EventEmitter {
       const resp = await context.acquireTokenWithAuthorizationCode(
         code,
         redirectUri,
-        AZ_RESOURCE,
+        this.resource,
         this.clientId,
         this.clientSecret,
       );

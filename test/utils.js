@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Adobe. All rights reserved.
+ * Copyright 2022 Adobe. All rights reserved.
  * This file is licensed to you under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License. You may obtain a copy
  * of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -13,6 +13,13 @@ const assert = require('assert');
 const nock = require('nock');
 
 function Nock() {
+  const DEFAULT_AUTH = {
+    token_type: 'Bearer',
+    refresh_token: 'dummy',
+    access_token: 'dummy',
+    expires_in: 181000,
+  };
+
   const scopes = {};
 
   let unmatched;
@@ -42,17 +49,9 @@ function Nock() {
     }
   };
 
-  nocker.mockIgnore = ({
-    content = '',
-    route = '/adobe/theblog/ignore-tests/.hlxignore',
-    status = 404,
-    times = 1,
-    optional = false,
-  } = {}) => nocker('https://raw.githubusercontent.com')
-    .get(route)
-    .times(times)
-    .optionally(optional)
-    .reply(status, content);
+  nocker.loginWindowsNet = (auth = DEFAULT_AUTH) => nocker('https://login.windows.net')
+    .post('/common/oauth2/token?api-version=1.0')
+    .reply(200, auth);
 
   return nocker;
 }
