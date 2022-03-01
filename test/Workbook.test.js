@@ -36,13 +36,13 @@ describe('Workbook Tests', () => {
   it('Get workbook via sharelink', async () => {
     const item = await oneDrive.getDriveItemFromShareLink(TEST_SHARE_LINK);
     const workbook = oneDrive.getWorkbook(item);
-    assert.equal(workbook.uri, '/drives/my-drive/items/my-item/workbook');
+    assert.strictEqual(workbook.uri, '/drives/my-drive/items/my-item/workbook');
   });
 
   it('Get workbook via onedrive uri', async () => {
     const item = await oneDrive.getDriveItemFromShareLink('onedrive:/drives/my-drive/items/my-item');
     const workbook = oneDrive.getWorkbook(item);
-    assert.equal(workbook.uri, '/drives/my-drive/items/my-item/workbook');
+    assert.strictEqual(workbook.uri, '/drives/my-drive/items/my-item/workbook');
   });
 
   it('Get workbook via invalid sharelink failed', async () => {
@@ -61,35 +61,35 @@ describe('Workbook Tests', () => {
 
   it('Get the workbook data', async () => {
     const { name } = await book.getData();
-    assert.equal(name, 'book');
+    assert.strictEqual(name, 'book');
   });
 
   it('Get sheet names', async () => {
     const values = await book.getWorksheetNames();
-    assert.deepEqual(values, ['sheet']);
+    assert.deepStrictEqual(values, ['sheet']);
   });
   it('Get table names', async () => {
     const values = await book.getTableNames();
-    assert.deepEqual(values, ['table']);
+    assert.deepStrictEqual(values, ['table']);
   });
   it('Get named items', async () => {
     const values = await book.getNamedItems();
-    assert.deepEqual(values, sampleBook.namedItems);
+    assert.deepStrictEqual(values, sampleBook.namedItems);
   });
   it('Get named item', async () => {
     const name = 'alice';
     const values = await book.getNamedItem(name);
-    assert.deepEqual(values, sampleBook.namedItems[0]);
+    assert.deepStrictEqual(values, sampleBook.namedItems[0]);
   });
   it('Get named item that doesn\'t exist', async () => {
     const name = 'fred';
     const values = await book.getNamedItem(name);
-    assert.equal(values, null);
+    assert.strictEqual(values, null);
   });
   it('Add named item', async () => {
     const namedItem = { name: 'bob', value: '$B2', comment: 'none' };
     await book.addNamedItem(namedItem.name, namedItem.value, namedItem.comment);
-    assert.deepEqual(sampleBook.namedItems[sampleBook.namedItems.length - 1], namedItem);
+    assert.deepStrictEqual(sampleBook.namedItems[sampleBook.namedItems.length - 1], namedItem);
   });
   it('Add named item that already exists', async () => {
     const item = { name: 'alice', value: '$B2', comment: 'none' };
@@ -99,7 +99,7 @@ describe('Workbook Tests', () => {
     const name = 'alice';
     await book.deleteNamedItem(name);
     const index = sampleBook.namedItems.findIndex((item) => item.name === name);
-    assert.equal(index, -1);
+    assert.strictEqual(index, -1);
   });
   it('Delete named item that doesn\'t exist', async () => {
     const name = 'fred';

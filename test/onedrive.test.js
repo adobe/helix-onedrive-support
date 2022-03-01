@@ -17,10 +17,10 @@
 process.env.HELIX_FETCH_FORCE_HTTP1 = 'true';
 
 const assert = require('assert');
-const nock = require('nock');
 const OneDrive = require('../src/OneDrive.js');
 const MockDrive = require('../src/OneDriveMock.js');
 const StatusCodeError = require('../src/StatusCodeError');
+const { Nock } = require('./utils.js');
 
 const AZ_AUTHORITY_HOST_URL = 'https://login.windows.net';
 
@@ -34,7 +34,13 @@ const DEFAULT_AUTH = {
 };
 
 describe('OneDrive Tests', () => {
+  let nock;
+  beforeEach(() => {
+    nock = new Nock();
+  });
+
   afterEach(() => {
+    nock.done();
     delete process.env.HELIX_ONEDRIVE_NO_SHARE_LINK_CACHE;
   });
 
@@ -50,17 +56,17 @@ describe('OneDrive Tests', () => {
   });
 
   it('can encode a share link', () => {
-    assert.deepEqual(OneDrive.encodeSharingUrl('https://onedrive.com/a/b/c/d'),
+    assert.deepStrictEqual(OneDrive.encodeSharingUrl('https://onedrive.com/a/b/c/d'),
       'u!aHR0cHM6Ly9vbmVkcml2ZS5jb20vYS9iL2MvZA=');
   });
 
   it('can encode a share link as url', () => {
-    assert.deepEqual(OneDrive.encodeSharingUrl(new URL('https://onedrive.com/a/b/c/d')),
+    assert.deepStrictEqual(OneDrive.encodeSharingUrl(new URL('https://onedrive.com/a/b/c/d')),
       'u!aHR0cHM6Ly9vbmVkcml2ZS5jb20vYS9iL2MvZA=');
   });
 
   it('can convert a drive item to a uri', () => {
-    assert.deepEqual(OneDrive.driveItemToURL({
+    assert.deepStrictEqual(OneDrive.driveItemToURL({
       id: 'item-id',
       parentReference: {
         driveId: 'drive-id',
@@ -69,7 +75,7 @@ describe('OneDrive Tests', () => {
   });
 
   it('can convert an url to a drive item', () => {
-    assert.deepEqual({
+    assert.deepStrictEqual({
       id: 'item-id',
       parentReference: {
         driveId: 'drive-id',
@@ -78,7 +84,7 @@ describe('OneDrive Tests', () => {
   });
 
   it('can convert an url string to a drive item', () => {
-    assert.deepEqual({
+    assert.deepStrictEqual({
       id: 'item-id',
       parentReference: {
         driveId: 'drive-id',
@@ -87,7 +93,7 @@ describe('OneDrive Tests', () => {
   });
 
   it('returns null for non onedrive urls', () => {
-    assert.equal(OneDrive.driveItemFromURL('https://www.example.com/drives/drive-id/items/item-id'), null);
+    assert.strictEqual(OneDrive.driveItemFromURL('https://www.example.com/drives/drive-id/items/item-id'), null);
   });
 
   it('throws an error for onedrive with wrong format (missing drives)', () => {
@@ -113,7 +119,7 @@ describe('OneDrive Tests', () => {
       .registerDriveItem('123', '456', data);
     const res = await drive.fuzzyGetDriveItem(folderItem);
 
-    assert.deepEqual(res, [data.value]);
+    assert.deepStrictEqual(res, [data.value]);
   });
 
   it('fuzzyGetDriveItem returns exact item', async () => {
@@ -129,7 +135,7 @@ describe('OneDrive Tests', () => {
       .registerDriveItemChildren('123', '456', data);
     const res = await drive.fuzzyGetDriveItem(folderItem, '/document.docx');
 
-    assert.deepEqual(res, [{
+    assert.deepStrictEqual(res, [{
       extension: 'docx',
       file: {
         mimeType: 'dummy',
@@ -152,7 +158,7 @@ describe('OneDrive Tests', () => {
       .registerDriveItemChildren('123', '456:/publish/en:', data); // this is a bit a hack to trick OneDriveMock
     const res = await drive.fuzzyGetDriveItem(folderItem, '/publish/en/document.docx');
 
-    assert.deepEqual(res, [{
+    assert.deepStrictEqual(res, [{
       extension: 'docx',
       file: {
         mimeType: 'dummy',
@@ -172,7 +178,7 @@ describe('OneDrive Tests', () => {
       .registerDriveItemChildren('123', '456', data);
     const res = await drive.fuzzyGetDriveItem(folderItem, '/document.docx');
 
-    assert.deepEqual(res, []);
+    assert.deepStrictEqual(res, []);
   });
 
   it('fuzzyGetDriveItem returns matching items', async () => {
@@ -197,7 +203,7 @@ describe('OneDrive Tests', () => {
       .registerDriveItemChildren('123', '456', data);
     const res = await drive.fuzzyGetDriveItem(folderItem, '/my-1-document.docx');
 
-    assert.deepEqual(res, [
+    assert.deepStrictEqual(res, [
       {
         extension: 'docx',
         file: { mimeType: 'dummy' },
@@ -247,7 +253,7 @@ describe('OneDrive Tests', () => {
       .registerDriveItemChildren('123', '456', data);
     const res = await drive.fuzzyGetDriveItem(folderItem, '/my-1-document');
 
-    assert.deepEqual(res, [
+    assert.deepStrictEqual(res, [
       {
         extension: 'docx',
         file: { mimeType: 'dummy' },
@@ -295,7 +301,7 @@ describe('OneDrive Tests', () => {
       .registerDriveItemChildren('123', '456', data);
     const res = await drive.fuzzyGetDriveItem(folderItem, '/my-1-document');
 
-    assert.deepEqual(res, [{
+    assert.deepStrictEqual(res, [{
       extension: 'docx',
       file: { mimeType: 'dummy' },
       fuzzyDistance: 5,
@@ -337,14 +343,40 @@ describe('OneDrive Tests', () => {
       password: TEST_PASSWORD || 'test-password',
     });
     const me = await od.me();
-    assert.deepEqual(me, expected);
+    assert.deepStrictEqual(me, expected);
   }).timeout(5000);
 
-  it('uses global share link cache by default', async () => {
-    const scope0 = nock(AZ_AUTHORITY_HOST_URL)
+  it('can authenticate against a resource', async () => {
+    nock(AZ_AUTHORITY_HOST_URL)
       .post('/common/oauth2/token?api-version=1.0')
-      .reply(200, DEFAULT_AUTH);
-    const scope1 = nock('https://graph.microsoft.com/v1.0')
+      .reply(200, {
+        token_type: 'Bearer',
+        refresh_token: 'dummy',
+        access_token: 'dummy',
+        expires_in: 81000,
+      });
+
+    const od = new OneDrive({
+      clientId: 'test-client-id',
+      clientSecret: 'test-client-secret',
+      resource: 'test-resource',
+    });
+    const resp = await od.getAccessToken();
+    delete resp.expiresOn;
+    assert.deepStrictEqual(resp, {
+      _authority: 'https://login.windows.net/common',
+      _clientId: 'test-client-id',
+      accessToken: 'dummy',
+      expiresIn: 81000,
+      refreshToken: 'dummy',
+      resource: 'test-resource',
+      tokenType: 'Bearer',
+    });
+  });
+
+  it('uses global share link cache by default', async () => {
+    nock.loginWindowsNet();
+    nock('https://graph.microsoft.com/v1.0')
       .get('/shares/u!aHR0cHM6Ly9vbmVkcml2ZS5jb20vYS9iL2MvZDA/driveItem')
       .reply(200, {
         id: 'some-id',
@@ -361,17 +393,14 @@ describe('OneDrive Tests', () => {
     });
     const item2 = await od.getDriveItemFromShareLink('https://onedrive.com/a/b/c/d0');
     assert.strictEqual(item1, item2);
-
-    scope0.done();
-    scope1.done();
   });
 
   it('share link cache can be disabled via option', async () => {
-    const scope0 = nock(AZ_AUTHORITY_HOST_URL)
+    nock(AZ_AUTHORITY_HOST_URL)
       .post('/common/oauth2/token?api-version=1.0')
       .twice()
       .reply(200, DEFAULT_AUTH);
-    const scope1 = nock('https://graph.microsoft.com/v1.0')
+    nock('https://graph.microsoft.com/v1.0')
       .get('/shares/u!aHR0cHM6Ly9vbmVkcml2ZS5jb20vYS9iL2MvZDAx/driveItem')
       .twice()
       .reply(200, {
@@ -389,20 +418,17 @@ describe('OneDrive Tests', () => {
       id: 'some-id',
     });
     const item2 = await od.getDriveItemFromShareLink('https://onedrive.com/a/b/c/d01');
-    assert.deepEqual(item1, item2);
+    assert.deepStrictEqual(item1, item2);
     assert.notStrictEqual(item1, item2);
-
-    scope0.done();
-    scope1.done();
   });
 
   it('share link cache can be disabled via env', async () => {
     process.env.HELIX_ONEDRIVE_NO_SHARE_LINK_CACHE = true;
-    const scope0 = nock(AZ_AUTHORITY_HOST_URL)
+    nock(AZ_AUTHORITY_HOST_URL)
       .post('/common/oauth2/token?api-version=1.0')
       .twice()
       .reply(200, DEFAULT_AUTH);
-    const scope1 = nock('https://graph.microsoft.com/v1.0')
+    nock('https://graph.microsoft.com/v1.0')
       .get('/shares/u!aHR0cHM6Ly9vbmVkcml2ZS5jb20vYS9iL2MvZDE/driveItem')
       .twice()
       .reply(200, {
@@ -419,18 +445,13 @@ describe('OneDrive Tests', () => {
       id: 'some-id',
     });
     const item2 = await od.getDriveItemFromShareLink('https://onedrive.com/a/b/c/d1');
-    assert.deepEqual(item1, item2);
+    assert.deepStrictEqual(item1, item2);
     assert.notStrictEqual(item1, item2);
-
-    scope0.done();
-    scope1.done();
   });
 
   it('share link cache can be supplied via opts', async () => {
-    const scope0 = nock(AZ_AUTHORITY_HOST_URL)
-      .post('/common/oauth2/token?api-version=1.0')
-      .reply(200, DEFAULT_AUTH);
-    const scope1 = nock('https://graph.microsoft.com/v1.0')
+    nock.loginWindowsNet();
+    nock('https://graph.microsoft.com/v1.0')
       .get('/shares/u!aHR0cHM6Ly9vbmVkcml2ZS5jb20vYS9iL2MvZDI/driveItem')
       .reply(200, {
         id: 'some-id',
@@ -456,8 +477,6 @@ describe('OneDrive Tests', () => {
         id: 'some-id',
       },
     });
-    scope0.done();
-    scope1.done();
   });
 
   it('propagates errors', async () => {

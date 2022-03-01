@@ -33,9 +33,9 @@ describe('Table Tests', () => {
 
   it('Rename a table', async () => {
     const name = 'table1';
-    assert.equal(sampleTable.name, 'table');
+    assert.strictEqual(sampleTable.name, 'table');
     await table.rename(name);
-    assert.equal(sampleTable.name, 'table1');
+    assert.strictEqual(sampleTable.name, 'table1');
   });
 
   it('Rename a table that does not exist', async () => {
@@ -46,17 +46,17 @@ describe('Table Tests', () => {
 
   it('Get header names of table', async () => {
     const values = await table.getHeaderNames();
-    assert.equal(values, sampleTable.headerNames);
+    assert.strictEqual(values, sampleTable.headerNames);
   });
 
   it('Get all rows in table', async () => {
     const values = await table.getRows();
-    assert.deepEqual(values, sampleTable.rows);
+    assert.deepStrictEqual(values, sampleTable.rows);
   });
   it('Get row in table', async () => {
     const index = 5;
     const values = await table.getRow(index);
-    assert.deepEqual(values, sampleTable.rows[index]);
+    assert.deepStrictEqual(values, sampleTable.rows[index]);
   });
   it('Get row in table with a bad index', async () => {
     const index = 20;
@@ -64,7 +64,7 @@ describe('Table Tests', () => {
   });
   it('Get rows as objects', async () => {
     const data = await table.getRowsAsObjects();
-    assert.deepEqual(data, [
+    assert.deepStrictEqual(data, [
       { ' F i r s t n a m e ': 'Albert', Name: 'Einstein' },
       { ' F i r s t n a m e ': 'Marie', Name: 'Curie' },
       { ' F i r s t n a m e ': 'Steven', Name: 'Hawking' },
@@ -79,7 +79,7 @@ describe('Table Tests', () => {
   });
   it('Get rows as objects (trimmed)', async () => {
     const data = await table.getRowsAsObjects({ trim: true });
-    assert.deepEqual(data, [
+    assert.deepStrictEqual(data, [
       { 'F i r s t n a m e': 'Albert', Name: 'Einstein' },
       { 'F i r s t n a m e': 'Marie', Name: 'Curie' },
       { 'F i r s t n a m e': 'Steven', Name: 'Hawking' },
@@ -95,29 +95,29 @@ describe('Table Tests', () => {
   it('Add row to table', async () => {
     const row = ['Heisenberg', 'Werner'];
     const index = await table.addRow(row);
-    assert.deepEqual(row, sampleTable.rows[index]);
+    assert.deepStrictEqual(row, sampleTable.rows[index]);
   });
   it('Add rows to table', async () => {
     const rows = [['Heisenberg', 'Werner'], ['Planck', 'Max']];
     const index = await table.addRows(rows);
-    assert.deepEqual(rows[0], sampleTable.rows[index - 1]);
-    assert.deepEqual(rows[1], sampleTable.rows[index]);
+    assert.deepStrictEqual(rows[0], sampleTable.rows[index - 1]);
+    assert.deepStrictEqual(rows[1], sampleTable.rows[index]);
   });
   it('Replace row in table', async () => {
     const index = 5;
     const row = ['Heisenberg', 'Werner'];
     await table.replaceRow(index, row);
-    assert.deepEqual(row, sampleTable.rows[index]);
+    assert.deepStrictEqual(row, sampleTable.rows[index]);
   });
   it('Get number of rows it table', async () => {
     const count = await table.getRowCount();
-    assert.equal(count, sampleTable.rows.length);
+    assert.strictEqual(count, sampleTable.rows.length);
   });
   it('Get column in table', async () => {
     const index = 0;
     const values = await table.getColumn('Name');
-    assert.deepEqual(values[0], [sampleTable.headerNames[index]]);
-    assert.deepEqual(values[5], [sampleTable.rows[4][index]]);
+    assert.deepStrictEqual(values[0], [sampleTable.headerNames[index]]);
+    assert.deepStrictEqual(values[5], [sampleTable.rows[4][index]]);
   });
   it('Get column in table that does not exist', async () => {
     await assert.rejects(table.getColumn('Foobar'), new StatusCodeError('Column name not found: Foobar', 400));
@@ -126,6 +126,6 @@ describe('Table Tests', () => {
     const index = 5;
     const rowAfter = sampleTable.rows[index + 1];
     await table.deleteRow(index);
-    assert.deepEqual(rowAfter, sampleTable.rows[index]);
+    assert.deepStrictEqual(rowAfter, sampleTable.rows[index]);
   });
 });
