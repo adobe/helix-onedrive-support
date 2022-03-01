@@ -20,6 +20,7 @@ const Workbook = require('./Workbook.js');
 const StatusCodeError = require('./StatusCodeError.js');
 const { driveItemFromURL, driveItemToURL } = require('./utils.js');
 const { splitByExtension, sanitize, editDistance } = require('./fuzzy-helper.js');
+const SharePointSite = require('./SharePointSite.js');
 
 const { fetch, reset } = process.env.HELIX_FETCH_FORCE_HTTP1
   ? fetchAPI.context({
@@ -206,18 +207,26 @@ class OneDrive extends EventEmitter {
       if (this.refreshToken) {
         log.debug('acquire token with refresh token.');
         const resp = await context.acquireTokenWithRefreshToken(
-          this.refreshToken, this.clientId, this.clientSecret, this.resource,
+          this.refreshToken,
+          this.clientId,
+          this.clientSecret,
+          this.resource,
         );
         return await this.augmentAndCacheResponse(resp);
       } else if (this.username && this.password) {
         log.debug('acquire token with ROPC.');
         return await context.acquireTokenWithUsernamePassword(
-          this.resource, this.username, this.password, this.clientId,
+          this.resource,
+          this.username,
+          this.password,
+          this.clientId,
         );
       } else if (this.clientSecret) {
         log.debug('acquire token with client credentials.');
         return await context.acquireTokenWithClientCredentials(
-          this.resource, this.clientId, this.clientSecret,
+          this.resource,
+          this.clientId,
+          this.clientSecret,
         );
       } else {
         const err = new StatusCodeError('No valid authentication credentials supplied.');
@@ -261,7 +270,11 @@ class OneDrive extends EventEmitter {
     const { log, authContext: context } = this;
     try {
       const resp = await context.acquireTokenWithAuthorizationCode(
-        code, redirectUri, this.resource, this.clientId, this.clientSecret,
+        code,
+        redirectUri,
+        this.resource,
+        this.clientId,
+        this.clientSecret,
       );
       return await this.augmentAndCacheResponse(resp);
     } catch (e) {
@@ -342,8 +355,8 @@ class OneDrive extends EventEmitter {
     try {
       return await this.doFetch(`/shares/${link}/driveItem`);
     } catch (e) {
-      if (e.statusCode === 401) {
-        // an inexistant share returns 401, we prefer to just say it wasn't found
+      if (e.statusCode === 401 || e.statusCode === 403) {
+        // an inexistent share returns either 401 or 403, we prefer to just say it wasn't found
         throw new StatusCodeError(e.message, 404, e.details);
       }
       throw e;
@@ -611,6 +624,35 @@ class OneDrive extends EventEmitter {
         this.log.error(error);
         throw error;
       }
+    }
+  }
+
+  async getSite(siteURL) {
+    this.log.debug(`getting site: (${siteURL})`);
+
+    const match = siteURL.match(/^https:\/\/(\S+).sharepoint.com\/sites\/([^/]+)\/(\S+)$/);
+    if (!match) {
+      throw new Error(`Site URL does not match (*.sharepoint.com/sites/.*): ${match}`);
+    }
+    const [, owner, site, root] = match;
+
+    try {
+      const accessToken = await this.getAccessToken();
+      return new SharePointSite({
+        owner,
+        site,
+        root,
+        clientId: this.clientId,
+        tenantId: accessToken.tenantId,
+        refreshToken: accessToken.refreshToken,
+        log: this.log,
+      });
+    } catch (e) {
+      if (e.statusCode === 401) {
+        // an inexistant share returns 401, we prefer to just say it wasn't found
+        throw new StatusCodeError(e.message, 404, e.details);
+      }
+      throw e;
     }
   }
 }

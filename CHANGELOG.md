@@ -1,3 +1,45 @@
+## [6.1.5](https://github.com/adobe/helix-onedrive-support/compare/v6.1.4...v6.1.5) (2022-02-28)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/helix-fetch to v3.0.6 ([#245](https://github.com/adobe/helix-onedrive-support/issues/245)) ([3747762](https://github.com/adobe/helix-onedrive-support/commit/3747762bcc9ed235559703a59862028b1910b07d))
+
+## [6.1.4](https://github.com/adobe/helix-onedrive-support/compare/v6.1.3...v6.1.4) (2022-02-21)
+
+
+### Bug Fixes
+
+* turn 403 in resolve into 404 ([#242](https://github.com/adobe/helix-onedrive-support/issues/242)) ([0fb36c3](https://github.com/adobe/helix-onedrive-support/commit/0fb36c35888f5c66e8841e5d6674ff2d36f87c81))
+
+## [6.1.3](https://github.com/adobe/helix-onedrive-support/compare/v6.1.2...v6.1.3) (2022-02-14)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/helix-fetch to v3.0.5 ([c260921](https://github.com/adobe/helix-onedrive-support/commit/c260921ccbd51847e64ad0ea15f353efde614311))
+
+## [6.1.2](https://github.com/adobe/helix-onedrive-support/compare/v6.1.1...v6.1.2) (2022-02-04)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/helix-fetch to v3.0.3 ([#232](https://github.com/adobe/helix-onedrive-support/issues/232)) ([6102d03](https://github.com/adobe/helix-onedrive-support/commit/6102d03ab45c89d2d1033d67b08bab179e86ea17))
+
+## [6.1.1](https://github.com/adobe/helix-onedrive-support/compare/v6.1.0...v6.1.1) (2022-02-03)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/helix-fetch to v3.0.2 ([3c3a2f2](https://github.com/adobe/helix-onedrive-support/commit/3c3a2f2c70bc4e69a66b8a2558add6154289eaee))
+
+# [6.1.0](https://github.com/adobe/helix-onedrive-support/compare/v6.0.1...v6.1.0) (2022-01-28)
+
+
+### Features
+
+* add API for SP API ([#227](https://github.com/adobe/helix-onedrive-support/issues/227)) ([6ce5938](https://github.com/adobe/helix-onedrive-support/commit/6ce59387a777d4549964a8fb90b2e0ca2a4fd86e))
+
 ## [6.0.1](https://github.com/adobe/helix-onedrive-support/compare/v6.0.0...v6.0.1) (2021-10-18)
 
 
