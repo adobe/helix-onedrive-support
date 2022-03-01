@@ -1,3 +1,10 @@
+# [6.2.0](https://github.com/adobe/helix-onedrive-support/compare/v6.1.5...v6.2.0) (2022-03-01)
+
+
+### Features
+
+* allow to set authentication resource ([#246](https://github.com/adobe/helix-onedrive-support/issues/246)) ([21d7445](https://github.com/adobe/helix-onedrive-support/commit/21d7445736bfe7452b710187cc81e71b37df8542))
+
 ## [6.1.5](https://github.com/adobe/helix-onedrive-support/compare/v6.1.4...v6.1.5) (2022-02-28)
 
 
