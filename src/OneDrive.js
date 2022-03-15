@@ -14,21 +14,13 @@
 const EventEmitter = require('events');
 const { promisify } = require('util');
 const { AuthenticationContext, MemoryCache } = require('adal-node');
-const fetchAPI = require('@adobe/helix-fetch');
+const { fetch, reset } = require('@adobe/helix-fetch').keepAliveNoCache();
 
 const Workbook = require('./Workbook.js');
 const StatusCodeError = require('./StatusCodeError.js');
 const { driveItemFromURL, driveItemToURL } = require('./utils.js');
 const { splitByExtension, sanitize, editDistance } = require('./fuzzy-helper.js');
 const SharePointSite = require('./SharePointSite.js');
-
-const { fetch, reset } = process.env.HELIX_FETCH_FORCE_HTTP1
-  ? fetchAPI.context({
-    alpnProtocols: [fetchAPI.ALPN_HTTP1_1],
-    userAgent: 'helix-fetch', // static user agent for test recordings
-  })
-  /* istanbul ignore next */
-  : fetchAPI;
 
 const AZ_AUTHORITY_HOST_URL = 'https://login.windows.net';
 const AZ_DEFAULT_RESOURCE = 'https://graph.microsoft.com'; // '00000002-0000-0000-c000-000000000000'; ??

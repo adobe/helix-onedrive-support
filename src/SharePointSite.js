@@ -10,17 +10,8 @@
  * governing permissions and limitations under the License.
  */
 
-const fetchAPI = require('@adobe/helix-fetch');
+const { fetch } = require('@adobe/helix-fetch').keepAliveNoCache();
 const StatusCodeError = require('./StatusCodeError.js');
-
-/* istanbul ignore next */
-const { fetch } = process.env.HELIX_FETCH_FORCE_HTTP1
-  ? fetchAPI.context({
-    alpnProtocols: [fetchAPI.ALPN_HTTP1_1],
-    userAgent: 'helix-fetch', // static user agent for test recordings
-  })
-  /* istanbul ignore next */
-  : fetchAPI;
 
 /**
  * Helper class accessing folders and files using the SharePoint V1 API.
