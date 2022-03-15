@@ -14,7 +14,7 @@
 const EventEmitter = require('events');
 const { promisify } = require('util');
 const { AuthenticationContext, MemoryCache } = require('adal-node');
-const { fetch, reset } = require('@adobe/helix-fetch').keepAliveNoCache();
+const { fetch, reset } = require('@adobe/helix-fetch').keepAliveNoCache({ userAgent: 'helix-fetch' });
 
 const Workbook = require('./Workbook.js');
 const StatusCodeError = require('./StatusCodeError.js');
