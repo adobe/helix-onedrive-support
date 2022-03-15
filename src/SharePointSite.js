@@ -10,7 +10,7 @@
  * governing permissions and limitations under the License.
  */
 
-const { fetch } = require('@adobe/helix-fetch').keepAliveNoCache();
+const { fetch } = require('@adobe/helix-fetch').keepAliveNoCache({ userAgent: 'helix-fetch' });
 const StatusCodeError = require('./StatusCodeError.js');
 
 /**
