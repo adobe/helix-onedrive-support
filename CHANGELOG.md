@@ -1,3 +1,10 @@
+## [6.2.1](https://github.com/adobe/helix-onedrive-support/compare/v6.2.0...v6.2.1) (2022-03-16)
+
+
+### Bug Fixes
+
+* use http1 for ms access ([#251](https://github.com/adobe/helix-onedrive-support/issues/251)) ([c91a629](https://github.com/adobe/helix-onedrive-support/commit/c91a629fa8c18c0dcdb2a0d21a225de940db05ea)), closes [#250](https://github.com/adobe/helix-onedrive-support/issues/250)
+
 # [6.2.0](https://github.com/adobe/helix-onedrive-support/compare/v6.1.5...v6.2.0) (2022-03-01)
 
 
