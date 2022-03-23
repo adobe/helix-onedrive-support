@@ -1,3 +1,11 @@
+## [7.0.1](https://github.com/adobe/helix-onedrive-support/compare/v7.0.0...v7.0.1) (2022-03-23)
+
+
+### Bug Fixes
+
+* detect *-my.sharepoint.com links ([#256](https://github.com/adobe/helix-onedrive-support/issues/256)) ([001f57d](https://github.com/adobe/helix-onedrive-support/commit/001f57d7d73fd760df86c5a18ac5f27bcf9f0cf5))
+* trigger release ([c8826a3](https://github.com/adobe/helix-onedrive-support/commit/c8826a38c69279593338b34918b2c305912225b1))
+
 # [7.0.0](https://github.com/adobe/helix-onedrive-support/compare/v6.2.2...v7.0.0) (2022-03-23)
 
 
