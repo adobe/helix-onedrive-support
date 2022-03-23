@@ -27,6 +27,7 @@ describe('Excel Integration Tests', () => {
       clientId: process.env.AZURE_WORD2MD_CLIENT_ID,
       username: process.env.AZURE_HELIX_USER,
       password: process.env.AZURE_HELIX_PASSWORD,
+      tenant: 'common',
     });
 
     const rootItem = await drive.getDriveItemFromShareLink('https://adobe.sharepoint.com/sites/cg-helix/Shared%20Documents/helix-test-content-onedrive/automation-tests');
@@ -45,6 +46,7 @@ describe('Excel Integration Tests', () => {
       clientId: process.env.AZURE_WORD2MD_CLIENT_ID,
       username: process.env.AZURE_HELIX_USER,
       password: process.env.AZURE_HELIX_PASSWORD,
+      tenant: 'common',
     });
 
     await drive.getAccessToken();
