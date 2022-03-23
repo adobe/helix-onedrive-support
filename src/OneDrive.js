@@ -155,7 +155,14 @@ class OneDrive extends EventEmitter {
       return;
     }
     const { log } = this;
-    const [tenantHost] = new URL(sharingUrl).hostname.split('.');
+    const url = sharingUrl instanceof URL
+      ? sharingUrl
+      : new URL(sharingUrl);
+    let [tenantHost] = url.hostname.split('.');
+    // special case: `xxxx-my.sharepoint.com`
+    if (url.hostname.endsWith('-my.sharepoint.com')) {
+      tenantHost = tenantHost.substring(0, tenantHost.length - 3);
+    }
 
     if (this.tenantCache) {
       this.tenant = this.tenantCache.get(tenantHost);

@@ -194,6 +194,8 @@ export declare class OneDrive extends EventEmitter {
 
   me(): Promise<GraphResult>;
 
+  initTenantFromShareLink(sharingUrl: string|URL): Promise<void>;
+
   resolveShareLink(sharingUrl: string|URL): Promise<GraphResult>;
 
   /**
