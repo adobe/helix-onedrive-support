@@ -1,3 +1,17 @@
+# [7.0.0](https://github.com/adobe/helix-onedrive-support/compare/v6.2.2...v7.0.0) (2022-03-23)
+
+
+### Features
+
+* add transparent tenant resolution ([dc59dbf](https://github.com/adobe/helix-onedrive-support/commit/dc59dbfc53d767593b82c845c753da3885560852))
+
+
+### BREAKING CHANGES
+
+* API slightly refactored
+- authorityUrl is now method: `getAuthorityIUrl`
+- new method: `setAccessToken`
+
 ## [6.2.2](https://github.com/adobe/helix-onedrive-support/compare/v6.2.1...v6.2.2) (2022-03-20)
 
 
