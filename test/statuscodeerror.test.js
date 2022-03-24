@@ -20,19 +20,19 @@ const StatusCodeError = require('../src/StatusCodeError.js');
 describe('StatusCodeError Tests', () => {
   it('Set the status code', async () => {
     const error = new StatusCodeError('not found', 404);
-    assert.equal(error.statusCode, 404);
+    assert.strictEqual(error.statusCode, 404);
   });
 
   it('fromError defaults to 500', async () => {
     const error = new Error('what the heck?!?');
     const e = StatusCodeError.fromError(error);
-    assert.equal(e.statusCode, 500);
+    assert.strictEqual(e.statusCode, 500);
   });
 
   it('fromError gets details from inner error', async () => {
     const error = new Error('what the heck?!?');
     const e = StatusCodeError.fromErrorResponse(error, 404);
-    assert.deepEqual(e.details, error);
+    assert.deepStrictEqual(e.details, error);
   });
 
   it('fromErrorResponse gets details from inner error', async () => {
@@ -40,7 +40,7 @@ describe('StatusCodeError Tests', () => {
       code: 'itemNotFound',
     };
     const e = StatusCodeError.fromErrorResponse(error, 404);
-    assert.equal(e.statusCode, 404);
-    assert.deepEqual(e.details, { code: 'itemNotFound' });
+    assert.strictEqual(e.statusCode, 404);
+    assert.deepStrictEqual(e.details, { code: 'itemNotFound' });
   });
 });

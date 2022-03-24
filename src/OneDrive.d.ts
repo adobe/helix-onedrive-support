@@ -25,6 +25,7 @@ export declare interface OneDriveOptions {
   refreshToken?: string;
   log?: Logger;
   tenant?: string;
+  resource?: string;
   username?: string;
   password?: string;
 
@@ -44,6 +45,18 @@ export declare interface OneDriveOptions {
    * Note that the cache is only used, if the `noShareLinkCache` flag is `falsy`
    */
   shareLinkCache?: Map<string, DriveItem>,
+
+  /**
+   * Disables the cache for the tenant lookup.
+   * @default process.env.HELIX_ONEDRIVE_NO_TENANT_CACHE
+   */
+  noTenantCache?: boolean;
+
+  /**
+   * Map to use for the tenant lookup cache. If empty, a module-global cache will be used.
+   * Note that the cache is only used, if the `noTenantCache` flag is `falsy`
+   */
+  tenantCache?: Map<string, DriveItem>,
 }
 
 export declare interface GraphResult {
@@ -58,6 +71,36 @@ export declare interface SubscriptionOptions {
   clientState: string;
   changeType?: string;
   expiresIn?: number;
+}
+
+export declare interface SharePointSite {
+  /**
+   * Return a file's properties.
+   * @param file file name
+   * @returns file properties
+   */
+  getFile(file: string): Promise<GraphResult>;
+
+  /**
+   * Return a folder's properties.
+   * @param folder folder name
+   * @returns folder properties
+   */
+  getFolder(folder: string): Promise<GraphResult>;
+
+  /**
+   * Return a file's contents, as a binary buffer.
+   * @param file file name
+   * @returns file contents
+   */
+  getFileContents(file: string): Promise<Buffer>;
+
+  /**
+   * Returns a list of children items in a folder
+   * @param folder folder name
+   * @returns list of files and folders
+   */
+  getFilesAndFolders(folder: string): Promise<GraphResult>;
 }
 
 /**
@@ -115,7 +158,7 @@ export declare class OneDrive extends EventEmitter {
   /**
    * the authority url for login.
    */
-  authorityUrl: string;
+  getAuthorityUrl(): string;
 
   /**
    * Adds entries to the token cache
@@ -131,6 +174,14 @@ export declare class OneDrive extends EventEmitter {
    */
   login(onCode: Function): Promise<TokenResponse>;
 
+  /**
+   * Sets the access token to use for all requests. if the token is a valid JWT token,
+   * its `tid` claim is used a tenant (if no tenant is already set).
+   *
+   * @param {string} bearerToken
+   */
+  setAccessToken(bearerToken);
+
   getAccessToken(autoRefresh: boolean): Promise<TokenResponse>;
 
   createLoginUrl(): string;
@@ -142,6 +193,8 @@ export declare class OneDrive extends EventEmitter {
   doFetch(relUrl: string, rawResponseBody: boolean = false, options: object = {}): Promise<object|Buffer>
 
   me(): Promise<GraphResult>;
+
+  initTenantFromShareLink(sharingUrl: string|URL): Promise<void>;
 
   resolveShareLink(sharingUrl: string|URL): Promise<GraphResult>;
 
@@ -228,4 +281,11 @@ export declare class OneDrive extends EventEmitter {
    * @returns {Promise<Array>} A return object with the values and a `@odata.deltaLink`.
    */
   fetchChanges(resource: string, token?: string);
+
+  /**
+   * Returns a site object exposing the SharePoint API (now called Graph API V1).
+   * @param siteURL site URL, in the format https://<tenant>.sharepoint.com/sites/<site>
+   * @return {Promise<SharePointSite} site object
+   */
+  getSite(siteURL: string): Promise<SharePointSite>;
 }

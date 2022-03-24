@@ -27,13 +27,14 @@ describe('Excel Integration Tests', () => {
       clientId: process.env.AZURE_WORD2MD_CLIENT_ID,
       username: process.env.AZURE_HELIX_USER,
       password: process.env.AZURE_HELIX_PASSWORD,
+      tenant: 'common',
     });
 
-    const rootItem = await drive.getDriveItemFromShareLink('https://adobe.sharepoint.com/sites/cg-helix/Shared%20Documents/automation-tests');
+    const rootItem = await drive.getDriveItemFromShareLink('https://adobe.sharepoint.com/sites/cg-helix/Shared%20Documents/helix-test-content-onedrive/automation-tests');
     const items = await drive.fuzzyGetDriveItem(rootItem, encodeURI('/pet-shop'));
     const book = await drive.getWorkbook(items[0]);
     const names = await book.getWorksheetNames();
-    assert.deepEqual(names, ['Sheet1', 'Config']);
+    assert.deepStrictEqual(names, ['helix-default', 'incoming', 'Config']);
   }).timeout(10000);
 
   it('Test pre authenticate fetch', async function test() {
@@ -45,20 +46,21 @@ describe('Excel Integration Tests', () => {
       clientId: process.env.AZURE_WORD2MD_CLIENT_ID,
       username: process.env.AZURE_HELIX_USER,
       password: process.env.AZURE_HELIX_PASSWORD,
+      tenant: 'common',
     });
 
     await drive.getAccessToken();
     const books = ['/pet-shop', '/load-test', '/doccloud-test'];
     const result = await Promise.all(books.map(async (bookName) => {
-      const rootItem = await drive.getDriveItemFromShareLink('https://adobe.sharepoint.com/sites/cg-helix/Shared%20Documents/automation-tests');
+      const rootItem = await drive.getDriveItemFromShareLink('https://adobe.sharepoint.com/sites/cg-helix/Shared%20Documents/helix-test-content-onedrive/automation-tests');
       const items = await drive.fuzzyGetDriveItem(rootItem, encodeURI(bookName));
       const book = await drive.getWorkbook(items[0]);
       // eslint-disable-next-line no-return-await
       return await book.getWorksheetNames();
     }));
 
-    assert.deepEqual(result, [
-      ['Sheet1', 'Config'],
+    assert.deepStrictEqual(result, [
+      ['helix-default', 'incoming', 'Config'],
       ['Sheet1', 'Config'],
       ['Sheet1', 'Config'],
     ]);

@@ -33,7 +33,7 @@ describe('Worksheet Tests', () => {
 
   it('Get the sheet data', async () => {
     const { name } = await sheet.getData();
-    assert.equal(name, 'sheet');
+    assert.strictEqual(name, 'sheet');
   });
 
   it('Get a sheet that does not exist fails.', async () => {
@@ -64,7 +64,7 @@ describe('Worksheet Tests', () => {
     await sheet.deleteNamedItem(name);
     const index = oneDrive.workbooks[0].data.sheets[0].namedItems
       .findIndex((item) => item.name === name);
-    assert.equal(index, -1);
+    assert.strictEqual(index, -1);
   });
   it('Get table names', async () => {
     const values = await sheet.getTableNames();
@@ -73,12 +73,12 @@ describe('Worksheet Tests', () => {
   it('Get used range address', async () => {
     const range = sheet.usedRange();
     const address = await range.getAddress();
-    assert.equal(address, 'Sheet1!A1:B4');
+    assert.strictEqual(address, 'Sheet1!A1:B4');
   });
   it('Get used range address local', async () => {
     const range = sheet.usedRange();
     const address = await range.getAddressLocal();
-    assert.equal(address, 'A1:B4');
+    assert.strictEqual(address, 'A1:B4');
   });
   it('Get all data', async () => {
     const range = sheet.usedRange();

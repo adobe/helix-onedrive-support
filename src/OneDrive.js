@@ -11,25 +11,19 @@
  */
 
 // eslint-disable-next-line max-classes-per-file
-const fetchAPI = require('@adobe/helix-fetch');
+const { fetch, reset } = require('@adobe/helix-fetch').keepAliveNoCache({ userAgent: 'helix-fetch' });
 const { PublicClientApplication, ConfidentialClientApplication, LogLevel } = require('@azure/msal-node');
+const jose = require('jose');
 
 const Workbook = require('./Workbook.js');
 const StatusCodeError = require('./StatusCodeError.js');
 const { driveItemFromURL, driveItemToURL } = require('./utils.js');
 const { splitByExtension, sanitize, editDistance } = require('./fuzzy-helper.js');
-
-const { fetch, reset } = process.env.HELIX_FETCH_FORCE_HTTP1
-  ? fetchAPI.context({
-    alpnProtocols: [fetchAPI.ALPN_HTTP1_1],
-    userAgent: 'helix-fetch', // static user agent for test recordings
-  })
-  /* istanbul ignore next */
-  : fetchAPI;
+const SharePointSite = require('./SharePointSite.js');
 
 const AZ_AUTHORITY_HOST_URL = 'https://login.windows.net';
-const AZ_RESOURCE = 'https://graph.microsoft.com'; // '00000002-0000-0000-c000-000000000000'; ??
-const AZ_DEFAULT_TENANT = 'common';
+const AZ_DEFAULT_RESOURCE = 'https://graph.microsoft.com'; // '00000002-0000-0000-c000-000000000000'; ??
+const AZ_COMMON_TENANT = 'common';
 
 const DEFAULT_SCOPES = ['user.read', 'openid', 'profile', 'offline_access'];
 
@@ -52,10 +46,16 @@ const MAX_SUBSCRIPTION_EXPIRATION_TIME = 4230 * 60 * 1000;
 
 /**
  * map that caches share item data. key is a sharing url, the value a drive item.
- * @type {Map<string, *>}
+ * @type {Map<string, string>}
  * @private
  */
 const globalShareLinkCache = new Map();
+
+/**
+ * map that caches the tenant ids
+ * @type {Map<string, string>}
+ */
+const globalTenantCache = new Map();
 
 /**
  * Helper class that facilitates accessing one drive.
@@ -66,36 +66,39 @@ const globalShareLinkCache = new Map();
 class OneDrive {
   /**
    * @param {OneDriveOptions} opts Options
-   * @param {string}  opts.clientId The client id of the app
-   * @param {string}  [opts.clientSecret] The client secret of the app
-   * @param {string}  [opts.refreshToken] The refresh token.
-   * @param {string}  [opts.accessToken] The access token.
-   * @param {string}  [opts.username] Username for username/password authentication.
-   * @param {string}  [opts.password] Password for username/password authentication.
-   * @param {number}  [opts.expiresOn] Expiration time.
-   * @param {Logger}  [opts.log] A logger.
-   * @param {boolean} [opts.localAuthCache] Whether to use local auth cache
    */
   constructor(opts) {
+    if (!opts.clientId) {
+      throw new Error('Missing clientId.');
+    }
+
     this.clientId = opts.clientId;
     this.clientSecret = opts.clientSecret || '';
     this.refreshToken = opts.refreshToken || '';
     this.username = opts.username || '';
     this.password = opts.password || '';
     this._log = opts.log || console;
-    this.tenant = opts.tenant || AZ_DEFAULT_TENANT;
+    this.tenant = opts.tenant;
+    this.resource = opts.resource || AZ_DEFAULT_RESOURCE;
     this.localAuthCache = opts.localAuthCache;
+
     if (!opts.noShareLinkCache && !process.env.HELIX_ONEDRIVE_NO_SHARE_LINK_CACHE) {
+      /** @type {Map<string, string>} */
       this.shareLinkCache = opts.shareLinkCache || globalShareLinkCache;
     }
-    if (!this.clientId) {
-      throw new Error('Missing clientId.');
+
+    if (!opts.noTenantCache && !process.env.HELIX_ONEDRIVE_NO_TENANT_CACHE) {
+      /** @type {Map<string, string>} */
+      this.tenantCache = opts.tenantCache || globalTenantCache;
     }
   }
 
   get app() {
     if (!this._app) {
-      const { log, localAuthCache } = this;
+      const {
+        log,
+        localAuthCache,
+      } = this;
       const msalConfig = {
         auth: {
           clientId: this.clientId,
@@ -126,6 +129,100 @@ class OneDrive {
   }
 
   /**
+   * Return the auth context
+   * @returns {AuthenticationContext}
+   */
+  // async getAuthContext() {
+  //   if (!this.authContext) {
+  //     this.authContext = new AuthenticationContext(
+  //       this.getAuthorityUrl(),
+  //       undefined,
+  //       this.localAuthCache ? new MemoryCache() : undefined,
+  //     );
+  //     [
+  //       'acquireUserCode',
+  //       'acquireToken',
+  //       'acquireTokenWithDeviceCode',
+  //       'acquireTokenWithRefreshToken',
+  //       'acquireTokenWithUsernamePassword',
+  //       'acquireTokenWithClientCredentials',
+  //     ].forEach((m) => {
+  //       this.authContext[m] = promisify(this.authContext[m].bind(this.authContext));
+  //     });
+  //     const { cache } = this.authContext;
+  //     if (this.localAuthCache) {
+  //       const originalAdd = cache.add;
+  //       cache.add = (entries, cb) => {
+  //         originalAdd.call(cache, entries, (...args) => {
+  //           // eslint-disable-next-line no-underscore-dangle
+  //           this.emit('tokens', cache._entries);
+  //           cb(...args);
+  //         });
+  //       };
+  //       const originalRemove = cache.remove;
+  //       cache.remove = (entries, cb) => {
+  //         originalRemove.call(cache, entries, (...args) => {
+  //           // eslint-disable-next-line no-underscore-dangle
+  //           this.emit('tokens', cache._entries);
+  //           cb(...args);
+  //         });
+  //       };
+  //     }
+  //     cache.add.promise = promisify(cache.add.bind(cache));
+  //     cache.remove.promise = promisify(cache.remove.bind(cache));
+  //     cache.find.promise = promisify(cache.find.bind(cache));
+  //   }
+  //   return this.authContext;
+  // }
+
+  async resolveTenant(tenantHost) {
+    const { log } = this;
+    const configUrl = `https://login.windows.net/${tenantHost}.onmicrosoft.com/.well-known/openid-configuration`;
+    const res = await fetch(configUrl);
+    if (!res.ok) {
+      log.info(`error fetching openid-configuration for ${tenantHost}: ${res.status}. Fallback to 'common'`);
+      return AZ_COMMON_TENANT;
+    }
+
+    const { issuer } = await res.json();
+    if (!issuer) {
+      log.info(`unable to extract tenant from openid-configuration for ${tenantHost}: no 'issuer'. Fallback to 'common'`);
+      return AZ_COMMON_TENANT;
+    }
+
+    // eslint-disable-next-line prefer-destructuring
+    const tenant = new URL(issuer).pathname.split('/')[1];
+    log.info(`fetched tenant information from for ${tenantHost}: ${tenant}`);
+    return tenant;
+  }
+
+  async initTenantFromShareLink(sharingUrl) {
+    if (this.tenant) {
+      return;
+    }
+    const { log } = this;
+    const url = sharingUrl instanceof URL
+      ? sharingUrl
+      : new URL(sharingUrl);
+    let [tenantHost] = url.hostname.split('.');
+    // special case: `xxxx-my.sharepoint.com`
+    if (url.hostname.endsWith('-my.sharepoint.com')) {
+      tenantHost = tenantHost.substring(0, tenantHost.length - 3);
+    }
+
+    if (this.tenantCache) {
+      this.tenant = this.tenantCache.get(tenantHost);
+    }
+    if (!this.tenant) {
+      this.tenant = await this.resolveTenant(tenantHost);
+      if (this.tenantCache) {
+        this.tenantCache.set(tenantHost, this.tenant);
+      }
+    }
+    log.info(`using tenant ${this.tenant} for ${tenantHost} from ${sharingUrl}`);
+  }
+
+  /**
    */
   // eslint-disable-next-line class-methods-use-this
   async dispose() {
@@ -139,7 +236,10 @@ class OneDrive {
     return this._log;
   }
 
-  get authorityUrl() {
+  getAuthorityUrl() {
+    if (!this.tenant) {
+      throw new Error('unable to compute authority url. no tenant.');
+    }
     return `${AZ_AUTHORITY_HOST_URL}/${this.tenant}`;
   }
 
@@ -196,8 +296,31 @@ class OneDrive {
   }
 
   /**
+   * Sets the access token to use for all requests. if the token is a valid JWT token,
+   * its `tid` claim is used a tenant (if no tenant is already set).
+   *
+   * @param {string} bearerToken
    */
-  async getAccessToken(silentOnly) {
+  setAccessToken(bearerToken) {
+    const { log } = this;
+    this.accessToken = {
+      accessToken: bearerToken,
+    };
+    if (!this.tenant) {
+      try {
+        const { tid } = jose.decodeJwt(bearerToken);
+        if (tid) {
+          log.info(`using tenant from access token: ${tid}`);
+          this.tenant = tid;
+        }
+      } catch (e) {
+        log.warn(`unable to decode access token: ${e.message}`);
+      }
+    }
+    this.accessToken.tenantId = this.tenant;
+  }
+
+  async fetchAccessToken(silentOnly) {
     const { log, app } = this;
     const accounts = await app.getTokenCache().getAllAccounts();
     if (accounts.length > 0) {
@@ -245,10 +368,17 @@ class OneDrive {
     }
   }
 
+  async getAccessToken() {
+    if (!this.accessToken) {
+      this.accessToken = await this.fetchAccessToken();
+    }
+    return this.accessToken;
+  }
+
   /**
    */
   createLoginUrl(redirectUri, state) {
-    return `${this.authorityUrl}/oauth2/authorize?response_type=code&scope=/.default&client_id=${this.clientId}&redirect_uri=${redirectUri}&state=${state}&resource=${AZ_RESOURCE}`;
+    return `${this.getAuthorityUrl()}/oauth2/authorize?response_type=code&scope=/.default&client_id=${this.clientId}&redirect_uri=${redirectUri}&state=${state}&resource=${this.resource}`;
   }
 
   async augmentAndCacheResponse(response) {
@@ -273,10 +403,15 @@ class OneDrive {
   /**
    */
   async acquireToken(redirectUri, code) {
-    const { log, authContext: context } = this;
+    const { log } = this;
+    const context = await this.getAuthContext();
     try {
       const resp = await context.acquireTokenWithAuthorizationCode(
-        code, redirectUri, AZ_RESOURCE, this.clientId, this.clientSecret,
+        code,
+        redirectUri,
+        this.resource,
+        this.clientId,
+        this.clientSecret,
       );
       return await this.augmentAndCacheResponse(resp);
     } catch (e) {
@@ -352,13 +487,14 @@ class OneDrive {
   /**
    */
   async resolveShareLink(sharingUrl) {
+    await this.initTenantFromShareLink(sharingUrl);
     const link = OneDrive.encodeSharingUrl(sharingUrl);
     this.log.debug(`resolving sharelink ${sharingUrl} (${link})`);
     try {
       return await this.doFetch(`/shares/${link}/driveItem`);
     } catch (e) {
-      if (e.statusCode === 401) {
-        // an inexistant share returns 401, we prefer to just say it wasn't found
+      if (e.statusCode === 401 || e.statusCode === 403) {
+        // an inexistent share returns either 401 or 403, we prefer to just say it wasn't found
         throw new StatusCodeError(e.message, 404, e.details);
       }
       throw e;
@@ -378,6 +514,7 @@ class OneDrive {
     if (driveItem) {
       return driveItem;
     }
+    await this.initTenantFromShareLink(sharingUrl);
     if (this.shareLinkCache) {
       driveItem = this.shareLinkCache.get(sharingUrl);
     }
@@ -626,6 +763,35 @@ class OneDrive {
         this.log.error(error);
         throw error;
       }
+    }
+  }
+
+  async getSite(siteURL) {
+    this.log.debug(`getting site: (${siteURL})`);
+
+    const match = siteURL.match(/^https:\/\/(\S+).sharepoint.com\/sites\/([^/]+)\/(\S+)$/);
+    if (!match) {
+      throw new Error(`Site URL does not match (*.sharepoint.com/sites/.*): ${match}`);
+    }
+    const [, owner, site, root] = match;
+
+    try {
+      const accessToken = await this.getAccessToken();
+      return new SharePointSite({
+        owner,
+        site,
+        root,
+        clientId: this.clientId,
+        tenantId: accessToken.tenantId,
+        refreshToken: accessToken.refreshToken,
+        log: this.log,
+      });
+    } catch (e) {
+      if (e.statusCode === 401) {
+        // an inexistant share returns 401, we prefer to just say it wasn't found
+        throw new StatusCodeError(e.message, 404, e.details);
+      }
+      throw e;
     }
   }
 }
