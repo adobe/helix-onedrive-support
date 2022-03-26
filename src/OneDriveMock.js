@@ -9,10 +9,9 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-const OneDrive = require('./OneDrive.js');
+const { OneDrive } = require('./OneDrive.js');
 const Workbook = require('./Workbook.js');
 const StatusCodeError = require('./StatusCodeError.js');
-const { driveItemFromURL, driveItemToURL } = require('./utils.js');
 
 /**
  * Handle the `namedItems` operation on a workbook / worksheet
@@ -308,7 +307,6 @@ class OneDriveMock extends OneDrive {
   }
 }
 
-module.exports = Object.assign(OneDriveMock, {
-  driveItemToURL,
-  driveItemFromURL,
-});
+module.exports = {
+  OneDriveMock,
+};

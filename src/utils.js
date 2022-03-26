@@ -27,50 +27,6 @@ function superTrim(str) {
     .trim();
 }
 
-/**
- * Returns a onedrive uri for the given drive item. the uri has the format:
- * `onedrive:/drives/<driveId>/items/<itemId>`
- *
- * @param {DriveItem} driveItem
- * @returns {URL} An url representing the drive item
- */
-function driveItemToURL(driveItem) {
-  return new URL(`onedrive:/drives/${driveItem.parentReference.driveId}/items/${driveItem.id}`);
-}
-
-/**
- * Returns a partial drive item from the given url. The urls needs to have the format:
- * `onedrive:/drives/<driveId>/items/<itemId>`. if the url does not start with the correct
- * protocol, {@code null} is returned.
- *
- * @param {URL|string} url The url of the drive item.
- * @return {DriveItem} A (partial) drive item.
- */
-function driveItemFromURL(url) {
-  if (!(url instanceof URL)) {
-    // eslint-disable-next-line no-param-reassign
-    url = new URL(String(url));
-  }
-  if (url.protocol !== 'onedrive:') {
-    return null;
-  }
-  const [drives, driveId, items, itemId] = url.pathname.split('/').filter((s) => !!s);
-  if (drives !== 'drives') {
-    throw new Error(`URI not supported (missing 'drives' segment): ${url}`);
-  }
-  if (items !== 'items') {
-    throw new Error(`URI not supported (missing 'items' segment): ${url}`);
-  }
-  return {
-    id: itemId,
-    parentReference: {
-      driveId,
-    },
-  };
-}
-
 module.exports = {
-  driveItemFromURL,
-  driveItemToURL,
   superTrim,
 };

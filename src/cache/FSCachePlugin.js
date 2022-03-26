@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Adobe. All rights reserved.
+ * Copyright 2022 Adobe. All rights reserved.
  * This file is licensed to you under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License. You may obtain a copy
  * of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -12,21 +12,27 @@
 const fs = require('fs/promises');
 
 /**
+ * aliases
+ * @typedef {import("@azure/msal-node").ICachePlugin} ICachePlugin
+ * @typedef {import("@azure/msal-node").TokenCacheContext} TokenCacheContext
+ */
+
+/**
  * Cache plugin for MSAL
+ * @param {FSCachePluginOptions} opts
  * @class FSCachePlugin
  * @implements ICachePlugin
  */
-module.exports = class FSCachePlugin {
-  constructor(filePath) {
-    this.filePath = filePath;
-    this.log = console;
+class FSCachePlugin {
+  constructor(opts) {
+    this.filePath = opts.filePath;
+    this.log = opts.log || console;
   }
 
-  withLogger(logger) {
-    this.log = logger;
-    return this;
-  }
-
+  /**
+   * @param {TokenCacheContext} cacheContext
+   * @returns {Promise<boolean>} if cache was updated
+   */
   async beforeCacheAccess(cacheContext) {
     const { log, filePath } = this;
     try {
@@ -38,6 +44,10 @@ module.exports = class FSCachePlugin {
     return false;
   }
 
+  /**
+   * @param {TokenCacheContext} cacheContext
+   * @returns {Promise<boolean>} if cache was updated
+   */
   async afterCacheAccess(cacheContext) {
     const { filePath } = this;
     if (cacheContext.cacheHasChanged) {
@@ -48,4 +58,7 @@ module.exports = class FSCachePlugin {
     }
     return false;
   }
+}
+module.exports = {
+  FSCachePlugin,
 };
