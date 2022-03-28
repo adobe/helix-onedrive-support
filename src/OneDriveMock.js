@@ -10,6 +10,7 @@
  * governing permissions and limitations under the License.
  */
 const { OneDrive } = require('./OneDrive.js');
+const { OneDriveAuth } = require('./OneDriveAuth.js');
 const Workbook = require('./Workbook.js');
 const StatusCodeError = require('./StatusCodeError.js');
 
@@ -139,9 +140,21 @@ function handleTable(sheet, segs, method, body) {
  * Mock OneDrive client that supports some of the operations the `OneDrive` class does.
  */
 class OneDriveMock extends OneDrive {
-  constructor() {
+  constructor({ auth } = {}) {
+    if (!auth) {
+      // eslint-disable-next-line no-param-reassign
+      auth = new OneDriveAuth({
+        clientId: 'mock-id',
+        tenant: 'test-tenant',
+      });
+      // eslint-disable-next-line no-param-reassign
+      auth.accessToken = {
+        accessToken: 'dummy-token',
+        tenantId: 'test-tenant',
+      };
+    }
     super({
-      clientId: 'mock-id',
+      auth,
     });
     this.workbooks = [];
     this.sharelinks = {};

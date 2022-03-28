@@ -19,6 +19,7 @@ export declare interface OneDriveAuthOptions {
   tenant?: string;
   resource?: string;
   scopes?: string[];
+  localAuthCache?:boolean;
 
   /**
    * use cache plugin instead for default (global) token cache.
@@ -76,8 +77,9 @@ export declare class OneDriveAuth {
    * its `tid` claim is used a tenant (if no tenant is already set).
    *
    * @param {string} bearerToken
+   * @returns {OneDriveAuth} this
    */
-  setAccessToken(bearerToken);
+  setAccessToken(bearerToken): OneDriveAuth;
 
   /**
    * Acquires the access token either from the cache or from MS.

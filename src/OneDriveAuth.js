@@ -75,7 +75,7 @@ class OneDriveAuth {
       this.tenantCache = opts.tenantCache || globalTenantCache;
     }
 
-    if (process.env.HELIX_ONEDRIVE_LOCAL_AUTH_CACHE && !this.cachePlugin) {
+    if ((opts.localAuthCache || process.env.HELIX_ONEDRIVE_LOCAL_AUTH_CACHE) && !this.cachePlugin) {
       this.cachePlugin = new MemCachePlugin({
         log: this._log,
         key: 'default',
@@ -222,6 +222,7 @@ class OneDriveAuth {
    * its `tid` claim is used a tenant (if no tenant is already set).
    *
    * @param {string} bearerToken
+   * @returns {OneDriveAuth} this
    */
   setAccessToken(bearerToken) {
     const { log } = this;
@@ -241,6 +242,7 @@ class OneDriveAuth {
       }
     }
     this.accessToken.tenantId = this.tenant;
+    return this;
   }
 
   /**

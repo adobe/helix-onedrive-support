@@ -16,7 +16,7 @@
 
 const assert = require('assert');
 
-const OneDriveMock = require('../src/OneDriveMock.js');
+const { OneDriveMock } = require('../src/OneDriveMock.js');
 const StatusCodeError = require('../src/StatusCodeError.js');
 const exampleBook = require('./fixtures/book.js');
 

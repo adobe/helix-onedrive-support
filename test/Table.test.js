@@ -15,7 +15,7 @@
 'use strict';
 
 const assert = require('assert');
-const OneDriveMock = require('../src/OneDriveMock.js');
+const { OneDriveMock } = require('../src/OneDriveMock.js');
 const exampleBook = require('./fixtures/book.js');
 const StatusCodeError = require('../src/StatusCodeError.js');
 
