@@ -11,9 +11,6 @@
  */
 
 /* eslint-env mocha */
-
-'use strict';
-
 const assert = require('assert');
 const jose = require('jose');
 const { OneDriveAuth } = require('../src/OneDriveAuth.js');

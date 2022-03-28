@@ -11,11 +11,6 @@
  */
 
 /* eslint-env mocha */
-
-'use strict';
-
-process.env.HELIX_FETCH_FORCE_HTTP1 = 'true';
-
 const assert = require('assert');
 const jose = require('jose');
 const { OneDrive } = require('../src/OneDrive.js');
@@ -23,10 +18,6 @@ const { OneDriveAuth } = require('../src/OneDriveAuth.js');
 const { OneDriveMock: MockDrive } = require('../src/OneDriveMock.js');
 const StatusCodeError = require('../src/StatusCodeError');
 const { Nock } = require('./utils.js');
-
-const AZ_AUTHORITY_HOST_URL = 'https://login.windows.net';
-
-const { TEST_CLIENT_ID, TEST_USER, TEST_PASSWORD } = process.env;
 
 /**
  * @param {OneDriveAuthOptions} opts
