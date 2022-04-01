@@ -1,3 +1,10 @@
+# [7.1.0](https://github.com/adobe/helix-onedrive-support/compare/v7.0.1...v7.1.0) (2022-04-01)
+
+
+### Features
+
+* speed up fuzzyItem lookup ([#259](https://github.com/adobe/helix-onedrive-support/issues/259)) ([5963fa6](https://github.com/adobe/helix-onedrive-support/commit/5963fa6389329d0cf737f64724688593b9291923)), closes [#258](https://github.com/adobe/helix-onedrive-support/issues/258)
+
 ## [7.0.1](https://github.com/adobe/helix-onedrive-support/compare/v7.0.0...v7.0.1) (2022-03-23)
 
 
