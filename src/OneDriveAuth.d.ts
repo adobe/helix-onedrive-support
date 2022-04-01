@@ -9,7 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import {AuthenticationResult, ICachePlugin} from "@azure/msal-node";
+import {AuthenticationResult, ClientApplication, ICachePlugin} from "@azure/msal-node";
 
 export declare interface OneDriveAuthOptions {
   clientId: string;
@@ -58,6 +58,11 @@ export declare class OneDriveAuth {
    * the logger of this client
    */
   log: Console;
+
+  /**
+   * the MSAL client application
+   */
+  app: ClientApplication;
 
   /**
    * the authority url for login.

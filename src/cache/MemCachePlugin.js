@@ -43,7 +43,7 @@ class MemCachePlugin {
   async beforeCacheAccess(cacheContext) {
     try {
       this.log.info('mem: read token cache', this.key);
-      const cache = caches[this.key];
+      const cache = caches.get(this.key);
       if (cache) {
         cacheContext.tokenCache.deserialize(cache);
         return true;
@@ -52,7 +52,7 @@ class MemCachePlugin {
         const ret = await this.base.beforeCacheAccess(cacheContext);
         if (ret) {
           this.log.info('mem: base updated. remember.');
-          caches[this.key] = cacheContext.tokenCache.serialize();
+          caches.set(this.key, cacheContext.tokenCache.serialize());
         }
         return ret;
       }
@@ -68,7 +68,7 @@ class MemCachePlugin {
   async afterCacheAccess(cacheContext) {
     if (cacheContext.cacheHasChanged) {
       this.log.info('mem: write token cache', this.key);
-      caches[this.key] = cacheContext.tokenCache.serialize();
+      caches.set(this.key, cacheContext.tokenCache.serialize());
       if (this.base) {
         this.log.info('mem: write token cache done. telling base', this.key);
         return this.base.afterCacheAccess(cacheContext);
