@@ -251,6 +251,9 @@ class OneDriveMock extends OneDrive {
     const url = new URL(`https://dummy.org${uri}`);
     if (url.pathname in this.driveItems) {
       const result = this.driveItems[url.pathname];
+      if (result instanceof Error) {
+        throw result;
+      }
       if (!Array.isArray(result.value)) {
         return result;
       }

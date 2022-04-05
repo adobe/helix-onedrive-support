@@ -159,16 +159,17 @@ export declare class OneDrive extends EventEmitter {
    * - replace all non-alphanumeric characters with a dash
    * - remove all consecutive dashes
    * - remove all leading and trailing dashes
-   * - extensions are ignored, if the given path doesn't have one
+   * - extensions are ignored, if the given path doesn't have one or if ignoreExtension is true
    *
    * The result is an array of drive items that match the given path. They are ordered by the edit
    * distance to the original name and then alphanumerically.
    *
    * @param folderItem
    * @param relPath
+   * @param ignoreExtension
    * @returns {Promise<DriveItem[]>}
    */
-  fuzzyGetDriveItem(folderItem: DriveItem, relPath?: string): Promise<DriveItem[]>;
+  fuzzyGetDriveItem(folderItem: DriveItem, relPath?: string, ignoreExtension?: boolean): Promise<DriveItem[]>;
 
   downloadDriveItem(driveItem: DriveItem): Promise<GraphResult>;
 

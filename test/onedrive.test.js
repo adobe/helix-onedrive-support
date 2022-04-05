@@ -114,33 +114,37 @@ describe('OneDrive Tests', () => {
     );
   });
 
+  it('fuzzyGetDriveItem throws an error if relPath does not start with /', async () => {
+    const drive = new MockDrive();
+    const folderItem = OneDrive.driveItemFromURL('onedrive:/drives/123/items/456');
+
+    await assert.rejects(
+      drive.fuzzyGetDriveItem(folderItem, 'foo'),
+      new Error('relPath must be empty or start with /'),
+    );
+  });
+
   it('fuzzyGetDriveItem returns folder item when relpath is missing', async () => {
     const folderItem = OneDrive.driveItemFromURL('onedrive:/drives/123/items/456');
 
     const data = {
-      value: {
-        folder: { childCount: 1 },
-        name: 'test',
-      },
+      folder: { childCount: 1 },
+      name: 'test',
     };
     const drive = new MockDrive()
       .registerDriveItem('123', '456', data);
     const res = await drive.fuzzyGetDriveItem(folderItem);
 
-    assert.deepStrictEqual(res, [data.value]);
+    assert.deepStrictEqual(res, [data]);
   });
 
   it('fuzzyGetDriveItem returns exact item', async () => {
     const folderItem = OneDrive.driveItemFromURL('onedrive:/drives/123/items/456');
-    const data = {
-      value: [{
+    const drive = new MockDrive()
+      .registerDriveItem('123', '456:/document.docx', {
         file: { mimeType: 'dummy' },
         name: 'document.docx',
-      }],
-    };
-
-    const drive = new MockDrive()
-      .registerDriveItemChildren('123', '456', data);
+      });
     const res = await drive.fuzzyGetDriveItem(folderItem, '/document.docx');
 
     assert.deepStrictEqual(res, [{
@@ -148,9 +152,15 @@ describe('OneDrive Tests', () => {
       file: {
         mimeType: 'dummy',
       },
-      fuzzyDistance: 0,
       name: 'document.docx',
     }]);
+  });
+
+  it('fuzzyGetDriveItem throw error on direct item', async () => {
+    const folderItem = OneDrive.driveItemFromURL('onedrive:/drives/123/items/456');
+    const drive = new MockDrive()
+      .registerDriveItem('123', '456:/document.docx', new StatusCodeError('rate limit', 429));
+    await assert.rejects(drive.fuzzyGetDriveItem(folderItem, '/document.docx'), new Error('rate limit'));
   });
 
   it('fuzzyGetDriveItem returns item for deep path', async () => {
@@ -204,6 +214,9 @@ describe('OneDrive Tests', () => {
       }, {
         file: { mimeType: 'dummy' },
         name: 'My-1-Document.docx',
+      }, {
+        file: { mimeType: 'dummy' },
+        name: 'My-1-Document.md',
       }],
     };
 
@@ -260,6 +273,56 @@ describe('OneDrive Tests', () => {
     const drive = new MockDrive()
       .registerDriveItemChildren('123', '456', data);
     const res = await drive.fuzzyGetDriveItem(folderItem, '/my-1-document');
+
+    assert.deepStrictEqual(res, [
+      {
+        extension: 'docx',
+        file: { mimeType: 'dummy' },
+        fuzzyDistance: 0,
+        name: 'my-1-document.docx',
+      },
+      {
+        extension: 'md',
+        file: { mimeType: 'dummy' },
+        fuzzyDistance: 0,
+        name: 'my-1-document.md',
+      },
+      {
+        extension: 'docx',
+        file: { mimeType: 'dummy' },
+        fuzzyDistance: 2,
+        name: 'My-1-Document.docx',
+      },
+      {
+        extension: 'docx',
+        file: { mimeType: 'dummy' },
+        fuzzyDistance: 5,
+        name: 'My 1. Document.docx',
+      },
+    ]);
+  });
+
+  it('fuzzyGetDriveItem returns matching items (ignore extension)', async () => {
+    const folderItem = OneDrive.driveItemFromURL('onedrive:/drives/123/items/456');
+    const data = {
+      value: [{
+        file: { mimeType: 'dummy' },
+        name: 'My 1. Document.docx',
+      }, {
+        file: { mimeType: 'dummy' },
+        name: 'my-1-document.docx',
+      }, {
+        file: { mimeType: 'dummy' },
+        name: 'my-1-document.md',
+      }, {
+        file: { mimeType: 'dummy' },
+        name: 'My-1-Document.docx',
+      }],
+    };
+
+    const drive = new MockDrive()
+      .registerDriveItemChildren('123', '456', data);
+    const res = await drive.fuzzyGetDriveItem(folderItem, '/my-1-document.docx', true);
 
     assert.deepStrictEqual(res, [
       {

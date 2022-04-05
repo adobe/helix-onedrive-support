@@ -242,22 +242,39 @@ class OneDrive {
    * - convert to lower case
    * - replace all non-alphanumeric characters with a dash
    * - remove all consecutive dashes
-   * - extensions are ignored, if the given path doesn't have one
+   * - extensions are ignored, if the given path doesn't have one or if ignoreExtension is true
    *
    * The result is an array of drive items that match the given path. They are ordered by the edit
    * distance to the original name and then alphanumerically.
    *
    * @param {DriveItem} folderItem
-   * @param {string} relPath
+   * @param {string} [relPath = '']
+   * @param {boolean} [ignoreExtension = false]
    * @returns {Promise<DriveItem[]>}
    */
-  async fuzzyGetDriveItem(folderItem, relPath = '') {
-    const idx = relPath.lastIndexOf('/');
-    if (idx < 0) {
-      const ret = await this.getDriveItem(folderItem, '', false);
-      // todo: add extra extension
-      return [ret.value];
+  async fuzzyGetDriveItem(folderItem, relPath = '', ignoreExtension = false) {
+    if (relPath && !relPath.startsWith('/')) {
+      throw new Error('relPath must be empty or start with /');
     }
+
+    // first try to get item directly
+    try {
+      const ret = await this.getDriveItem(folderItem, relPath, false);
+      if (relPath) {
+        // eslint-disable-next-line prefer-destructuring
+        ret.extension = splitByExtension(relPath)[1];
+      }
+      this.log.info(`fetched drive item directly: /drives/${folderItem.parentReference.driveId}/items/${folderItem.id}:${relPath}`);
+      return [ret];
+    } catch (e) {
+      this.log.info(`fetched drive item directly failed: /drives/${folderItem.parentReference.driveId}/items/${folderItem.id}:${relPath} (${e.statusCode})`);
+      // if no 404 or no relPath, propagate error
+      if (e.statusCode !== 404 || !relPath) {
+        throw e;
+      }
+    }
+
+    const idx = relPath.lastIndexOf('/');
     const folderRelPath = relPath.substring(0, idx);
     const name = relPath.substring(idx + 1);
     const [baseName, ext] = splitByExtension(name);
@@ -281,7 +298,7 @@ class OneDrive {
       }
     } while (query.$skiptoken);
 
-    this.log.debug(`loaded ${fileList.length} children from ${relPath}`);
+    this.log.info(`loaded ${fileList.length} children from /drives/${folderItem.parentReference.driveId}/items/${folderItem.id}:${relPath}`);
     const items = fileList.filter((item) => {
       if (!item.file) {
         return false;
@@ -290,7 +307,7 @@ class OneDrive {
       // remember extension
       // eslint-disable-next-line no-param-reassign
       item.extension = itemExt;
-      if (ext && ext !== itemExt) {
+      if (ext && ext !== itemExt && !ignoreExtension) {
         // only match extension if given via relPath
         return false;
       }
