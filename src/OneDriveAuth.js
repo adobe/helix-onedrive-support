@@ -138,11 +138,7 @@ class OneDriveAuth {
     return tenant;
   }
 
-  async initTenantFromUrl(sharingUrl) {
-    if (this.tenant) {
-      return;
-    }
-    const { log } = this;
+  static getTenantHostFromUrl(sharingUrl) {
     const url = sharingUrl instanceof URL
       ? sharingUrl
       : new URL(sharingUrl);
@@ -151,6 +147,15 @@ class OneDriveAuth {
     if (url.hostname.endsWith('-my.sharepoint.com')) {
       tenantHost = tenantHost.substring(0, tenantHost.length - 3);
     }
+    return tenantHost;
+  }
+
+  async initTenantFromUrl(sharingUrl) {
+    if (this.tenant) {
+      return;
+    }
+    const { log } = this;
+    const tenantHost = OneDriveAuth.getTenantHostFromUrl(sharingUrl);
 
     if (this.tenantCache) {
       this.tenant = this.tenantCache.get(tenantHost);

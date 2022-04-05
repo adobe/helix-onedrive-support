@@ -1,0 +1,58 @@
+/*
+ * Copyright 2022 Adobe. All rights reserved.
+ * This file is licensed to you under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License. You may obtain a copy
+ * of the License at http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
+ * OF ANY KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
+const { S3CachePlugin } = require('./S3CachePlugin.js');
+const { S3Client } = require('@aws-sdk/client-s3');
+
+/**
+ * aliases
+ * @typedef {import("@azure/msal-node").ICachePlugin} ICachePlugin
+ * @typedef {import("@azure/msal-node").TokenCacheContext} TokenCacheContext
+ */
+
+class S3CacheManager {
+  constructor(opts) {
+    this.log = opts.log;
+    this.bucket = opts.bucket;
+    this.prefix = opts.prefix;
+    this.secret = opts.secret;
+    this.s3 = new S3Client();
+  }
+
+  async listCacheKeys() {
+    return ['default', 'forms'];
+  }
+
+  /**
+   * @param key
+   * @returns {S3CachePlugin}
+   */
+  getCache(key) {
+    return new S3CachePlugin({
+      log: this.log,
+      key: `${this.prefix}/auth-${key}.json`,
+      secret: this.secret,
+      bucket: this.bucket,
+    });
+  }
+
+  async createCache(key) {
+
+  }
+
+  async deleteCache(key) {
+
+  }
+}
+
+module.exports = {
+  S3CacheManager,
+};
