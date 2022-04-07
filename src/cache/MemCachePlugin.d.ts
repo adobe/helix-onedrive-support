@@ -26,6 +26,8 @@ export declare interface MemCachePluginOptions {
 export declare class MemCachePlugin implements ICachePlugin {
   constructor(opts: MemCachePluginOptions);
 
+  deleteCache(): Promise<void>;
+
   afterCacheAccess(tokenCacheContext: TokenCacheContext): Promise<boolean>;
 
   beforeCacheAccess(tokenCacheContext: TokenCacheContext): Promise<boolean>;

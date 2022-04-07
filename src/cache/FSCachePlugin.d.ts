@@ -21,6 +21,8 @@ export declare interface FSCachePluginOptions {
 export declare class FSCachePlugin implements ICachePlugin {
   constructor(opts: FSCachePluginOptions);
 
+  deleteCache(): Promise<void>;
+
   afterCacheAccess(tokenCacheContext: TokenCacheContext): Promise<boolean>;
 
   beforeCacheAccess(tokenCacheContext: TokenCacheContext): Promise<boolean>;

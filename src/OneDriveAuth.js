@@ -232,7 +232,7 @@ class OneDriveAuth {
   setAccessToken(bearerToken) {
     const { log } = this;
     /** @type AuthenticationResult */
-    this.accessToken = {
+    this.authResult = {
       accessToken: bearerToken,
     };
     if (!this.tenant) {
@@ -246,16 +246,16 @@ class OneDriveAuth {
         log.warn(`unable to decode access token: ${e.message}`);
       }
     }
-    this.accessToken.tenantId = this.tenant;
+    this.authResult.tenantId = this.tenant;
     return this;
   }
 
   /**
-   * Acquires the access token either from the cache or from MS.
+   * Authenticates against MS
    * @param {boolean} silentOnly
    * @returns {Promise<null|AuthenticationResult>}
    */
-  async acquireAccessToken(silentOnly) {
+  async doAuthenticate(silentOnly) {
     const { log, app } = this;
     const accounts = await app.getTokenCache().getAllAccounts();
     if (accounts.length > 0) {
@@ -298,15 +298,15 @@ class OneDriveAuth {
   }
 
   /**
-   * Acquires the access token either from the cache or from MS.
+   * Authenticates by either using the cached result or talking to MS
    * @param {boolean} silentOnly
    * @returns {Promise<AuthenticationResult>}
    */
-  async getAccessToken(silentOnly) {
-    if (!this.accessToken) {
-      this.accessToken = await this.acquireAccessToken(silentOnly);
+  async authenticate(silentOnly) {
+    if (!this.authResult) {
+      this.authResult = await this.doAuthenticate(silentOnly);
     }
-    return this.accessToken;
+    return this.authResult;
   }
 }
 

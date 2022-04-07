@@ -37,7 +37,12 @@ class MemCachePlugin {
     this.caches.clear();
   }
 
-
+  async deleteCache() {
+    this.caches.delete(this.key);
+    if (this.base) {
+      await this.base.deleteCache();
+    }
+  }
 
   /**
    * @param {TokenCacheContext} cacheContext

@@ -23,10 +23,11 @@ class FSCacheManager {
   constructor(opts) {
     this.dirPath = opts.dirPath;
     this.log = opts.log || console;
+    this.type = opts.type;
   }
 
   getCacheFilePath(key) {
-    return path.resolve(this.dirPath, `auth-${key}.json`);
+    return path.resolve(this.dirPath, `auth-${this.type}-${key}.json`);
   }
 
   async listCacheKeys() {
@@ -34,7 +35,7 @@ class FSCacheManager {
       const files = await fs.readdir(this.dirPath);
       return files
         .filter((name) => (name.startsWith('auth-') && name.endsWith('.json')))
-        .map((name) => name.replace(/auth-([a-z0-9]+).json/i, '$1'));
+        .map((name) => name.replace(/auth-([a-z0-9]+)-([a-z0-9]+).json/i, '$2'));
     } catch (e) {
       if (e.code === 'ENOENT') {
         return [];
@@ -47,24 +48,19 @@ class FSCacheManager {
    * @param key
    * @returns {FSCachePlugin}
    */
-  getCache(key) {
+  async getCache(key) {
+    try {
+      await fs.lstat(this.dirPath);
+    } catch (e) {
+      if (e.code !== 'ENOENT') {
+        throw e;
+      }
+      await fs.mkdir(this.dirPath);
+    }
     return new FSCachePlugin({
       log: this.log,
       filePath: this.getCacheFilePath(key),
     });
-  }
-
-  async createCache(key) {
-
-  }
-
-  async deleteCache(key) {
-    try {
-      await fs.rm(this.getCacheFilePath(key));
-    } catch (e) {
-      this.log.warn(`error deleting cache: ${e.message}`);
-      // ignore
-    }
   }
 }
 

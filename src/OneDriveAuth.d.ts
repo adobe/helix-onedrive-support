@@ -91,11 +91,9 @@ export declare class OneDriveAuth {
    * @param {boolean} silentOnly
    * @returns {Promise<AuthenticationResult>}
    */
-  getAccessToken(silentOnly: boolean): Promise<AuthenticationResult>;
+  authenticate(silentOnly: boolean): Promise<AuthenticationResult>;
 
   dispose() : Promise<void>;
 
   initTenantFromUrl(sharingUrl: string|URL): Promise<void>;
-
-
 }

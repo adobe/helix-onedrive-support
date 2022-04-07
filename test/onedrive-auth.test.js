@@ -78,7 +78,7 @@ describe('OneDriveAuth Tests', () => {
       resource: 'test-resource',
       tenant: 'common',
     });
-    const resp = await od.getAccessToken();
+    const resp = await od.authenticate();
     delete resp.expiresOn;
     delete resp.extExpiresOn;
     delete resp.correlationId;
@@ -189,7 +189,7 @@ describe('OneDriveAuth Tests', () => {
     });
     od.setAccessToken(bearerToken);
 
-    const accessToken = await od.getAccessToken();
+    const accessToken = await od.authenticate();
     assert.strictEqual(accessToken.accessToken, bearerToken);
     assert.strictEqual(accessToken.tenantId, 'test-tenantid');
     assert.strictEqual(od.tenant, 'test-tenantid');

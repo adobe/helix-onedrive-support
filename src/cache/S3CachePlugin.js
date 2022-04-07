@@ -9,7 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-const { GetObjectCommand, PutObjectCommand, S3Client } = require('@aws-sdk/client-s3');
+const { GetObjectCommand, PutObjectCommand, DeleteObjectCommand, S3Client } = require('@aws-sdk/client-s3');
 const { Response } = require('@adobe/helix-fetch');
 const { encrypt, decrypt } = require('./encrypt.js');
 
@@ -34,6 +34,23 @@ class S3CachePlugin {
     this.key = opts.key;
     this.secret = opts.secret;
     this.s3 = new S3Client();
+  }
+
+  async deleteCache() {
+    const { log, key, bucket } = this;
+    try {
+      log.info('s3: read token cache', key);
+      await this.s3.send(new DeleteObjectCommand({
+        Bucket: bucket,
+        Key: key,
+      }));
+    } catch (e) {
+      if (e.$metadata?.httpStatusCode === 404) {
+        log.info('s3: unable to deserialize token cache: not found');
+      } else {
+        log.warn('s3: unable to deserialize token cache', e);
+      }
+    }
   }
 
   async beforeCacheAccess(cacheContext) {

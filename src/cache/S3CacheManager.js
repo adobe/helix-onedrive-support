@@ -11,6 +11,7 @@
  */
 const { S3CachePlugin } = require('./S3CachePlugin.js');
 const { S3Client } = require('@aws-sdk/client-s3');
+const path = require('path');
 
 /**
  * aliases
@@ -24,6 +25,7 @@ class S3CacheManager {
     this.bucket = opts.bucket;
     this.prefix = opts.prefix;
     this.secret = opts.secret;
+    this.type = opts.type;
     this.s3 = new S3Client();
   }
 
@@ -31,25 +33,21 @@ class S3CacheManager {
     return ['default', 'forms'];
   }
 
+  getAuthObjectKey(key) {
+    return `${this.prefix}/auth-${this.type}-${key}.json`;
+  }
+
   /**
    * @param key
    * @returns {S3CachePlugin}
    */
-  getCache(key) {
+  async getCache(key) {
     return new S3CachePlugin({
       log: this.log,
-      key: `${this.prefix}/auth-${key}.json`,
+      key: this.getAuthObjectKey(key),
       secret: this.secret,
       bucket: this.bucket,
     });
-  }
-
-  async createCache(key) {
-
-  }
-
-  async deleteCache(key) {
-
   }
 }
 

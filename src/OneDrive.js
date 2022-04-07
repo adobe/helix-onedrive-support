@@ -117,7 +117,7 @@ class OneDrive {
    */
   async doFetch(relUrl, rawResponseBody = false, options = {}) {
     const opts = { ...options };
-    const { accessToken } = await this.auth.getAccessToken();
+    const { accessToken } = await this.auth.authenticate();
     if (!opts.headers) {
       opts.headers = {};
     }
@@ -486,14 +486,14 @@ class OneDrive {
     const [, owner, site, root] = match;
 
     try {
-      const accessToken = await this.getAccessToken();
+      const authResult = await this.auth.authenticate();
       return new SharePointSite({
         owner,
         site,
         root,
         clientId: this.clientId,
-        tenantId: accessToken.tenantId,
-        refreshToken: accessToken.refreshToken,
+        tenantId: authResult.tenantId,
+        refreshToken: authResult.refreshToken,
         log: this.log,
       });
     } catch (e) {

@@ -29,6 +29,15 @@ class FSCachePlugin {
     this.log = opts.log || console;
   }
 
+  async deleteCache() {
+    try {
+      await fs.rm(this.filePath);
+    } catch (e) {
+      this.log.warn(`error deleting cache: ${e.message}`);
+      // ignore
+    }
+  }
+
   /**
    * @param {TokenCacheContext} cacheContext
    * @returns {Promise<boolean>} if cache was updated

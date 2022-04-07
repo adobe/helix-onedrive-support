@@ -23,6 +23,8 @@ export declare interface S3CachePluginOptions {
 export declare class S3CachePlugin implements ICachePlugin {
   constructor(opts: S3CachePluginOptions);
 
+  deleteCache(): Promise<void>;
+
   afterCacheAccess(tokenCacheContext: TokenCacheContext): Promise<boolean>;
 
   beforeCacheAccess(tokenCacheContext: TokenCacheContext): Promise<boolean>;
