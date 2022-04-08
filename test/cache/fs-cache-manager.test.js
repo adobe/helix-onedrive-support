@@ -16,10 +16,6 @@ const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs').promises;
 const { FSCacheManager, FSCachePlugin } = require('../../src/index.js');
-const {
-  S3CacheManager,
-  S3CachePlugin
-} = require('../../src');
 
 describe('FSCacheManager Test', () => {
   let testRoot;
