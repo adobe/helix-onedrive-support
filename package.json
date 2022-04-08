@@ -10,7 +10,7 @@
     "lint": "./node_modules/.bin/eslint .",
     "semantic-release": "semantic-release",
     "docs": "npx jsdoc2md -c .jsdoc.json --files 'src/*.js'  > docs/API.md",
-    "commit": "git-cz"
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
@@ -34,12 +34,11 @@
     "@semantic-release/git": "10.0.1",
     "ajv": "8.11.0",
     "codecov": "3.8.3",
-    "commitizen": "4.2.4",
-    "cz-conventional-changelog": "3.3.0",
     "dotenv": "16.0.0",
     "eslint": "8.12.0",
     "eslint-plugin-header": "3.1.1",
     "eslint-plugin-import": "2.25.4",
+    "husky": "7.0.4",
     "jsdoc-to-markdown": "7.1.1",
     "junit-report-builder": "3.0.0",
     "lint-staged": "12.3.7",
@@ -51,14 +50,6 @@
   },
   "lint-staged": {
     "*.js": "eslint"
-  },
-  "config": {
-    "commitizen": {
-      "path": "node_modules/cz-conventional-changelog"
-    },
-    "ghooks": {
-      "pre-commit": "npx lint-staged"
-    }
   },
   "mocha": {
     "spec": "test/**/*.test.js",
