@@ -9,9 +9,9 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+const { basename } = require('path');
+const { S3Client, ListObjectsV2Command } = require('@aws-sdk/client-s3');
 const { S3CachePlugin } = require('./S3CachePlugin.js');
-const { S3Client } = require('@aws-sdk/client-s3');
-const path = require('path');
 
 /**
  * aliases
@@ -21,7 +21,7 @@ const path = require('path');
 
 class S3CacheManager {
   constructor(opts) {
-    this.log = opts.log;
+    this.log = opts.log || console;
     this.bucket = opts.bucket;
     this.prefix = opts.prefix;
     this.secret = opts.secret;
@@ -29,12 +29,28 @@ class S3CacheManager {
     this.s3 = new S3Client();
   }
 
-  async listCacheKeys() {
-    return ['default', 'forms'];
-  }
-
   getAuthObjectKey(key) {
     return `${this.prefix}/auth-${this.type}-${key}.json`;
+  }
+
+  async listCacheKeys() {
+    const {
+      log, s3, bucket, prefix,
+    } = this;
+    log.info('s3: list token cache', prefix);
+    try {
+      const res = await s3.send(new ListObjectsV2Command({
+        Bucket: bucket,
+        Prefix: `${prefix}/`,
+      }));
+      return (res.Contents || [])
+        .map((entry) => basename(entry.Key))
+        .filter((name) => (name.startsWith('auth-') && name.endsWith('.json')))
+        .map((name) => name.replace(/auth-([a-z0-9]+)-([a-z0-9]+).json/i, '$2'));
+    } catch (e) {
+      log.info('s3: unable to list token caches', e);
+      return [];
+    }
   }
 
   /**

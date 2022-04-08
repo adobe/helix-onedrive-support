@@ -9,7 +9,9 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-const { GetObjectCommand, PutObjectCommand, DeleteObjectCommand, S3Client } = require('@aws-sdk/client-s3');
+const {
+  GetObjectCommand, PutObjectCommand, DeleteObjectCommand, S3Client,
+} = require('@aws-sdk/client-s3');
 const { Response } = require('@adobe/helix-fetch');
 const { encrypt, decrypt } = require('./encrypt.js');
 
@@ -29,7 +31,7 @@ class S3CachePlugin {
    * @param {S3CachePluginOptions} opts
    */
   constructor(opts) {
-    this.log = opts.log;
+    this.log = opts.log || console;
     this.bucket = opts.bucket;
     this.key = opts.key;
     this.secret = opts.secret;
@@ -66,6 +68,8 @@ class S3CachePlugin {
       let data = await new Response(res.Body, {}).buffer();
       if (secret) {
         data = decrypt(secret, data).toString('utf-8');
+      } else {
+        data = data.toString('utf-8');
       }
       cacheContext.tokenCache.deserialize(data);
       return true;
