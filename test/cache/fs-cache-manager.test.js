@@ -16,6 +16,7 @@ const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs').promises;
 const { FSCacheManager, FSCachePlugin } = require('../../src/index.js');
+const { MockTokenCacheContext } = require('./MockTokenCacheContext');
 
 describe('FSCacheManager Test', () => {
   let testRoot;
@@ -95,5 +96,30 @@ describe('FSCacheManager Test', () => {
     });
     mgr.dirPath = '\0hack';
     await assert.rejects(mgr.getCache('content'));
+  });
+
+  it('checks if cache exists', async () => {
+    const mgr = new FSCacheManager({
+      dirPath: path.resolve(testRoot, 'sub'),
+      type: 'onedrive',
+    });
+    assert.strictEqual(await mgr.hasCache('content'), false);
+
+    const p = await mgr.getCache('content');
+    const ctx = new MockTokenCacheContext({
+      cacheHasChanged: true,
+      tokens: '{ "access_token": "1234" }',
+    });
+    await p.afterCacheAccess(ctx);
+
+    assert.strictEqual(await mgr.hasCache('content'), true);
+  });
+
+  it('checks if cache exists handles errors', async () => {
+    const mgr = new FSCacheManager({
+      dirPath: path.resolve(testRoot, 'sub'),
+      type: 'onedrive',
+    });
+    await assert.rejects(mgr.hasCache('\0conten'));
   });
 });

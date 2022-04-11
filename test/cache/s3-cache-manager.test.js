@@ -124,4 +124,37 @@ describe('S3CacheManager Test', () => {
     assert.strictEqual(p.bucket, 'test-bucket');
     assert.strictEqual(p.secret, 'foobar');
   });
+
+  it('checks if cache exits', async () => {
+    const mgr = new S3CacheManager({
+      bucket: 'test-bucket',
+      prefix: 'myproject/auth-default',
+      type: 'onedrive',
+      secret: 'foobar',
+    });
+
+    nock('https://test-bucket.s3.us-east-1.amazonaws.com')
+      .head('/myproject/auth-default/auth-onedrive-content.json')
+      .reply(404)
+      .head('/myproject/auth-default/auth-onedrive-content.json')
+      .reply(200);
+
+    assert.strictEqual(await mgr.hasCache('content'), false);
+    assert.strictEqual(await mgr.hasCache('content'), true);
+  });
+
+  it('checks if cache exits handles errors', async () => {
+    const mgr = new S3CacheManager({
+      bucket: 'test-bucket',
+      prefix: 'myproject/auth-default',
+      type: 'onedrive',
+      secret: 'foobar',
+    });
+
+    nock('https://test-bucket.s3.us-east-1.amazonaws.com')
+      .head('/myproject/auth-default/auth-onedrive-content.json')
+      .reply(401);
+
+    await assert.rejects(mgr.hasCache('content'));
+  });
 });

@@ -10,7 +10,7 @@
  * governing permissions and limitations under the License.
  */
 const { basename } = require('path');
-const { S3Client, ListObjectsV2Command } = require('@aws-sdk/client-s3');
+const { S3Client, ListObjectsV2Command, HeadObjectCommand } = require('@aws-sdk/client-s3');
 const { S3CachePlugin } = require('./S3CachePlugin.js');
 
 /**
@@ -50,6 +50,23 @@ class S3CacheManager {
     } catch (e) {
       log.info('s3: unable to list token caches', e);
       return [];
+    }
+  }
+
+  async hasCache(key) {
+    const { log, bucket } = this;
+    try {
+      await this.s3.send(new HeadObjectCommand({
+        Bucket: bucket,
+        Key: this.getAuthObjectKey(key),
+      }));
+      return true;
+    } catch (e) {
+      if (e.$metadata?.httpStatusCode !== 404) {
+        log.warn('s3: unable to check token cache', e);
+        throw e;
+      }
+      return false;
     }
   }
 

@@ -44,6 +44,18 @@ class FSCacheManager {
     }
   }
 
+  async hasCache(key) {
+    try {
+      await fs.lstat(this.getCacheFilePath(key));
+      return true;
+    } catch (e) {
+      if (e.code !== 'ENOENT') {
+        throw e;
+      }
+      return false;
+    }
+  }
+
   /**
    * @param key
    * @returns {FSCachePlugin}
