@@ -45,7 +45,7 @@ class S3CacheManager {
       }));
       return (res.Contents || [])
         .map((entry) => basename(entry.Key))
-        .filter((name) => (name.startsWith('auth-') && name.endsWith('.json')))
+        .filter((name) => (name.startsWith(`auth-${this.type}-`) && name.endsWith('.json')))
         .map((name) => name.replace(/auth-([a-z0-9]+)-([a-z0-9]+).json/i, '$2'));
     } catch (e) {
       log.info('s3: unable to list token caches', e);

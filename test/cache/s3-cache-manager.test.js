@@ -49,7 +49,7 @@ describe('S3CacheManager Test', () => {
         <ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
           <Name>helix-code-bus</Name>
           <Prefix>myproject/auth-default/</Prefix>
-          <KeyCount>2</KeyCount>
+          <KeyCount>3</KeyCount>
           <MaxKeys>1000</MaxKeys>
           <IsTruncated>false</IsTruncated>
           <Contents>
@@ -57,6 +57,9 @@ describe('S3CacheManager Test', () => {
           </Contents>
           <Contents>
             <Key>myproject/auth-default/auth-onedrive-content.json</Key>
+          </Contents>
+          <Contents>
+            <Key>myproject/auth-default/auth-google-content.json</Key>
           </Contents>
           <Contents>
             <Key>myproject/auth-default/auth-onedrive-index.json</Key>
