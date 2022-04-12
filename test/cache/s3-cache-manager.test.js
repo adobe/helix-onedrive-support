@@ -160,4 +160,45 @@ describe('S3CacheManager Test', () => {
 
     await assert.rejects(mgr.hasCache('content'));
   });
+
+  it('finds the cache that exists', async () => {
+    nock('https://test-bucket.s3.us-east-1.amazonaws.com')
+      .head('/myproject/special1/auth-onedrive-content.json')
+      .reply(404)
+      .head('/myproject/special2/auth-onedrive-content.json')
+      .reply(200);
+
+    const plugin = await S3CacheManager.findCache('content', {
+      bucket: 'test-bucket',
+      prefix: 'myproject/auth-default',
+      type: 'onedrive',
+      secret: 'foobar',
+    }, {
+      prefix: 'myproject/special1',
+    }, {
+      prefix: 'myproject/special2',
+    });
+    assert.strictEqual(plugin.key, 'myproject/special2/auth-onedrive-content.json');
+  });
+
+  it('findCache falls back to default', async () => {
+    nock('https://test-bucket.s3.us-east-1.amazonaws.com')
+      .head('/myproject/special1/auth-onedrive-content.json')
+      .reply(404)
+      .head('/myproject/special2/auth-onedrive-content.json')
+      .reply(404);
+
+    const plugin = await S3CacheManager.findCache('content', {
+      bucket: 'test-bucket',
+      prefix: 'myproject/auth-default',
+      type: 'onedrive',
+      secret: 'foobar',
+    }, {
+      prefix: 'myproject/special1',
+    }, {
+      prefix: 'myproject/special2',
+    });
+
+    assert.strictEqual(plugin.key, 'myproject/auth-default/auth-onedrive-content.json');
+  });
 });
