@@ -20,6 +20,28 @@ const { S3CachePlugin } = require('./S3CachePlugin.js');
  */
 
 class S3CacheManager {
+  /**
+   * Find the first cache with the given opts, that exists, otherwise the plugin using the
+   * default options is returned.
+   * @param {string} key
+   * @param {object} defaultOpts
+   * @param {object} opts
+   * @returns {Promise<S3CachePlugin>}
+   */
+  static async findCache(key, defaultOpts, ...opts) {
+    for (const opt of opts) {
+      const cacheManager = new S3CacheManager({
+        ...defaultOpts,
+        ...opt,
+      });
+      // eslint-disable-next-line no-await-in-loop
+      if (await cacheManager.hasCache(key)) {
+        return cacheManager.getCache(key);
+      }
+    }
+    return new S3CacheManager(defaultOpts).getCache(key);
+  }
+
   constructor(opts) {
     this.log = opts.log || console;
     this.bucket = opts.bucket;

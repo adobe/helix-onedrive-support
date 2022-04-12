@@ -16,3 +16,9 @@ export * from './Worksheet';
 export * from './NamedItem';
 export * from './Table';
 export * from './Range';
+
+export * from './cache/FSCacheManager';
+export * from './cache/FSCachePlugin';
+export * from './cache/MemCachePlugin';
+export * from './cache/S3CacheManager';
+export * from './cache/S3CachePlugin';

@@ -9,26 +9,20 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { ICachePlugin, TokenCacheContext } from  '@azure/msal-node';
+import { FSCachePlugin } from "./FSCachePlugin";
 
-import { Logger } from "../OneDrive";
-
-export declare interface MemCachePluginOptions {
+export declare interface FSCacheManagerOptions {
   log: Console;
-  /**
-   * memory cache key
-   */
-  key: string;
-  base: ICachePlugin;
-  caches?: Map<string, any>;
+  dirPath: string;
+  type: string;
 }
 
-export declare class MemCachePlugin implements ICachePlugin {
-  constructor(opts: MemCachePluginOptions);
+export declare class FSCacheManager {
+  constructor(opts: FSCacheManagerOptions);
 
-  deleteCache(): Promise<void>;
+  listCacheKeys():Promise<string[]>;
 
-  afterCacheAccess(tokenCacheContext: TokenCacheContext): Promise<boolean>;
+  hasCache(key:string):Promise<boolean>;
 
-  beforeCacheAccess(tokenCacheContext: TokenCacheContext): Promise<boolean>;
+  getCache(key:string):Promise<FSCachePlugin>;
 }
