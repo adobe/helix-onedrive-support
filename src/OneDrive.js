@@ -15,7 +15,7 @@ const { fetch, reset } = require('@adobe/helix-fetch').keepAliveNoCache({ userAg
 
 const Workbook = require('./Workbook.js');
 const StatusCodeError = require('./StatusCodeError.js');
-const { splitByExtension, sanitize, editDistance } = require('./fuzzy-helper.js');
+const { splitByExtension, sanitizeName, editDistance } = require('./fuzzy-helper.js');
 const SharePointSite = require('./SharePointSite.js');
 
 /**
@@ -278,7 +278,7 @@ class OneDrive {
     const folderRelPath = relPath.substring(0, idx);
     const name = relPath.substring(idx + 1);
     const [baseName, ext] = splitByExtension(name);
-    const sanitizedName = sanitize(baseName);
+    const sanitizedName = sanitizeName(baseName);
 
     const query = {
       $top: 999,
@@ -311,7 +311,7 @@ class OneDrive {
         // only match extension if given via relPath
         return false;
       }
-      const sanitizedItemName = sanitize(itemName);
+      const sanitizedItemName = sanitizeName(itemName);
       if (sanitizedItemName !== sanitizedName) {
         return false;
       }

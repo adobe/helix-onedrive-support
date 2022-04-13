@@ -11,11 +11,10 @@
  */
 
 /* eslint-env mocha */
-
-'use strict';
-
 const assert = require('assert');
-const { splitByExtension, sanitize, editDistance } = require('../src/fuzzy-helper.js');
+const {
+  splitByExtension, sanitizeName, sanitizePath, editDistance,
+} = require('../src/fuzzy-helper.js');
 
 describe('splitByExtension Tests', () => {
   it('extension split works for empty string', () => {
@@ -45,27 +44,27 @@ describe('splitByExtension Tests', () => {
 
 describe('sanitize Tests', () => {
   it('sanitize works for empty string', () => {
-    assert.strictEqual(sanitize(''), '');
+    assert.strictEqual(sanitizeName(''), '');
   });
 
   it('sanitize transform string to lower case', () => {
-    assert.strictEqual(sanitize('MyDocument'), 'mydocument');
+    assert.strictEqual(sanitizeName('MyDocument'), 'mydocument');
   });
 
   it('sanitize transforms non-alpha to dashes', () => {
-    assert.strictEqual(sanitize('My 2. Document'), 'my-2-document');
+    assert.strictEqual(sanitizeName('My 2. Document'), 'my-2-document');
   });
 
   it('sanitize removes leading dashes', () => {
-    assert.strictEqual(sanitize('.My 2. Document'), 'my-2-document');
+    assert.strictEqual(sanitizeName('.My 2. Document'), 'my-2-document');
   });
 
   it('sanitize removes trailing dashes', () => {
-    assert.strictEqual(sanitize('.My 2. Document-'), 'my-2-document');
+    assert.strictEqual(sanitizeName('.My 2. Document-'), 'my-2-document');
   });
 
   it('sanitize normalizes unicode', () => {
-    assert.strictEqual(sanitize('Föhren Smürd'), 'fohren-smurd');
+    assert.strictEqual(sanitizeName('Föhren Smürd'), 'fohren-smurd');
   });
 });
 
@@ -106,5 +105,49 @@ describe('editDistance Tests', () => {
     ));
     const t1 = Date.now();
     assert.ok(t1 - t0 < 100);
+  });
+});
+
+describe('sanitizePath Tests', () => {
+  it('sanitizePath works for empty string', () => {
+    assert.strictEqual(sanitizePath(''), '');
+  });
+
+  it('sanitizePath transform string to lower case', () => {
+    assert.strictEqual(sanitizePath('MyDocument'), 'mydocument');
+  });
+
+  it('sanitizePath can ignore extension', () => {
+    assert.strictEqual(sanitizePath('.MyDocument', {
+      ignoreExtension: true,
+    }), 'mydocument');
+  });
+
+  it('sanitizePath works with dots in path and no extension', () => {
+    assert.strictEqual(sanitizePath('/foo.bar/My Document'), '/foo.bar/my-document');
+  });
+
+  it('sanitizePath only transforms last path segment', () => {
+    assert.strictEqual(sanitizePath('/Untitled Folder/MyDocument'), '/Untitled Folder/mydocument');
+  });
+
+  it('sanitizePath only transforms root segment', () => {
+    assert.strictEqual(sanitizePath('/MyDocument'), '/mydocument');
+  });
+
+  it('sanitizePath transforms non-alpha to dashes', () => {
+    assert.strictEqual(sanitizePath('My 2. Document.docx'), 'my-2-document.docx');
+  });
+
+  it('sanitizePath removes leading dashes', () => {
+    assert.strictEqual(sanitizePath('.My 2. Document.docx'), 'my-2-document.docx');
+  });
+
+  it('sanitizePath removes trailing dashes', () => {
+    assert.strictEqual(sanitizePath('.My 2. Document!.docx'), 'my-2-document.docx');
+  });
+
+  it('sanitizePath normalizes unicode', () => {
+    assert.strictEqual(sanitizePath('Föhren Smürd'), 'fohren-smurd');
   });
 });

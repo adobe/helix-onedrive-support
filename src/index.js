@@ -17,6 +17,12 @@ const { MemCachePlugin } = require('./cache/MemCachePlugin.js');
 const { S3CachePlugin } = require('./cache/S3CachePlugin.js');
 const { S3CacheManager } = require('./cache/S3CacheManager.js');
 const { OneDriveMock } = require('./OneDriveMock.js');
+const {
+  splitByExtension,
+  editDistance,
+  sanitizeName,
+  sanitizePath,
+} = require('./fuzzy-helper.js');
 
 module.exports = {
   OneDrive,
@@ -27,4 +33,10 @@ module.exports = {
   MemCachePlugin,
   S3CachePlugin,
   S3CacheManager,
+  utils: {
+    splitByExtension,
+    editDistance,
+    sanitizeName,
+    sanitizePath,
+  },
 };

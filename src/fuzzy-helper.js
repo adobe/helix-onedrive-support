@@ -33,13 +33,39 @@ function splitByExtension(name) {
  * @param {string} name
  * @returns {string} sanitized name
  */
-function sanitize(name) {
+function sanitizeName(name) {
   return name
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
+}
+
+/**
+ * Sanitizes the file path by:
+ * - convert to lower case
+ * - normalize all unicode characters
+ * - replace all non-alphanumeric characters with a dash
+ * - remove all consecutive dashes
+ * - remove all leading and trailing dashes
+ *
+ * Note that only the basename of the file path is sanitized. i.e. The ancestor path and the
+ * extension is not affected.
+ *
+ * @param {string} filepath the file path
+ * @param {object} opts Options
+ * @param {boolean} [opts.ignoreExtension] if {@code true} ignores the extension
+ * @returns {string} sanitized file path
+ */
+function sanitizePath(filepath, opts = {}) {
+  const idx = filepath.lastIndexOf('/') + 1;
+  const extIdx = opts.ignoreExtension ? -1 : filepath.lastIndexOf('.');
+  const pfx = filepath.substring(0, idx);
+  const basename = extIdx < idx ? filepath.substring(idx) : filepath.substring(idx, extIdx);
+  const ext = extIdx < idx ? '' : filepath.substring(extIdx);
+  const name = sanitizeName(basename);
+  return `${pfx}${name}${ext}`;
 }
 
 /**
@@ -84,6 +110,7 @@ function editDistance(s0, s1) {
 
 module.exports = {
   splitByExtension,
-  sanitize,
   editDistance,
+  sanitizeName,
+  sanitizePath,
 };
