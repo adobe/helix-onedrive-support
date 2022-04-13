@@ -22,7 +22,7 @@ const caches = new Map();
  * @class MemCachePlugin
  * @implements ICachePlugin
  */
-class MemCachePlugin {
+export class MemCachePlugin {
   /**
    * @param {MemCachePluginOptions} opts
    */
@@ -86,7 +86,3 @@ class MemCachePlugin {
     return false;
   }
 }
-
-module.exports = {
-  MemCachePlugin,
-};

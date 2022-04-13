@@ -9,10 +9,10 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-const assert = require('assert');
-const nock = require('nock');
+import assert from 'assert';
+import nock from 'nock';
 
-function Nock() {
+export function Nock() {
   const DEFAULT_AUTH = {
     token_type: 'Bearer',
     refresh_token: 'dummy',
@@ -55,5 +55,3 @@ function Nock() {
 
   return nocker;
 }
-
-module.exports = { Nock };

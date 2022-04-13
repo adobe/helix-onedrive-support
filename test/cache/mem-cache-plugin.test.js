@@ -11,9 +11,9 @@
  */
 
 /* eslint-env mocha */
-const assert = require('assert');
-const { MemCachePlugin } = require('../../src/index.js');
-const { MockTokenCacheContext } = require('./MockTokenCacheContext');
+import assert from 'assert';
+import { MemCachePlugin } from '../../src/index.js';
+import { MockTokenCacheContext } from './MockTokenCacheContext.js';
 
 describe('MemCachePlugin Test', () => {
   beforeEach(() => {

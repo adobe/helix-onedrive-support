@@ -9,9 +9,9 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-const fs = require('fs/promises');
-const path = require('path');
-const { FSCachePlugin } = require('./FSCachePlugin.js');
+import fs from 'fs/promises';
+import path from 'path';
+import { FSCachePlugin } from './FSCachePlugin.js';
 
 /**
  * aliases
@@ -19,7 +19,7 @@ const { FSCachePlugin } = require('./FSCachePlugin.js');
  * @typedef {import("@azure/msal-node").TokenCacheContext} TokenCacheContext
  */
 
-class FSCacheManager {
+export class FSCacheManager {
   constructor(opts) {
     this.dirPath = opts.dirPath;
     this.log = opts.log || console;
@@ -75,7 +75,3 @@ class FSCacheManager {
     });
   }
 }
-
-module.exports = {
-  FSCacheManager,
-};

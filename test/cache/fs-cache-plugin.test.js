@@ -11,19 +11,19 @@
  */
 
 /* eslint-env mocha */
-const assert = require('assert');
-const path = require('path');
-const crypto = require('crypto');
-const fs = require('fs').promises;
-const { FSCachePlugin } = require('../../src/index.js');
-const { MockTokenCacheContext } = require('./MockTokenCacheContext');
+import assert from 'assert';
+import path from 'path';
+import crypto from 'crypto';
+import { promises as fs } from 'fs';
+import { FSCachePlugin } from '../../src/index.js';
+import { MockTokenCacheContext } from './MockTokenCacheContext.js';
 
 describe('FSCachePlugin Test', () => {
   let testRoot;
   let testFilePath;
 
   beforeEach(async () => {
-    testRoot = path.resolve(__dirname, 'tmp', crypto.randomUUID());
+    testRoot = path.resolve(__testdir, 'cache', 'tmp', crypto.randomUUID());
     await fs.mkdir(testRoot, { recursive: true });
     testFilePath = path.resolve(testRoot, 'auth.json');
   });

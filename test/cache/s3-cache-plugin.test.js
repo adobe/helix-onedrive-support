@@ -11,11 +11,11 @@
  */
 
 /* eslint-env mocha */
-const assert = require('assert');
-const { S3CachePlugin } = require('../../src/index.js');
-const { encrypt, decrypt } = require('../../src/cache/encrypt.js');
-const { MockTokenCacheContext } = require('./MockTokenCacheContext');
-const { Nock } = require('../utils.js');
+import assert from 'assert';
+import { S3CachePlugin } from '../../src/index.js';
+import { decrypt, encrypt } from '../../src/cache/encrypt.js';
+import { MockTokenCacheContext } from './MockTokenCacheContext.js';
+import { Nock } from '../utils.js';
 
 describe('S3CachePlugin Test', () => {
   let nock;

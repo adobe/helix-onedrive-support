@@ -11,9 +11,9 @@
  */
 
 /* eslint-env mocha */
-const assert = require('assert');
-const { S3CacheManager, S3CachePlugin } = require('../../src/index.js');
-const { Nock } = require('../utils.js');
+import assert from 'assert';
+import { S3CacheManager, S3CachePlugin } from '../../src/index.js';
+import { Nock } from '../utils.js';
 
 describe('S3CacheManager Test', () => {
   let nock;

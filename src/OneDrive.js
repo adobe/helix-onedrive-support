@@ -11,13 +11,13 @@
  */
 
 // eslint-disable-next-line max-classes-per-file
-const { fetch, reset } = require('@adobe/helix-fetch').keepAliveNoCache({ userAgent: 'helix-fetch' });
+import { keepAliveNoCache } from '@adobe/helix-fetch';
+import { Workbook } from './excel/Workbook.js';
+import { StatusCodeError } from './StatusCodeError.js';
+import { editDistance, sanitizeName, splitByExtension } from './utils.js';
+import { SharePointSite } from './SharePointSite.js';
 
-const Workbook = require('./Workbook.js');
-const StatusCodeError = require('./StatusCodeError.js');
-const { splitByExtension, sanitizeName, editDistance } = require('./fuzzy-helper.js');
-const SharePointSite = require('./SharePointSite.js');
-
+const { fetch, reset } = keepAliveNoCache({ userAgent: 'helix-fetch' });
 /**
  * the maximum subscription time in milliseconds
  * @see https://docs.microsoft.com/en-us/graph/api/resources/subscription?view=graph-rest-1.0#maximum-length-of-subscription-per-resource-type
@@ -40,7 +40,7 @@ const globalShareLinkCache = new Map();
  * @class
  * @field {ConfidentialClientApplication|PublicClientApplication} app
  */
-class OneDrive {
+export class OneDrive {
   /**
    * Returns an onedrive uri for the given drive item. the uri has the format:
    * `onedrive:/drives/<driveId>/items/<itemId>`
@@ -507,7 +507,3 @@ class OneDrive {
 }
 
 OneDrive.MAX_SUBSCRIPTION_EXPIRATION_TIME = MAX_SUBSCRIPTION_EXPIRATION_TIME;
-
-module.exports = {
-  OneDrive,
-};

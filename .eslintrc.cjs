@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Adobe. All rights reserved.
+ * Copyright 2019 Adobe. All rights reserved.
  * This file is licensed to you under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License. You may obtain a copy
  * of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -10,22 +10,24 @@
  * governing permissions and limitations under the License.
  */
 
-/**
- * @typedef {import("@azure/msal-node").ISerializableTokenCache} ISerializableTokenCache
- *
- * @extends TokenCacheContext
- */
-export class MockTokenCacheContext {
-  constructor(opts = {}) {
-    const context = this;
-    Object.assign(this, {
-      cacheHasChanged: false,
-      tokens: '',
-      /** @type ISerializableTokenCache */
-      tokenCache: {
-        serialize: () => context.tokens,
-        deserialize: (value) => { context.tokens = value; },
-      },
-    }, opts);
-  }
-}
+module.exports = {
+  root: true,
+  extends: '@adobe/helix',
+  env: {
+    node: true,
+    es6: true,
+  },
+  parserOptions: {
+    sourceType: 'module',
+    ecmaVersion: 2020,
+  },
+  rules: {
+    'import/extensions': [2, 'ignorePackages'],
+    'import/prefer-default-export': 0,
+    'no-param-reassign': ['error', { props: false }],
+  },
+  globals: {
+    __rootdir: true,
+    __testdir: true,
+  },
+};

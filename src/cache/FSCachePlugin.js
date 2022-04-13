@@ -9,7 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-const fs = require('fs/promises');
+import fs from 'fs/promises';
 
 /**
  * aliases
@@ -23,7 +23,7 @@ const fs = require('fs/promises');
  * @class FSCachePlugin
  * @implements ICachePlugin
  */
-class FSCachePlugin {
+export class FSCachePlugin {
   constructor(opts) {
     this.filePath = opts.filePath;
     this.log = opts.log || console;
@@ -68,6 +68,3 @@ class FSCachePlugin {
     return false;
   }
 }
-module.exports = {
-  FSCachePlugin,
-};

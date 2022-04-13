@@ -10,7 +10,7 @@
  * governing permissions and limitations under the License.
  */
 import { EventEmitter } from 'events';
-import { Workbook } from './Workbook';
+import { Workbook } from './excel/Workbook';
 import { TokenResponse } from 'adal-node';
 import {OneDriveAuth} from "./OneDriveAuth";
 

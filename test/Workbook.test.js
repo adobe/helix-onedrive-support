@@ -11,13 +11,9 @@
  */
 
 /* eslint-env mocha */
-
-'use strict';
-
-const assert = require('assert');
-const { OneDriveMock } = require('../src/OneDriveMock.js');
-const StatusCodeError = require('../src/StatusCodeError.js');
-const exampleBook = require('./fixtures/book.js');
+import assert from 'assert';
+import { OneDriveMock, StatusCodeError } from '../src/index.js';
+import exampleBook from './fixtures/book.js';
 
 const TEST_SHARE_LINK = 'https://adobe.sharepoint.com/:x:/r/sites/cg-helix/Shared%20Documents/data-embed-unit-tests/example-data.xlsx';
 

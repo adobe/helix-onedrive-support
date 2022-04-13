@@ -9,14 +9,15 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+import { keepAliveNoCache } from '@adobe/helix-fetch';
+import { StatusCodeError } from './StatusCodeError.js';
 
-const { fetch } = require('@adobe/helix-fetch').keepAliveNoCache({ userAgent: 'helix-fetch' });
-const StatusCodeError = require('./StatusCodeError.js');
+const { fetch } = keepAliveNoCache({ userAgent: 'helix-fetch' });
 
 /**
  * Helper class accessing folders and files using the SharePoint V1 API.
  */
-class SharePointSite {
+export class SharePointSite {
   constructor(opts) {
     this._owner = opts.owner;
     this._site = opts.site;
@@ -113,11 +114,10 @@ class SharePointSite {
       // await result in order to be able to catch any error
       return await (rawResponseBody || !json ? resp.buffer() : resp.json());
     } catch (e) {
-      /* istanbul ignore else */
+      /* c8 ignore next 4 */
       if (e instanceof StatusCodeError) {
         throw e;
       }
-      /* istanbul ignore next */
       throw StatusCodeError.fromError(e);
     }
   }
@@ -126,5 +126,3 @@ class SharePointSite {
     return this._log;
   }
 }
-
-module.exports = SharePointSite;

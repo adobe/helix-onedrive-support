@@ -11,9 +11,8 @@
  */
 
 /* eslint-env mocha */
-
-const assert = require('assert');
-const { encrypt, decrypt } = require('../../src/cache/encrypt.js');
+import assert from 'assert';
+import { decrypt, encrypt } from '../../src/cache/encrypt.js';
 
 describe('Encrypt Tests', () => {
   it('encrypts and decrypts data', async () => {

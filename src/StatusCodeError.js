@@ -10,13 +10,13 @@
  * governing permissions and limitations under the License.
  */
 
-const { AbortError, FetchError } = require('@adobe/helix-fetch');
+import { AbortError, FetchError } from '@adobe/helix-fetch';
 
 /**
  * Internal error class
  * @private
  */
-class StatusCodeError extends Error {
+export class StatusCodeError extends Error {
   /**
    * Converts a fetch error to a status code error.
    * @param {Error} err The original error
@@ -63,5 +63,3 @@ class StatusCodeError extends Error {
     this.details = details;
   }
 }
-
-module.exports = StatusCodeError;

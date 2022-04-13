@@ -9,7 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-const crypto = require('crypto');
+import crypto from 'crypto';
 
 const ALGO = 'aes-256-gcm';
 const SALT_SIZE = 8;
@@ -32,7 +32,7 @@ function deriveKey(key, salt) {
  * @param {Buffer} plain Plain text to encrypt
  * @return {Buffer} digest.
  */
-function encrypt(key, plain) {
+export function encrypt(key, plain) {
   const salt = crypto.randomBytes(SALT_SIZE);
   const iv = crypto.randomBytes(IV_SIZE);
   const derivedKey = deriveKey(key, salt);
@@ -52,7 +52,7 @@ function encrypt(key, plain) {
  * @returns {Buffer} the plain text
  * @throws an error if the given key cannot decrypt the digest.
  */
-function decrypt(key, data) {
+export function decrypt(key, data) {
   const salt = data.slice(0, SALT_SIZE);
   const iv = data.slice(SALT_SIZE, SALT_SIZE + IV_SIZE);
   const authTag = data.slice(SALT_SIZE + IV_SIZE, SALT_SIZE + IV_SIZE + AUTH_TAG_SIZE);
@@ -68,8 +68,3 @@ function decrypt(key, data) {
   ];
   return Buffer.concat(ret);
 }
-
-module.exports = {
-  encrypt,
-  decrypt,
-};

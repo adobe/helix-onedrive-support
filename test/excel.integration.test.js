@@ -11,12 +11,12 @@
  */
 
 /* eslint-env mocha */
-const assert = require('assert');
+import assert from 'assert';
+import { config } from 'dotenv';
+import { OneDrive } from '../src/OneDrive.js';
+import { OneDriveAuth } from '../src/OneDriveAuth.js';
 
-const { OneDrive } = require('../src/OneDrive.js');
-const { OneDriveAuth } = require('../src/OneDriveAuth.js');
-
-require('dotenv').config();
+config();
 
 describe('Excel Integration Tests', () => {
   it.skip('Get the sheet data', async function test() {

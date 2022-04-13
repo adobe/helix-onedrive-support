@@ -11,12 +11,13 @@
  */
 
 // eslint-disable-next-line max-classes-per-file
-const { fetch, reset } = require('@adobe/helix-fetch').keepAliveNoCache({ userAgent: 'helix-fetch' });
-const { ConfidentialClientApplication, LogLevel } = require('@azure/msal-node');
-const jose = require('jose');
+import { keepAliveNoCache } from '@adobe/helix-fetch';
+import { ConfidentialClientApplication, LogLevel } from '@azure/msal-node';
+import { decodeJwt } from 'jose';
+import { MemCachePlugin } from './cache/MemCachePlugin.js';
+import { StatusCodeError } from './StatusCodeError.js';
 
-const { MemCachePlugin } = require('./cache/MemCachePlugin.js');
-const StatusCodeError = require('./StatusCodeError.js');
+const { fetch, reset } = keepAliveNoCache({ userAgent: 'helix-fetch' });
 
 const AZ_AUTHORITY_HOST_URL = 'https://login.windows.net';
 const AZ_DEFAULT_RESOURCE = 'https://graph.microsoft.com'; // '00000002-0000-0000-c000-000000000000'; ??
@@ -49,7 +50,7 @@ const globalTenantCache = new Map();
  * @class
  * @field {ConfidentialClientApplication|PublicClientApplication} app
  */
-class OneDriveAuth {
+export class OneDriveAuth {
   /**
    * @param {OneDriveAuthOptions} opts Options
    */
@@ -237,7 +238,7 @@ class OneDriveAuth {
     };
     if (!this.tenant) {
       try {
-        const { tid } = jose.decodeJwt(bearerToken);
+        const { tid } = decodeJwt(bearerToken);
         if (tid) {
           log.info(`using tenant from access token: ${tid}`);
           this.tenant = tid;
@@ -309,7 +310,3 @@ class OneDriveAuth {
     return this.authResult;
   }
 }
-
-module.exports = {
-  OneDriveAuth,
-};

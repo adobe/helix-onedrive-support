@@ -9,9 +9,9 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-const { basename } = require('path');
-const { S3Client, ListObjectsV2Command, HeadObjectCommand } = require('@aws-sdk/client-s3');
-const { S3CachePlugin } = require('./S3CachePlugin.js');
+import { basename } from 'path';
+import { HeadObjectCommand, ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3';
+import { S3CachePlugin } from './S3CachePlugin.js';
 
 /**
  * aliases
@@ -19,7 +19,7 @@ const { S3CachePlugin } = require('./S3CachePlugin.js');
  * @typedef {import("@azure/msal-node").TokenCacheContext} TokenCacheContext
  */
 
-class S3CacheManager {
+export class S3CacheManager {
   /**
    * Find the first cache with the given opts, that exists, otherwise the plugin using the
    * default options is returned.
@@ -105,7 +105,3 @@ class S3CacheManager {
     });
   }
 }
-
-module.exports = {
-  S3CacheManager,
-};

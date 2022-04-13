@@ -11,10 +11,10 @@
  */
 
 /* eslint-env mocha */
-const assert = require('assert');
-const jose = require('jose');
-const { OneDriveAuth } = require('../src/OneDriveAuth.js');
-const { Nock } = require('./utils.js');
+import assert from 'assert';
+import { UnsecuredJWT } from 'jose';
+import { OneDriveAuth } from '../src/OneDriveAuth.js';
+import { Nock } from './utils.js';
 
 const AZ_AUTHORITY_HOST_URL = 'https://login.windows.net';
 
@@ -175,7 +175,7 @@ describe('OneDriveAuth Tests', () => {
   });
 
   it('sets the access token an extract the tenant', async () => {
-    const bearerToken = new jose.UnsecuredJWT({
+    const bearerToken = new UnsecuredJWT({
       email: 'bob',
       tid: 'test-tenantid',
     })

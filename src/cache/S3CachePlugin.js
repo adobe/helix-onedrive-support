@@ -9,11 +9,14 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-const {
-  GetObjectCommand, PutObjectCommand, DeleteObjectCommand, S3Client,
-} = require('@aws-sdk/client-s3');
-const { Response } = require('@adobe/helix-fetch');
-const { encrypt, decrypt } = require('./encrypt.js');
+import {
+  DeleteObjectCommand,
+  GetObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3';
+import { Response } from '@adobe/helix-fetch';
+import { decrypt, encrypt } from './encrypt.js';
 
 /**
  * aliases
@@ -26,7 +29,7 @@ const { encrypt, decrypt } = require('./encrypt.js');
  * @class MemCachePlugin
  * @implements ICachePlugin
  */
-class S3CachePlugin {
+export class S3CachePlugin {
   /**
    * @param {S3CachePluginOptions} opts
    */
@@ -108,7 +111,3 @@ class S3CachePlugin {
     return false;
   }
 }
-
-module.exports = {
-  S3CachePlugin,
-};

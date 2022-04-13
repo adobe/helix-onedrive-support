@@ -11,10 +11,10 @@
  */
 
 /* eslint-env mocha */
-const assert = require('assert');
-const {
-  splitByExtension, sanitizeName, sanitizePath, editDistance,
-} = require('../src/fuzzy-helper.js');
+import assert from 'assert';
+import {
+  editDistance, sanitizeName, sanitizePath, splitByExtension,
+} from '../src/utils.js';
 
 describe('splitByExtension Tests', () => {
   it('extension split works for empty string', () => {

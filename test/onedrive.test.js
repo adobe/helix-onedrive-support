@@ -11,13 +11,13 @@
  */
 
 /* eslint-env mocha */
-const assert = require('assert');
-const jose = require('jose');
-const { OneDrive } = require('../src/OneDrive.js');
-const { OneDriveAuth } = require('../src/OneDriveAuth.js');
-const { OneDriveMock: MockDrive } = require('../src/OneDriveMock.js');
-const StatusCodeError = require('../src/StatusCodeError');
-const { Nock } = require('./utils.js');
+import assert from 'assert';
+import { UnsecuredJWT } from 'jose';
+import { OneDrive } from '../src/OneDrive.js';
+import { OneDriveAuth } from '../src/OneDriveAuth.js';
+import { OneDriveMock as MockDrive } from '../src/OneDriveMock.js';
+import { StatusCodeError } from '../src/index.js';
+import { Nock } from './utils.js';
 
 /**
  * @param {OneDriveAuthOptions} opts
@@ -28,7 +28,7 @@ const DEFAULT_AUTH = (opts = {}) => new OneDriveAuth({
   localAuthCache: true,
   noTenantCache: true,
   ...opts,
-}).setAccessToken(new jose.UnsecuredJWT({
+}).setAccessToken(new UnsecuredJWT({
   email: 'bob',
   tid: 'test-tenantid',
 }).encode());

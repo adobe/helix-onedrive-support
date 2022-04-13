@@ -11,11 +11,11 @@
  */
 export * from './OneDrive';
 export * from './OneDriveAuth';
-export * from './Workbook';
-export * from './Worksheet';
-export * from './NamedItem';
-export * from './Table';
-export * from './Range';
+export * from './excel/Workbook';
+export * from './excel/Worksheet';
+export * from './excel/NamedItem';
+export * from './excel/Table';
+export * from './excel/Range';
 
 export * from './cache/FSCacheManager';
 export * from './cache/FSCachePlugin';

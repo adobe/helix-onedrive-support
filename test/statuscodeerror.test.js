@@ -12,10 +12,8 @@
 
 /* eslint-env mocha */
 
-'use strict';
-
-const assert = require('assert');
-const StatusCodeError = require('../src/StatusCodeError.js');
+import assert from 'assert';
+import { StatusCodeError } from '../src/index.js';
 
 describe('StatusCodeError Tests', () => {
   it('Set the status code', async () => {
