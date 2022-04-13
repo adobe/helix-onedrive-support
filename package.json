@@ -3,6 +3,10 @@
   "version": "7.1.3-beta",
   "description": "Helix OneDrive Support",
   "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./utils": "./src/utils.js"
+  },
   "type": "module",
   "types": "src/index.d.ts",
   "scripts": {

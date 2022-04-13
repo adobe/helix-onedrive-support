@@ -9,10 +9,6 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import {
-  editDistance, sanitizeName, sanitizePath, splitByExtension, superTrim,
-} from './utils.js';
-
 export { OneDrive } from './OneDrive.js';
 export { OneDriveAuth } from './OneDriveAuth.js';
 export { FSCachePlugin } from './cache/FSCachePlugin.js';
@@ -22,11 +18,3 @@ export { S3CachePlugin } from './cache/S3CachePlugin.js';
 export { S3CacheManager } from './cache/S3CacheManager.js';
 export { OneDriveMock } from './OneDriveMock.js';
 export { StatusCodeError } from './StatusCodeError.js';
-
-export const utils = {
-  splitByExtension,
-  editDistance,
-  sanitizeName,
-  sanitizePath,
-  superTrim,
-};
