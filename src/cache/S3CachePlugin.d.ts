@@ -21,6 +21,24 @@ export declare interface S3CachePluginOptions {
 }
 
 export declare class S3CachePlugin implements ICachePlugin {
+  /**
+   * Decrypts a AES-GCM encrypted digest.
+   * @param {string} key encryption key / password
+   * @param {Buffer} data the encrypted data
+   * @returns {Buffer} the plain text
+   * @throws an error if the given key cannot decrypt the digest.
+   */
+  static encrypt(key:string, data:Buffer):Buffer;
+
+  /**
+   * Decrypts a AES-GCM encrypted digest.
+   * @param {string} key encryption key / password
+   * @param {Buffer} data the encrypted data
+   * @returns {Buffer} the plain text
+   * @throws an error if the given key cannot decrypt the digest.
+   */
+  static decrypt(key: string, data: Buffer):Buffer;
+
   constructor(opts: S3CachePluginOptions);
 
   deleteCache(): Promise<void>;

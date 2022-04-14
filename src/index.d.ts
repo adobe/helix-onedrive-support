@@ -11,6 +11,8 @@
  */
 export * from './OneDrive';
 export * from './OneDriveAuth';
+export * from './OneDriveMock';
+export * from './StatusCodeError';
 export * from './excel/Workbook';
 export * from './excel/Worksheet';
 export * from './excel/NamedItem';

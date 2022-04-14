@@ -111,3 +111,6 @@ export class S3CachePlugin {
     return false;
   }
 }
+
+S3CachePlugin.encrypt = encrypt;
+S3CachePlugin.decrypt = decrypt;
