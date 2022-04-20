@@ -20,7 +20,6 @@ import { StatusCodeError } from './StatusCodeError.js';
 const { fetch, reset } = keepAliveNoCache({ userAgent: 'helix-fetch' });
 
 const AZ_AUTHORITY_HOST_URL = 'https://login.windows.net';
-const AZ_DEFAULT_RESOURCE = 'https://graph.microsoft.com'; // '00000002-0000-0000-c000-000000000000'; ??
 const AZ_COMMON_TENANT = 'common';
 
 const DEFAULT_SCOPES = ['https://graph.microsoft.com/.default', 'openid', 'profile', 'offline_access'];
@@ -67,7 +66,6 @@ export class OneDriveAuth {
     this.refreshToken = opts.refreshToken || '';
     this._log = opts.log || console;
     this.tenant = opts.tenant;
-    this.resource = opts.resource || AZ_DEFAULT_RESOURCE;
     this.cachePlugin = opts.cachePlugin;
     this.scopes = opts.scopes || DEFAULT_SCOPES;
 

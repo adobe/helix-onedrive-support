@@ -17,7 +17,6 @@ export declare interface OneDriveAuthOptions {
   refreshToken?: string;
   log?: Console;
   tenant?: string;
-  resource?: string;
   scopes?: string[];
   localAuthCache?:boolean;
 
