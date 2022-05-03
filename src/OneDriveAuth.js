@@ -34,7 +34,7 @@ const MSAL_LOG_LEVELS = [
 
 /**
  * aliases
- * @typedef {import("@azure/msal-node").AuthenticationResult} AuthenticationResult
+ * @typedef {import('@azure/msal-node').AuthenticationResult} AuthenticationResult
 */
 
 /**
