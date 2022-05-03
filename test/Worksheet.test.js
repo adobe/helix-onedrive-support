@@ -11,14 +11,9 @@
  */
 
 /* eslint-env mocha */
-
-'use strict';
-
-const assert = require('assert');
-
-const OneDriveMock = require('../src/OneDriveMock.js');
-const StatusCodeError = require('../src/StatusCodeError.js');
-const exampleBook = require('./fixtures/book.js');
+import assert from 'assert';
+import { OneDriveMock, StatusCodeError } from '../src/index.js';
+import exampleBook from './fixtures/book.js';
 
 describe('Worksheet Tests', () => {
   let sheet;

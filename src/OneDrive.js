@@ -11,22 +11,13 @@
  */
 
 // eslint-disable-next-line max-classes-per-file
-const EventEmitter = require('events');
-const { promisify } = require('util');
-const jose = require('jose');
-const { AuthenticationContext, MemoryCache } = require('adal-node');
-const { fetch, reset } = require('@adobe/helix-fetch').keepAliveNoCache({ userAgent: 'helix-fetch' });
+import { keepAliveNoCache } from '@adobe/helix-fetch';
+import { Workbook } from './excel/Workbook.js';
+import { StatusCodeError } from './StatusCodeError.js';
+import { editDistance, sanitizeName, splitByExtension } from './utils.js';
+import { SharePointSite } from './SharePointSite.js';
 
-const Workbook = require('./Workbook.js');
-const StatusCodeError = require('./StatusCodeError.js');
-const { driveItemFromURL, driveItemToURL } = require('./utils.js');
-const { splitByExtension, sanitize, editDistance } = require('./fuzzy-helper.js');
-const SharePointSite = require('./SharePointSite.js');
-
-const AZ_AUTHORITY_HOST_URL = 'https://login.windows.net';
-const AZ_DEFAULT_RESOURCE = 'https://graph.microsoft.com'; // '00000002-0000-0000-c000-000000000000'; ??
-const AZ_COMMON_TENANT = 'common';
-
+const { fetch, reset } = keepAliveNoCache({ userAgent: 'helix-fetch' });
 /**
  * the maximum subscription time in milliseconds
  * @see https://docs.microsoft.com/en-us/graph/api/resources/subscription?view=graph-rest-1.0#maximum-length-of-subscription-per-resource-type
@@ -44,143 +35,75 @@ const MAX_SUBSCRIPTION_EXPIRATION_TIME = 4230 * 60 * 1000;
 const globalShareLinkCache = new Map();
 
 /**
- * map that caches the tenant ids
- * @type {Map<string, string>}
- */
-const globalTenantCache = new Map();
-
-/**
  * Helper class that facilitates accessing one drive.
+ *
+ * @class
+ * @field {ConfidentialClientApplication|PublicClientApplication} app
  */
-class OneDrive extends EventEmitter {
+export class OneDrive {
+  /**
+   * Returns an onedrive uri for the given drive item. the uri has the format:
+   * `onedrive:/drives/<driveId>/items/<itemId>`
+   *
+   * @param {DriveItem} driveItem
+   * @returns {URL} An url representing the drive item
+   */
+  static driveItemToURL(driveItem) {
+    return new URL(`onedrive:/drives/${driveItem.parentReference.driveId}/items/${driveItem.id}`);
+  }
+
+  /**
+   * Returns a partial drive item from the given url. The urls needs to have the format:
+   * `onedrive:/drives/<driveId>/items/<itemId>`. if the url does not start with the correct
+   * protocol, {@code null} is returned.
+   *
+   * @param {URL|string} url The url of the drive item.
+   * @return {DriveItem} A (partial) drive item.
+   */
+  static driveItemFromURL(url) {
+    if (!(url instanceof URL)) {
+      // eslint-disable-next-line no-param-reassign
+      url = new URL(String(url));
+    }
+    if (url.protocol !== 'onedrive:') {
+      return null;
+    }
+    const [drives, driveId, items, itemId] = url.pathname.split('/').filter((s) => !!s);
+    if (drives !== 'drives') {
+      throw new Error(`URI not supported (missing 'drives' segment): ${url}`);
+    }
+    if (items !== 'items') {
+      throw new Error(`URI not supported (missing 'items' segment): ${url}`);
+    }
+    return {
+      id: itemId,
+      parentReference: {
+        driveId,
+      },
+    };
+  }
+
   /**
    * @param {OneDriveOptions} opts Options
    */
   constructor(opts) {
-    super(opts);
-    this.clientId = opts.clientId;
-    this.clientSecret = opts.clientSecret || '';
-    this.refreshToken = opts.refreshToken || '';
-    this.username = opts.username || '';
-    this.password = opts.password || '';
-    this._log = opts.log || console;
-    this.tenant = opts.tenant;
-    this.resource = opts.resource || AZ_DEFAULT_RESOURCE;
-    this.localAuthCache = opts.localAuthCache;
+    if (!opts.auth) {
+      throw new Error('Missing auth.');
+    }
+    this.auth = opts.auth;
+    this._log = opts.auth.log;
 
     if (!opts.noShareLinkCache && !process.env.HELIX_ONEDRIVE_NO_SHARE_LINK_CACHE) {
       /** @type {Map<string, string>} */
       this.shareLinkCache = opts.shareLinkCache || globalShareLinkCache;
     }
-    if (!opts.noTenantCache && !process.env.HELIX_ONEDRIVE_NO_TENANT_CACHE) {
-      /** @type {Map<string, string>} */
-      this.tenantCache = opts.tenantCache || globalTenantCache;
-    }
-
-    if (!this.clientId) {
-      throw new Error('Missing clientId.');
-    }
-  }
-
-  /**
-   * Return the auth context
-   * @returns {AuthenticationContext}
-   */
-  async getAuthContext() {
-    if (!this.authContext) {
-      this.authContext = new AuthenticationContext(
-        this.getAuthorityUrl(),
-        undefined,
-        this.localAuthCache ? new MemoryCache() : undefined,
-      );
-      [
-        'acquireUserCode',
-        'acquireToken',
-        'acquireTokenWithDeviceCode',
-        'acquireTokenWithRefreshToken',
-        'acquireTokenWithUsernamePassword',
-        'acquireTokenWithClientCredentials',
-      ].forEach((m) => {
-        this.authContext[m] = promisify(this.authContext[m].bind(this.authContext));
-      });
-      const { cache } = this.authContext;
-      if (this.localAuthCache) {
-        const originalAdd = cache.add;
-        cache.add = (entries, cb) => {
-          originalAdd.call(cache, entries, (...args) => {
-            // eslint-disable-next-line no-underscore-dangle
-            this.emit('tokens', cache._entries);
-            cb(...args);
-          });
-        };
-        const originalRemove = cache.remove;
-        cache.remove = (entries, cb) => {
-          originalRemove.call(cache, entries, (...args) => {
-            // eslint-disable-next-line no-underscore-dangle
-            this.emit('tokens', cache._entries);
-            cb(...args);
-          });
-        };
-      }
-      cache.add.promise = promisify(cache.add.bind(cache));
-      cache.remove.promise = promisify(cache.remove.bind(cache));
-      cache.find.promise = promisify(cache.find.bind(cache));
-    }
-    return this.authContext;
-  }
-
-  async resolveTenant(tenantHost) {
-    const { log } = this;
-    const configUrl = `https://login.windows.net/${tenantHost}.onmicrosoft.com/.well-known/openid-configuration`;
-    const res = await fetch(configUrl);
-    if (!res.ok) {
-      log.info(`error fetching openid-configuration for ${tenantHost}: ${res.status}. Fallback to 'common'`);
-      return AZ_COMMON_TENANT;
-    }
-
-    const { issuer } = await res.json();
-    if (!issuer) {
-      log.info(`unable to extract tenant from openid-configuration for ${tenantHost}: no 'issuer'. Fallback to 'common'`);
-      return AZ_COMMON_TENANT;
-    }
-
-    // eslint-disable-next-line prefer-destructuring
-    const tenant = new URL(issuer).pathname.split('/')[1];
-    log.info(`fetched tenant information from for ${tenantHost}: ${tenant}`);
-    return tenant;
-  }
-
-  async initTenantFromShareLink(sharingUrl) {
-    if (this.tenant) {
-      return;
-    }
-    const { log } = this;
-    const url = sharingUrl instanceof URL
-      ? sharingUrl
-      : new URL(sharingUrl);
-    let [tenantHost] = url.hostname.split('.');
-    // special case: `xxxx-my.sharepoint.com`
-    if (url.hostname.endsWith('-my.sharepoint.com')) {
-      tenantHost = tenantHost.substring(0, tenantHost.length - 3);
-    }
-
-    if (this.tenantCache) {
-      this.tenant = this.tenantCache.get(tenantHost);
-    }
-    if (!this.tenant) {
-      this.tenant = await this.resolveTenant(tenantHost);
-      if (this.tenantCache) {
-        this.tenantCache.set(tenantHost, this.tenant);
-      }
-    }
-    log.info(`using tenant ${this.tenant} for ${tenantHost} from ${sharingUrl}`);
   }
 
   /**
    */
-  // eslint-disable-next-line class-methods-use-this
   async dispose() {
     // TODO: clear other state?
+    await this.auth.dispose();
     return reset();
   }
 
@@ -190,194 +113,11 @@ class OneDrive extends EventEmitter {
     return this._log;
   }
 
-  getAuthorityUrl() {
-    if (!this.tenant) {
-      throw new Error('unable to compute authority url. no tenant.');
-    }
-    return `${AZ_AUTHORITY_HOST_URL}/${this.tenant}`;
-  }
-
-  /**
-   * @returns {boolean}
-   */
-  get authenticated() {
-    // eslint-disable-next-line no-underscore-dangle
-    return this.authContext?.cache._entries.length > 0;
-  }
-
-  /**
-   * Adds entries to the token cache
-   * @param {TokenResponse[]} entries
-   * @return this;
-   */
-  async loadTokenCache(entries) {
-    return (await this.getAuthContext()).cache.add.promise(entries);
-  }
-
-  /**
-   * Performs a login using an interactive flow which prompts the user to open a browser window and
-   * enter the authorization code.
-   * @params {function} [onCode] - optional function that gets invoked after code was retrieved.
-   * @returns {Promise<TokenResponse>}
-   */
-  async login(onCode) {
-    const { log } = this;
-    const context = await this.getAuthContext();
-
-    let code;
-    try {
-      code = await context.acquireUserCode(this.resource, this.clientId, 'en');
-    } catch (e) {
-      log.error('Error while requesting user code', e);
-      throw e;
-    }
-
-    log.info(code.message);
-    if (typeof onCode === 'function') {
-      await onCode(code);
-    }
-
-    try {
-      return await context.acquireTokenWithDeviceCode(this.resource, this.clientId, code);
-    } catch (e) {
-      log.error('Error while requesting access token with device code', e);
-      throw e;
-    }
-  }
-
-  /**
-   * Sets the access token to use for all requests. if the token is a valid JWT token,
-   * its `tid` claim is used a tenant (if no tenant is already set).
-   *
-   * @param {string} bearerToken
-   */
-  setAccessToken(bearerToken) {
-    const { log } = this;
-    this.accessToken = {
-      accessToken: bearerToken,
-    };
-    if (!this.tenant) {
-      try {
-        const { tid } = jose.decodeJwt(bearerToken);
-        if (tid) {
-          log.info(`using tenant from access token: ${tid}`);
-          this.tenant = tid;
-        }
-      } catch (e) {
-        log.warn(`unable to decode access token: ${e.message}`);
-      }
-    }
-    this.accessToken.tenantId = this.tenant;
-  }
-
-  /**
-   */
-  async fetchAccessToken() {
-    const { log } = this;
-    const context = await this.getAuthContext();
-    try {
-      return await context.acquireToken(this.resource, this.username, this.clientId);
-    } catch (e) {
-      if (e.message !== 'Entry not found in cache.') {
-        log.warn(`Unable to acquire token from cache: ${e}`);
-      } else {
-        log.debug(`Unable to acquire token from cache: ${e}`);
-      }
-    }
-
-    try {
-      if (this.refreshToken) {
-        log.debug('acquire token with refresh token.');
-        const resp = await context.acquireTokenWithRefreshToken(
-          this.refreshToken,
-          this.clientId,
-          this.clientSecret,
-          this.resource,
-        );
-        return await this.augmentAndCacheResponse(resp);
-      } else if (this.username && this.password) {
-        log.debug('acquire token with ROPC.');
-        return await context.acquireTokenWithUsernamePassword(
-          this.resource,
-          this.username,
-          this.password,
-          this.clientId,
-        );
-      } else if (this.clientSecret) {
-        log.debug('acquire token with client credentials.');
-        return await context.acquireTokenWithClientCredentials(
-          this.resource,
-          this.clientId,
-          this.clientSecret,
-        );
-      } else {
-        const err = new StatusCodeError('No valid authentication credentials supplied.');
-        err.statusCode = 401;
-        throw err;
-      }
-    } catch (e) {
-      log.error(`Error while refreshing access token ${e}`);
-      throw e;
-    }
-  }
-
-  async getAccessToken() {
-    if (!this.accessToken) {
-      this.accessToken = await this.fetchAccessToken();
-    }
-    return this.accessToken;
-  }
-
-  /**
-   */
-  createLoginUrl(redirectUri, state) {
-    return `${this.getAuthorityUrl()}/oauth2/authorize?response_type=code&scope=/.default&client_id=${this.clientId}&redirect_uri=${redirectUri}&state=${state}&resource=${this.resource}`;
-  }
-
-  async augmentAndCacheResponse(response) {
-    // somehow adal doesn't add the clientId and authority to response
-    // eslint-disable-next-line no-underscore-dangle
-    if (!response._clientId) {
-      // eslint-disable-next-line no-underscore-dangle
-      response._clientId = this.clientId;
-      // eslint-disable-next-line no-underscore-dangle
-      response._authority = this.authorityUrl;
-    }
-    const found = await this.authContext.cache.find.promise({
-      refreshToken: response.refreshToken,
-    });
-    if (found.length) {
-      await this.authContext.cache.remove.promise(found);
-    }
-    await this.authContext.cache.add.promise([response]);
-    return response;
-  }
-
-  /**
-   */
-  async acquireToken(redirectUri, code) {
-    const { log } = this;
-    const context = await this.getAuthContext();
-    try {
-      const resp = await context.acquireTokenWithAuthorizationCode(
-        code,
-        redirectUri,
-        this.resource,
-        this.clientId,
-        this.clientSecret,
-      );
-      return await this.augmentAndCacheResponse(resp);
-    } catch (e) {
-      log.error('Error while getting token with authorization code.', e);
-      throw e;
-    }
-  }
-
   /**
    */
   async doFetch(relUrl, rawResponseBody = false, options = {}) {
     const opts = { ...options };
-    const { accessToken } = await this.getAccessToken();
+    const { accessToken } = await this.auth.authenticate();
     if (!opts.headers) {
       opts.headers = {};
     }
@@ -440,7 +180,7 @@ class OneDrive extends EventEmitter {
   /**
    */
   async resolveShareLink(sharingUrl) {
-    await this.initTenantFromShareLink(sharingUrl);
+    await this.auth.initTenantFromUrl(sharingUrl);
     const link = OneDrive.encodeSharingUrl(sharingUrl);
     this.log.debug(`resolving sharelink ${sharingUrl} (${link})`);
     try {
@@ -467,7 +207,7 @@ class OneDrive extends EventEmitter {
     if (driveItem) {
       return driveItem;
     }
-    await this.initTenantFromShareLink(sharingUrl);
+    await this.auth.initTenantFromUrl(sharingUrl);
     if (this.shareLinkCache) {
       driveItem = this.shareLinkCache.get(sharingUrl);
     }
@@ -538,7 +278,7 @@ class OneDrive extends EventEmitter {
     const folderRelPath = relPath.substring(0, idx);
     const name = relPath.substring(idx + 1);
     const [baseName, ext] = splitByExtension(name);
-    const sanitizedName = sanitize(baseName);
+    const sanitizedName = sanitizeName(baseName);
 
     const query = {
       $top: 999,
@@ -571,7 +311,7 @@ class OneDrive extends EventEmitter {
         // only match extension if given via relPath
         return false;
       }
-      const sanitizedItemName = sanitize(itemName);
+      const sanitizedItemName = sanitizeName(itemName);
       if (sanitizedItemName !== sanitizedName) {
         return false;
       }
@@ -746,14 +486,14 @@ class OneDrive extends EventEmitter {
     const [, owner, site, root] = match;
 
     try {
-      const accessToken = await this.getAccessToken();
+      const authResult = await this.auth.authenticate();
       return new SharePointSite({
         owner,
         site,
         root,
         clientId: this.clientId,
-        tenantId: accessToken.tenantId,
-        refreshToken: accessToken.refreshToken,
+        tenantId: authResult.tenantId,
+        refreshToken: authResult.refreshToken,
         log: this.log,
       });
     } catch (e) {
@@ -766,8 +506,4 @@ class OneDrive extends EventEmitter {
   }
 }
 
-module.exports = Object.assign(OneDrive, {
-  MAX_SUBSCRIPTION_EXPIRATION_TIME,
-  driveItemToURL,
-  driveItemFromURL,
-});
+OneDrive.MAX_SUBSCRIPTION_EXPIRATION_TIME = MAX_SUBSCRIPTION_EXPIRATION_TIME;

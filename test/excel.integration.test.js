@@ -11,23 +11,26 @@
  */
 
 /* eslint-env mocha */
-const assert = require('assert');
+import assert from 'assert';
+import { config } from 'dotenv';
+import { OneDrive } from '../src/OneDrive.js';
+import { OneDriveAuth } from '../src/OneDriveAuth.js';
 
-const OneDrive = require('../src/OneDrive.js');
-
-require('dotenv').config();
+config();
 
 describe('Excel Integration Tests', () => {
-  it('Get the sheet data', async function test() {
+  it.skip('Get the sheet data', async function test() {
     if (!process.env.AZURE_WORD2MD_CLIENT_ID) {
       this.skip();
       return;
     }
     const drive = new OneDrive({
-      clientId: process.env.AZURE_WORD2MD_CLIENT_ID,
-      username: process.env.AZURE_HELIX_USER,
-      password: process.env.AZURE_HELIX_PASSWORD,
-      tenant: 'common',
+      auth: new OneDriveAuth({
+        clientId: process.env.AZURE_WORD2MD_CLIENT_ID,
+        username: process.env.AZURE_HELIX_USER,
+        password: process.env.AZURE_HELIX_PASSWORD,
+        tenant: 'common',
+      }),
     });
 
     const rootItem = await drive.getDriveItemFromShareLink('https://adobe.sharepoint.com/sites/cg-helix/Shared%20Documents/helix-test-content-onedrive/automation-tests');
@@ -37,16 +40,18 @@ describe('Excel Integration Tests', () => {
     assert.deepStrictEqual(names, ['helix-default', 'incoming', 'Config']);
   }).timeout(10000);
 
-  it('Test pre authenticate fetch', async function test() {
+  it.skip('Test pre authenticate fetch', async function test() {
     if (!process.env.AZURE_WORD2MD_CLIENT_ID) {
       this.skip();
       return;
     }
     const drive = new OneDrive({
-      clientId: process.env.AZURE_WORD2MD_CLIENT_ID,
-      username: process.env.AZURE_HELIX_USER,
-      password: process.env.AZURE_HELIX_PASSWORD,
-      tenant: 'common',
+      auth: new OneDriveAuth({
+        clientId: process.env.AZURE_WORD2MD_CLIENT_ID,
+        username: process.env.AZURE_HELIX_USER,
+        password: process.env.AZURE_HELIX_PASSWORD,
+        tenant: 'common',
+      }),
     });
 
     await drive.getAccessToken();

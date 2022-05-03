@@ -9,10 +9,10 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-const OneDrive = require('./OneDrive.js');
-const Workbook = require('./Workbook.js');
-const StatusCodeError = require('./StatusCodeError.js');
-const { driveItemFromURL, driveItemToURL } = require('./utils.js');
+import { OneDrive } from './OneDrive.js';
+import { OneDriveAuth } from './OneDriveAuth.js';
+import { Workbook } from './excel/Workbook.js';
+import { StatusCodeError } from './StatusCodeError.js';
 
 /**
  * Handle the `namedItems` operation on a workbook / worksheet
@@ -139,10 +139,22 @@ function handleTable(sheet, segs, method, body) {
 /**
  * Mock OneDrive client that supports some of the operations the `OneDrive` class does.
  */
-class OneDriveMock extends OneDrive {
-  constructor() {
+export class OneDriveMock extends OneDrive {
+  constructor({ auth } = {}) {
+    if (!auth) {
+      // eslint-disable-next-line no-param-reassign
+      auth = new OneDriveAuth({
+        clientId: 'mock-id',
+        tenant: 'test-tenant',
+      });
+      // eslint-disable-next-line no-param-reassign
+      auth.accessToken = {
+        accessToken: 'dummy-token',
+        tenantId: 'test-tenant',
+      };
+    }
     super({
-      clientId: 'mock-id',
+      auth,
     });
     this.workbooks = [];
     this.sharelinks = {};
@@ -310,8 +322,3 @@ class OneDriveMock extends OneDrive {
     }
   }
 }
-
-module.exports = Object.assign(OneDriveMock, {
-  driveItemToURL,
-  driveItemFromURL,
-});

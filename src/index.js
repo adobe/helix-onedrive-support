@@ -9,10 +9,12 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-const OneDrive = require('./OneDrive.js');
-const OneDriveMock = require('./OneDriveMock.js');
-
-module.exports = {
-  OneDrive,
-  OneDriveMock,
-};
+export { OneDrive } from './OneDrive.js';
+export { OneDriveAuth } from './OneDriveAuth.js';
+export { FSCachePlugin } from './cache/FSCachePlugin.js';
+export { FSCacheManager } from './cache/FSCacheManager.js';
+export { MemCachePlugin } from './cache/MemCachePlugin.js';
+export { S3CachePlugin } from './cache/S3CachePlugin.js';
+export { S3CacheManager } from './cache/S3CacheManager.js';
+export { OneDriveMock } from './OneDriveMock.js';
+export { StatusCodeError } from './StatusCodeError.js';

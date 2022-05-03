@@ -1,5 +1,7 @@
 {
-  "plugins": [],
+  "plugins": [
+    "node_modules/jsdoc-tsimport-plugin/index.js"
+  ],
   "recurseDepth": 10,
   "source": {
       "includePattern": ".+\\.js(doc|x)?$",

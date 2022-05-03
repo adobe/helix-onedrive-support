@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Adobe. All rights reserved.
+ * Copyright 2022 Adobe. All rights reserved.
  * This file is licensed to you under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License. You may obtain a copy
  * of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -9,18 +9,21 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-export * from './OneDrive';
-export * from './OneDriveAuth';
-export * from './OneDriveMock';
-export * from './StatusCodeError';
-export * from './excel/Workbook';
-export * from './excel/Worksheet';
-export * from './excel/NamedItem';
-export * from './excel/Table';
-export * from './excel/Range';
+import { ICachePlugin, TokenCacheContext } from  '@azure/msal-node';
 
-export * from './cache/FSCacheManager';
-export * from './cache/FSCachePlugin';
-export * from './cache/MemCachePlugin';
-export * from './cache/S3CacheManager';
-export * from './cache/S3CachePlugin';
+import { Logger } from "../OneDrive";
+
+export declare interface FSCachePluginOptions {
+  log: Console;
+  filePath: string;
+}
+
+export declare class FSCachePlugin implements ICachePlugin {
+  constructor(opts: FSCachePluginOptions);
+
+  deleteCache(): Promise<void>;
+
+  afterCacheAccess(tokenCacheContext: TokenCacheContext): Promise<boolean>;
+
+  beforeCacheAccess(tokenCacheContext: TokenCacheContext): Promise<boolean>;
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Adobe. All rights reserved.
+ * Copyright 2019 Adobe. All rights reserved.
  * This file is licensed to you under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License. You may obtain a copy
  * of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -9,18 +9,25 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-export * from './OneDrive';
-export * from './OneDriveAuth';
-export * from './OneDriveMock';
-export * from './StatusCodeError';
-export * from './excel/Workbook';
-export * from './excel/Worksheet';
-export * from './excel/NamedItem';
-export * from './excel/Table';
-export * from './excel/Range';
 
-export * from './cache/FSCacheManager';
-export * from './cache/FSCachePlugin';
-export * from './cache/MemCachePlugin';
-export * from './cache/S3CacheManager';
-export * from './cache/S3CachePlugin';
+module.exports = {
+  root: true,
+  extends: '@adobe/helix',
+  env: {
+    node: true,
+    es6: true,
+  },
+  parserOptions: {
+    sourceType: 'module',
+    ecmaVersion: 2020,
+  },
+  rules: {
+    'import/extensions': [2, 'ignorePackages'],
+    'import/prefer-default-export': 0,
+    'no-param-reassign': ['error', { props: false }],
+  },
+  globals: {
+    __rootdir: true,
+    __testdir: true,
+  },
+};

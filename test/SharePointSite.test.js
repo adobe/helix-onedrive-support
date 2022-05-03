@@ -11,12 +11,10 @@
  */
 
 /* eslint-env mocha */
-
-const assert = require('assert');
-const crypto = require('crypto');
-
-const SharePointSite = require('../src/SharePointSite.js');
-const { Nock } = require('./utils.js');
+import assert from 'assert';
+import crypto from 'crypto';
+import { SharePointSite } from '../src/SharePointSite.js';
+import { Nock } from './utils.js';
 
 describe('SharePointSite Tests', () => {
   let nock;

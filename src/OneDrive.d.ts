@@ -10,29 +10,13 @@
  * governing permissions and limitations under the License.
  */
 import { EventEmitter } from 'events';
-import { Workbook } from './Workbook';
+import { Workbook } from './excel/Workbook';
 import { TokenResponse } from 'adal-node';
+import {OneDriveAuth} from "./OneDriveAuth";
 
-/**
- * Logger interface
- */
-declare interface Logger {
-}
 
 export declare interface OneDriveOptions {
-  clientId: string;
-  clientSecret?: string;
-  refreshToken?: string;
-  log?: Logger;
-  tenant?: string;
-  resource?: string;
-  username?: string;
-  password?: string;
-
-  /**
-   * Uses a local auth cache for access tokens.
-   */
-  localAuthCache?: boolean,
+  auth: OneDriveAuth;
 
   /**
    * Disables the cache for the share link lookup.
@@ -45,18 +29,6 @@ export declare interface OneDriveOptions {
    * Note that the cache is only used, if the `noShareLinkCache` flag is `falsy`
    */
   shareLinkCache?: Map<string, DriveItem>,
-
-  /**
-   * Disables the cache for the tenant lookup.
-   * @default process.env.HELIX_ONEDRIVE_NO_TENANT_CACHE
-   */
-  noTenantCache?: boolean;
-
-  /**
-   * Map to use for the tenant lookup cache. If empty, a module-global cache will be used.
-   * Note that the cache is only used, if the `noTenantCache` flag is `falsy`
-   */
-  tenantCache?: Map<string, DriveItem>,
 }
 
 export declare interface GraphResult {
@@ -146,55 +118,15 @@ export declare class OneDrive extends EventEmitter {
   constructor(opts: OneDriveOptions);
 
   /**
-   * is set to {@code true} if this client is initialized.
-   */
-  authenticated: boolean;
-
-  /**
    * the logger of this client
    */
   log: Logger;
 
-  /**
-   * the authority url for login.
-   */
-  getAuthorityUrl(): string;
-
-  /**
-   * Adds entries to the token cache
-   * @param {TokenResponse[]} entries
-   */
-  loadTokenCache(entries: TokenResponse[]): Promise<void>;
-
-  /**
-   * Performs a login using an interactive flow which prompts the user to open a browser window and
-   * enter the authorization code.
-   * @params {function} [onCode] - optional function that gets invoked after code was retrieved.
-   * @returns {Promise<TokenResponse>}
-   */
-  login(onCode: Function): Promise<TokenResponse>;
-
-  /**
-   * Sets the access token to use for all requests. if the token is a valid JWT token,
-   * its `tid` claim is used a tenant (if no tenant is already set).
-   *
-   * @param {string} bearerToken
-   */
-  setAccessToken(bearerToken);
-
-  getAccessToken(autoRefresh: boolean): Promise<TokenResponse>;
-
-  createLoginUrl(): string;
-
-  acquireToken(redirectUri: string, code: string): Promise<TokenResponse>;
+  auth: OneDriveAuth;
 
   dispose() : Promise<void>;
 
-  doFetch(relUrl: string, rawResponseBody: boolean = false, options: object = {}): Promise<object|Buffer>
-
   me(): Promise<GraphResult>;
-
-  initTenantFromShareLink(sharingUrl: string|URL): Promise<void>;
 
   resolveShareLink(sharingUrl: string|URL): Promise<GraphResult>;
 

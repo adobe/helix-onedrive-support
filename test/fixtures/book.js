@@ -34,7 +34,7 @@ const namedItems = [
   },
 ];
 
-module.exports = {
+export default {
   name: 'book',
   tables,
   sheets: [{
