@@ -1,3 +1,24 @@
+# [8.0.0](https://github.com/adobe/helix-onedrive-support/compare/v7.1.4...v8.0.0) (2022-05-03)
+
+
+### Features
+
+* use msal-node ([a6dca62](https://github.com/adobe/helix-onedrive-support/commit/a6dca6215af57d9ea5ad830003d0192a67b91bff)), closes [#180](https://github.com/adobe/helix-onedrive-support/issues/180)
+
+
+### BREAKING CHANGES
+
+* Major refactoring
+- ESM only
+- new OneDriveAuth class handling all authentication
+- OneDrive no longer takes auth specific options; use OneDriveAuth instead
+- username/password authentication no longer supported
+
+Feature:
+
+- Authentication cache (store) is now pluggable
+- Memory, Filesystem and S3 based cache plugins available
+
 ## [7.1.4](https://github.com/adobe/helix-onedrive-support/compare/v7.1.3...v7.1.4) (2022-04-30)
 
 
