@@ -58,7 +58,7 @@ export class OneDriveAuth {
       throw new Error('Missing clientId.');
     }
     if (opts.username || opts.password) {
-      throw new Error('Username/password authentication no longer support.');
+      throw new Error('Username/password authentication no longer supported.');
     }
 
     this.clientId = opts.clientId;
