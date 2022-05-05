@@ -1,3 +1,10 @@
+## [8.0.1](https://github.com/adobe/helix-onedrive-support/compare/v8.0.0...v8.0.1) (2022-05-05)
+
+
+### Bug Fixes
+
+* export missing classes ([#268](https://github.com/adobe/helix-onedrive-support/issues/268)) ([173d2e4](https://github.com/adobe/helix-onedrive-support/commit/173d2e4dc308cf64acec466168395600171019d3))
+
 # [8.0.0](https://github.com/adobe/helix-onedrive-support/compare/v7.1.4...v8.0.0) (2022-05-03)
 
 
