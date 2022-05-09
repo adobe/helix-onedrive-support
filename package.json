@@ -44,7 +44,7 @@
     "eslint": "8.15.0",
     "eslint-plugin-header": "3.1.1",
     "eslint-plugin-import": "2.26.0",
-    "husky": "7.0.4",
+    "husky": "8.0.1",
     "install": "0.13.0",
     "jsdoc-to-markdown": "7.1.1",
     "jsdoc-tsimport-plugin": "1.0.5",
