@@ -90,6 +90,7 @@ describe('OneDriveAuth Tests', () => {
       code: undefined,
       familyId: '',
       fromCache: false,
+      fromNativeBroker: false,
       idToken: '',
       idTokenClaims: {},
       msGraphHost: '',
