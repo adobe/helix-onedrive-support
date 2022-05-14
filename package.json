@@ -29,7 +29,7 @@
   "homepage": "https://github.com/adobe/helix-onedrive-support#readme",
   "dependencies": {
     "@adobe/helix-fetch": "3.0.9",
-    "@aws-sdk/client-s3": "3.86.0",
+    "@aws-sdk/client-s3": "3.88.0",
     "@azure/msal-node": "1.9.0",
     "jose": "4.8.1"
   },
@@ -40,7 +40,7 @@
     "ajv": "8.11.0",
     "c8": "7.11.2",
     "codecov": "3.8.3",
-    "dotenv": "16.0.0",
+    "dotenv": "16.0.1",
     "eslint": "8.15.0",
     "eslint-plugin-header": "3.1.1",
     "eslint-plugin-import": "2.26.0",
@@ -53,7 +53,7 @@
     "mocha": "10.0.0",
     "mocha-multi-reporters": "1.5.1",
     "nock": "13.2.4",
-    "npm": "8.9.0",
+    "npm": "8.10.0",
     "semantic-release": "19.0.2"
   },
   "lint-staged": {
