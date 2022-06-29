@@ -1,3 +1,10 @@
+## [8.0.11](https://github.com/adobe/helix-onedrive-support/compare/v8.0.10...v8.0.11) (2022-06-29)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/helix-fetch to v3.1.1 ([622df8a](https://github.com/adobe/helix-onedrive-support/commit/622df8ac01e819d4a45653ccb320677ef8053254))
+
 ## [8.0.10](https://github.com/adobe/helix-onedrive-support/compare/v8.0.9...v8.0.10) (2022-06-28)
 
 
