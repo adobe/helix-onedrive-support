@@ -1,3 +1,10 @@
+# [8.1.0](https://github.com/adobe/helix-onedrive-support/compare/v8.0.12...v8.1.0) (2022-07-05)
+
+
+### Features
+
+* add initTenantFromMountPoint() ([#284](https://github.com/adobe/helix-onedrive-support/issues/284)) ([1f1861a](https://github.com/adobe/helix-onedrive-support/commit/1f1861ae28fe8edfbbb644b0190165f62e2e0b1e))
+
 ## [8.0.12](https://github.com/adobe/helix-onedrive-support/compare/v8.0.11...v8.0.12) (2022-07-02)
 
 
