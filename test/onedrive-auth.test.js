@@ -107,6 +107,18 @@ describe('OneDriveAuth Tests', () => {
     });
   });
 
+  it('uses the tenant from a mountpoint', async () => {
+    const od = new OneDriveAuth({
+      clientId: 'foobar',
+      refreshToken: 'dummy',
+      localAuthCache: true,
+    });
+    await od.initTenantFromMountPoint({
+      tenantId: 'c0452eed-9384-4001-b1b1-71b3d5cf28ad',
+    });
+    assert.deepStrictEqual(od.tenant, 'c0452eed-9384-4001-b1b1-71b3d5cf28ad');
+  });
+
   it('resolves the tenant from a share link and caches it', async () => {
     nock(AZ_AUTHORITY_HOST_URL)
       .get('/onedrive.onmicrosoft.com/.well-known/openid-configuration')
@@ -121,7 +133,9 @@ describe('OneDriveAuth Tests', () => {
       localAuthCache: true,
       tenantCache,
     });
-    await od1.initTenantFromUrl('https://onedrive.com/a/b/c/d2');
+    await od1.initTenantFromMountPoint({
+      url: 'https://onedrive.com/a/b/c/d2',
+    });
 
     const od2 = new OneDriveAuth({
       clientId: 'foobar',
@@ -173,6 +187,11 @@ describe('OneDriveAuth Tests', () => {
     await od1.initTenantFromUrl('https://onedrive.com/a/b/c/d2');
     delete od1.tenant;
     await od1.initTenantFromUrl('https://onedrive.com/a/b/c/d2');
+
+    // this should not fetch it again
+    await od1.initTenantFromMountPoint({
+      url: 'https://onedrive.com/a/b/c/d2',
+    });
   });
 
   it('sets the access token an extract the tenant', async () => {

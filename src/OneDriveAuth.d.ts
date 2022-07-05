@@ -39,6 +39,14 @@ export declare interface OneDriveAuthOptions {
 }
 
 /**
+ * Helix config mount point
+ */
+declare interface MountPoint {
+  url: string;
+  tenantId?: string;
+}
+
+/**
  * Helper class that facilitates authentication for one drive.
  */
 export declare class OneDriveAuth {
@@ -92,7 +100,22 @@ export declare class OneDriveAuth {
    */
   authenticate(silentOnly: boolean): Promise<AuthenticationResult>;
 
+  /**
+   * Disposes allocated resources.
+   */
   dispose() : Promise<void>;
 
-  initTenantFromUrl(sharingUrl: string|URL): Promise<void>;
+  /**
+   * Initializes the tenant from the url by requesting the required information from microsoft.
+   * @param {string|URL} sharingUrl
+   * @returns {string} the tenant id
+   */
+  initTenantFromUrl(sharingUrl: string|URL): Promise<string>;
+
+  /**
+   * Initializes the tenant either with the `tenantId` of the mount point or via the share url.
+   * @param {MountPoint} mp
+   * @returns {string} the tenant id
+   */
+  initTenantFromMountPoint(mp: MountPoint): Promise<string>;
 }

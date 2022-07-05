@@ -151,7 +151,7 @@ export class OneDriveAuth {
 
   async initTenantFromUrl(sharingUrl) {
     if (this.tenant) {
-      return;
+      return this.tenant;
     }
     const { log } = this;
     const tenantHost = OneDriveAuth.getTenantHostFromUrl(sharingUrl);
@@ -166,6 +166,20 @@ export class OneDriveAuth {
       }
     }
     log.info(`using tenant ${this.tenant} for ${tenantHost} from ${sharingUrl}`);
+    return this.tenant;
+  }
+
+  async initTenantFromMountPoint(mp) {
+    const { log } = this;
+    if (this.tenant) {
+      return this.tenant;
+    }
+    if (mp.tenantId) {
+      this.tenant = mp.tenantId;
+      log.info(`using tenant ${this.tenant} from fstab.`);
+      return this.tenant;
+    }
+    return this.initTenantFromUrl(mp.url);
   }
 
   /**
