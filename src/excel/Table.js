@@ -125,6 +125,10 @@ export class Table {
     });
   }
 
+  get name() {
+    return this._name;
+  }
+
   get uri() {
     return `${this._prefix}/${this._name}`;
   }

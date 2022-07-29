@@ -58,6 +58,16 @@ export declare interface Worksheet {
   table(name: string): Table;
 
   /**
+   * Add a table to a worksheet. Note, that it is not possible
+   * to define the name at this point, one has to rename the
+   * table afterwards (see Table#rename).
+   *
+   * @param address address of table in sheet, e.g. A1:C1
+   * @param hasHeaders whether the table has headers
+   */
+  addTable(address, hasHeaders): Promise<Table>;
+
+  /**
    * Returns the use name.
    */
   getUsedName(): Promise<any>;

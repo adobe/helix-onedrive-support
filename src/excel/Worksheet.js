@@ -46,6 +46,17 @@ export class Worksheet extends NamedItemContainer {
     return new Table(this._oneDrive, `${this._uri}/tables`, name, this._log);
   }
 
+  async addTable(address, hasHeaders) {
+    const result = await this._oneDrive.doFetch(`${this.uri}/tables/add`, false, {
+      method: 'POST',
+      body: {
+        address,
+        hasHeaders,
+      },
+    });
+    return this.table(result.name);
+  }
+
   usedRange() {
     return new Range(this._oneDrive, `${this._uri}/usedRange`, this._log);
   }

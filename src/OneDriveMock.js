@@ -60,79 +60,84 @@ function handleNamedItems(sheet, segs, method, body) {
  * @returns {object} The response value
  */
 function handleTable(sheet, segs, method, body) {
+  const first = segs.shift();
+  if (!first) {
+    return { value: sheet.tables.map((table) => ({ name: table.name })) };
+  }
+  if (first === 'add') {
+    const name = `Table${sheet.tables.length + 1}`;
+    return {
+      name,
+    };
+  }
+  const table = sheet.tables.find((t) => t.name === first);
+  if (!table) {
+    throw new StatusCodeError(first, 404);
+  }
+  let command;
+  let name;
   if (segs[0]) {
-    const tableName = segs.shift();
-    const table = sheet.tables.find((t) => t.name === tableName);
-    if (!table) {
-      throw new StatusCodeError(tableName, 404);
-    }
-    let command;
-    let name;
-    if (segs[0]) {
-      [, command, , name] = segs.shift().match(/([^?(]+)(\('([^)]+)'\))?(\?(.+))?/);
-    }
-    switch (command) {
-      case 'dataBodyRange':
-        return { rowCount: table.rows.length };
-      case 'headerRowRange':
-        return { values: [table.headerNames] };
-      case 'rows': {
-        if (!segs[0]) {
-          return { value: table.rows.map((row) => ({ values: [row] })) };
-        }
-        const subCommand = segs.shift();
-        if (subCommand === 'add') {
-          table.rows.push(...body.values);
-          return { index: table.rows.length - 1 };
-        }
-        const index = parseInt(subCommand.replace(/itemAt\(index=([0-9]+)\)/, '$1'), 10);
-        if (index < 0 || index >= table.rows.length) {
-          throw new StatusCodeError(`Index out of range: ${index}`, 400);
-        }
-        if (method === 'DELETE') {
-          table.rows.splice(index, 1);
-          return null;
-        }
-        if (body) {
-          [table.rows[index]] = body.values;
-        }
-        return { values: [table.rows[index]] };
+    [, command, , name] = segs.shift().match(/([^?(]+)(\('([^)]+)'\))?(\?(.+))?/);
+  }
+  switch (command) {
+    case 'dataBodyRange':
+      return { rowCount: table.rows.length };
+    case 'headerRowRange':
+      return { values: [table.headerNames] };
+    case 'rows': {
+      if (!segs[0]) {
+        return { value: table.rows.map((row) => ({ values: [row] })) };
       }
-      case 'columns': {
-        if (!name) {
-          const cols = table.headerNames.map((n) => ({
-            name: n,
-            values: [[n]],
-          }));
-          table.rows.forEach((row) => {
-            row.forEach((value, idx) => {
-              cols[idx].values.push([value]);
-            });
+      const subCommand = segs.shift();
+      if (subCommand === 'add') {
+        table.rows.push(...body.values);
+        return { index: table.rows.length - 1 };
+      }
+      const index = parseInt(subCommand.replace(/itemAt\(index=([0-9]+)\)/, '$1'), 10);
+      if (index < 0 || index >= table.rows.length) {
+        throw new StatusCodeError(`Index out of range: ${index}`, 400);
+      }
+      if (method === 'DELETE') {
+        table.rows.splice(index, 1);
+        return null;
+      }
+      if (body) {
+        [table.rows[index]] = body.values;
+      }
+      return { values: [table.rows[index]] };
+    }
+    case 'columns': {
+      if (!name) {
+        const cols = table.headerNames.map((n) => ({
+          name: n,
+          values: [[n]],
+        }));
+        table.rows.forEach((row) => {
+          row.forEach((value, idx) => {
+            cols[idx].values.push([value]);
           });
-          return {
-            value: cols,
-          };
-        }
-        const columnName = name;
-        const index = table.headerNames.findIndex((n) => n === columnName);
-        if (index === -1) {
-          throw new StatusCodeError(`Column name not found: ${columnName}`, 400);
-        }
+        });
         return {
-          values: [
-            [table.headerNames[index]],
-            ...table.rows.map((row) => [row[index]]),
-          ],
+          value: cols,
         };
       }
-      default:
-        if (body) {
-          table.name = body.name;
-        }
-        return { values: table.name };
+      const columnName = name;
+      const index = table.headerNames.findIndex((n) => n === columnName);
+      if (index === -1) {
+        throw new StatusCodeError(`Column name not found: ${columnName}`, 400);
+      }
+      return {
+        values: [
+          [table.headerNames[index]],
+          ...table.rows.map((row) => [row[index]]),
+        ],
+      };
     }
-  } else {
-    return { value: sheet.tables.map((table) => ({ name: table.name })) };
+    default:
+      if (body) {
+        table.name = body.name;
+      }
+      return { values: table.name };
   }
 }
 
@@ -309,7 +314,8 @@ export class OneDriveMock extends OneDrive {
     }
 
     // handle the operations on the workbook / worksheet
-    switch (segs.shift()) {
+    const type = segs.shift();
+    switch (type) {
       case 'usedRange':
         return sheet.usedRange;
       case 'tables':
@@ -317,6 +323,11 @@ export class OneDriveMock extends OneDrive {
       case 'names':
         return handleNamedItems(sheet, segs, method, body);
       default:
+        if (type && type.startsWith('range(address=')) {
+          return {
+            address: type.match(/range\(address='([^)]+)'\)/)[1],
+          };
+        }
         // default return the data
         return { value: data };
     }

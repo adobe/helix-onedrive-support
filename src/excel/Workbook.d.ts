@@ -43,6 +43,16 @@ export declare interface Workbook {
   table(name: string): Table;
 
   /**
+   * Add a table to a workbook. Note, that it is not possible
+   * to define the name at this point, one has to rename the
+   * table afterwards (see Table#rename).
+   *
+   * @param address address of table, e.g. Sheet1!A1:C1
+   * @param hasHeaders whether the table has headers
+   */
+  addTable(address, hasHeaders): Promise<Table>;
+
+  /**
    * Return the named items in a work book
    * @returns array of named items when resolved
    */

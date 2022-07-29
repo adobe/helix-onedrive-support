@@ -65,6 +65,10 @@ describe('Worksheet Tests', () => {
     const values = await sheet.getTableNames();
     assert.deepStrictEqual(values, ['table']);
   });
+  it('Add table', async () => {
+    const table = await sheet.addTable('A1:C1', true);
+    assert(table.name.startsWith('Table'));
+  });
   it('Get used range address', async () => {
     const range = sheet.usedRange();
     const address = await range.getAddress();
@@ -73,6 +77,11 @@ describe('Worksheet Tests', () => {
   it('Get used range address local', async () => {
     const range = sheet.usedRange();
     const address = await range.getAddressLocal();
+    assert.strictEqual(address, 'A1:B4');
+  });
+  it('Get range', async () => {
+    const range = sheet.range('A1:B4');
+    const address = await range.getAddress();
     assert.strictEqual(address, 'A1:B4');
   });
   it('Get all data', async () => {

@@ -68,6 +68,10 @@ describe('Workbook Tests', () => {
     const values = await book.getTableNames();
     assert.deepStrictEqual(values, ['table']);
   });
+  it('Add table', async () => {
+    const table = await book.addTable('Sheet1!A1:C1', true);
+    assert(table.name.startsWith('Table'));
+  });
   it('Get named items', async () => {
     const values = await book.getNamedItems();
     assert.deepStrictEqual(values, sampleBook.namedItems);
