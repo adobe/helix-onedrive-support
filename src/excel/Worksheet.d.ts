@@ -58,6 +58,17 @@ export declare interface Worksheet {
   table(name: string): Table;
 
   /**
+   * Add a table to a workbook. If a name is passed that is not
+   * identical to one automatically given, the table gets
+   * automatically renamed.
+   *
+   * @param address address of table in sheet, e.g. A1:C1
+   * @param hasHeaders whether the table has headers
+   * @param name optional name
+   */
+  addTable(address: string, hasHeaders: boolean, name?: string): Promise<Table>;
+
+  /**
    * Returns the use name.
    */
   getUsedName(): Promise<any>;

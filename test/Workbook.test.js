@@ -68,6 +68,21 @@ describe('Workbook Tests', () => {
     const values = await book.getTableNames();
     assert.deepStrictEqual(values, ['table']);
   });
+  it('Add table with a generated name', async () => {
+    const table = await book.addTable('Sheet1!A1:C1', true);
+    assert.strictEqual(table.name, 'Table2');
+  });
+  it('Add table with a specific name', async () => {
+    const table = await book.addTable('Sheet1!A1:C1', true, 'index_table');
+    assert.strictEqual(table.name, 'index_table');
+  });
+  it('Add table with a specific name that is also the generated one', async () => {
+    const table = await book.addTable('Sheet1!A1:C1', true, 'Table2');
+    assert.strictEqual(table.name, 'Table2');
+  });
+  it('Add table with an existing name', async () => {
+    await assert.rejects(async () => book.addTable('Sheet1!A1:C1', true, 'table'), /Table name already exists/);
+  });
   it('Get named items', async () => {
     const values = await book.getNamedItems();
     assert.deepStrictEqual(values, sampleBook.namedItems);
