@@ -10,6 +10,7 @@
  * governing permissions and limitations under the License.
  */
 import { NamedItemContainer } from './NamedItemContainer.js';
+import { StatusCodeError } from '../StatusCodeError.js';
 import { Table } from './Table.js';
 import { Range } from './Range.js';
 
@@ -46,7 +47,13 @@ export class Worksheet extends NamedItemContainer {
     return new Table(this._oneDrive, `${this._uri}/tables`, name, this._log);
   }
 
-  async addTable(address, hasHeaders) {
+  async addTable(address, hasHeaders, name) {
+    if (name) {
+      const names = await this.getTableNames();
+      if (names.includes(name)) {
+        throw new StatusCodeError(`Table name already exists: ${name}`, 409);
+      }
+    }
     const result = await this._oneDrive.doFetch(`${this.uri}/tables/add`, false, {
       method: 'POST',
       body: {
@@ -54,7 +61,11 @@ export class Worksheet extends NamedItemContainer {
         hasHeaders,
       },
     });
-    return this.table(result.name);
+    const table = this.table(result.name);
+    if (name && name !== table.name) {
+      await table.rename(name);
+    }
+    return table;
   }
 
   usedRange() {

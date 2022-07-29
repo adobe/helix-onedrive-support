@@ -65,9 +65,20 @@ describe('Worksheet Tests', () => {
     const values = await sheet.getTableNames();
     assert.deepStrictEqual(values, ['table']);
   });
-  it('Add table', async () => {
+  it('Add table with a generated name', async () => {
     const table = await sheet.addTable('A1:C1', true);
-    assert(table.name.startsWith('Table'));
+    assert.strictEqual(table.name, 'Table2');
+  });
+  it('Add table with a specific name', async () => {
+    const table = await sheet.addTable('A1:C1', true, 'index_table');
+    assert.strictEqual(table.name, 'index_table');
+  });
+  it('Add table with a specific name that is also the generated one', async () => {
+    const table = await sheet.addTable('A1:C1', true, 'Table2');
+    assert.strictEqual(table.name, 'Table2');
+  });
+  it('Add table with an existing name', async () => {
+    await assert.rejects(async () => sheet.addTable('A1:C1', true, 'table'), /Table name already exists/);
   });
   it('Get used range address', async () => {
     const range = sheet.usedRange();

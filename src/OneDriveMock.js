@@ -65,10 +65,10 @@ function handleTable(sheet, segs, method, body) {
     return { value: sheet.tables.map((table) => ({ name: table.name })) };
   }
   if (first === 'add') {
-    const name = `Table${sheet.tables.length + 1}`;
-    return {
-      name,
-    };
+    const len = sheet.tables.push({
+      name: `Table${sheet.tables.length + 1}`,
+    });
+    return sheet.tables[len - 1];
   }
   const table = sheet.tables.find((t) => t.name === first);
   if (!table) {
