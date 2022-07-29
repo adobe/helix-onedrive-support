@@ -1,3 +1,10 @@
+# [8.2.0](https://github.com/adobe/helix-onedrive-support/compare/v8.1.3...v8.2.0) (2022-07-29)
+
+
+### Features
+
+* add table ([#288](https://github.com/adobe/helix-onedrive-support/issues/288)) ([fd02048](https://github.com/adobe/helix-onedrive-support/commit/fd020486af2d355cf31e61a190bcf522031a15c2))
+
 ## [8.1.3](https://github.com/adobe/helix-onedrive-support/compare/v8.1.2...v8.1.3) (2022-07-23)
 
 
