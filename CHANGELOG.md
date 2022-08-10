@@ -1,3 +1,10 @@
+## [8.2.4](https://github.com/adobe/helix-onedrive-support/compare/v8.2.3...v8.2.4) (2022-08-10)
+
+
+### Bug Fixes
+
+* add proper table in mock's addTable ([#292](https://github.com/adobe/helix-onedrive-support/issues/292)) ([6c470ef](https://github.com/adobe/helix-onedrive-support/commit/6c470efa4e923440458e9459aab2e1c57346ba06))
+
 ## [8.2.3](https://github.com/adobe/helix-onedrive-support/compare/v8.2.2...v8.2.3) (2022-08-07)
 
 
