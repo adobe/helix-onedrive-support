@@ -42,7 +42,7 @@ export default {
     tables,
     namedItems,
     usedRange: {
-      address: 'Sheet1!A1:B4',
+      address: 'sheet!A1:B4',
       addressLocal: 'A1:B4',
       values: [
         ['project', '  c r e a t e d  '],

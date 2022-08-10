@@ -53,24 +53,44 @@ function handleNamedItems(sheet, segs, method, body) {
 
 /**
  * Handle the `table` operation on a workbook / worksheet
- * @param {object} sheet The mock data
+ * @param {object} container The mock data
  * @param {string[]} segs Array of path segments
  * @param {string} method Request method
  * @param {object} body Request body
  * @returns {object} The response value
  */
-function handleTable(sheet, segs, method, body) {
+function handleTable(container, segs, method, body) {
   const first = segs.shift();
   if (!first) {
-    return { value: sheet.tables.map((table) => ({ name: table.name })) };
+    return { value: container.tables.map((table) => ({ name: table.name })) };
   }
   if (first === 'add') {
-    const len = sheet.tables.push({
-      name: `Table${sheet.tables.length + 1}`,
+    let sheet = container;
+
+    const { address } = body;
+    const sep = address.indexOf('!');
+    if (sep !== -1) {
+      sheet = container.sheets.find((s) => s.name === address.substring(0, sep));
+    }
+
+    const { values } = sheet.usedRange;
+    const headerNames = [];
+    const rows = [];
+
+    if (body.hasHeaders) {
+      headerNames.push(...values[0]);
+      rows.push(...values.slice(1));
+    } else {
+      rows.push(...values);
+    }
+    const len = container.tables.push({
+      name: `Table${container.tables.length + 1}`,
+      headerNames,
+      rows,
     });
-    return sheet.tables[len - 1];
+    return container.tables[len - 1];
   }
-  const table = sheet.tables.find((t) => t.name === first);
+  const table = container.tables.find((t) => t.name === first);
   if (!table) {
     throw new StatusCodeError(first, 404);
   }

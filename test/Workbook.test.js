@@ -18,6 +18,9 @@ import exampleBook from './fixtures/book.js';
 const TEST_SHARE_LINK = 'https://adobe.sharepoint.com/:x:/r/sites/cg-helix/Shared%20Documents/data-embed-unit-tests/example-data.xlsx';
 
 describe('Workbook Tests', () => {
+  /**
+   * @type {import('../src/index.js').Workbook}
+   */
   let book;
   let sampleBook;
   let oneDrive;
@@ -69,19 +72,23 @@ describe('Workbook Tests', () => {
     assert.deepStrictEqual(values, ['table']);
   });
   it('Add table with a generated name', async () => {
-    const table = await book.addTable('Sheet1!A1:C1', true);
+    const table = await book.addTable('sheet!A1:B4', true);
     assert.strictEqual(table.name, 'Table2');
   });
   it('Add table with a specific name', async () => {
-    const table = await book.addTable('Sheet1!A1:C1', true, 'index_table');
+    const table = await book.addTable('sheet!A1:B4', true, 'index_table');
     assert.strictEqual(table.name, 'index_table');
+    const headerNames = await table.getHeaderNames();
+    assert.strictEqual(headerNames[0], 'project');
+    const row = await table.getRow(0);
+    assert.strictEqual(row[0], 'Helix');
   });
   it('Add table with a specific name that is also the generated one', async () => {
-    const table = await book.addTable('Sheet1!A1:C1', true, 'Table2');
+    const table = await book.addTable('sheet!A1:B4', true, 'Table2');
     assert.strictEqual(table.name, 'Table2');
   });
   it('Add table with an existing name', async () => {
-    await assert.rejects(async () => book.addTable('Sheet1!A1:C1', true, 'table'), /Table name already exists/);
+    await assert.rejects(async () => book.addTable('sheet!A1:B4', true, 'table'), /Table name already exists/);
   });
   it('Get named items', async () => {
     const values = await book.getNamedItems();
