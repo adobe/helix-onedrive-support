@@ -84,7 +84,7 @@ describe('Workbook Tests', () => {
     assert.strictEqual(row[0], 'Helix');
   });
   it('Add table with a specific name that is also the generated one', async () => {
-    const table = await book.addTable('sheet!A1:B4', true, 'Table2');
+    const table = await book.addTable('sheet!A1:B4', false, 'Table2');
     assert.strictEqual(table.name, 'Table2');
   });
   it('Add table with an existing name', async () => {
