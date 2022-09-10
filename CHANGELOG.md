@@ -1,3 +1,10 @@
+# [8.3.0](https://github.com/adobe/helix-onedrive-support/compare/v8.2.8...v8.3.0) (2022-09-10)
+
+
+### Features
+
+* support delete column ([#298](https://github.com/adobe/helix-onedrive-support/issues/298)) ([9e41fbd](https://github.com/adobe/helix-onedrive-support/commit/9e41fbdb091f372314bb2311a1c912315c108111))
+
 ## [8.2.8](https://github.com/adobe/helix-onedrive-support/compare/v8.2.7...v8.2.8) (2022-09-03)
 
 
