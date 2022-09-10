@@ -51,7 +51,7 @@ export declare interface Workbook {
    * @param hasHeaders whether the table has headers
    * @param name optional name
    */
-   addTable(address: string, hasHeaders: boolean, name?: string): Promise<Table>;
+  addTable(address: string, hasHeaders: boolean, name?: string): Promise<Table>;
 
   /**
    * Return the named items in a work book

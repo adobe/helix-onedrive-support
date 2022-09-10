@@ -86,11 +86,17 @@ export declare interface Table {
    */
    getColumn(name: string): Promise<string[]>;
 
-   /**
+  /**
    * Add a column to an existing table
    * @param name name of new column
    * @param index zero-based index or missing to add at end
    * @returns new column
    */
-   addColumn(name:string, index?:number): Promise<DriveItem>;
+  addColumn(name:string, index?:number): Promise<DriveItem>;
+
+  /**
+   * Delete a column from the table
+   * @param name column name
+   */
+  deleteColumn(name: string): Promise<void>;
 }

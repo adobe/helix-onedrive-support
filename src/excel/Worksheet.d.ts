@@ -82,5 +82,5 @@ export declare interface Worksheet {
    * Returns a new range object that spans the address given
    * @param address address, e.g. A1:C2
    */
-   range(address): Range;
+  range(address): Range;
 }
