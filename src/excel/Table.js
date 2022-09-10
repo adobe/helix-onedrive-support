@@ -116,12 +116,18 @@ export class Table {
     const body = {
       name,
     };
-    if (index) {
+    if (index !== undefined) {
       body.index = index;
     }
     return this._oneDrive.doFetch(`${this.uri}/columns`, false, {
       method: 'POST',
       body,
+    });
+  }
+
+  async deleteColumn(name) {
+    return this._oneDrive.doFetch(`${this.uri}/columns/${name}`, true, {
+      method: 'DELETE',
     });
   }
 

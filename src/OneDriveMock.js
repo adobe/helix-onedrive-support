@@ -96,6 +96,7 @@ function handleTable(container, segs, method, body) {
   }
   let command;
   let name;
+  let index;
   if (segs[0]) {
     [, command, , name] = segs.shift().match(/([^?(]+)(\('([^)]+)'\))?(\?(.+))?/);
   }
@@ -113,7 +114,7 @@ function handleTable(container, segs, method, body) {
         table.rows.push(...body.values);
         return { index: table.rows.length - 1 };
       }
-      const index = parseInt(subCommand.replace(/itemAt\(index=([0-9]+)\)/, '$1'), 10);
+      index = parseInt(subCommand.replace(/itemAt\(index=([0-9]+)\)/, '$1'), 10);
       if (index < 0 || index >= table.rows.length) {
         throw new StatusCodeError(`Index out of range: ${index}`, 400);
       }
@@ -127,7 +128,27 @@ function handleTable(container, segs, method, body) {
       return { values: [table.rows[index]] };
     }
     case 'columns': {
+      if (method === 'DELETE') {
+        const headerName = segs.shift();
+        index = table.headerNames.indexOf(headerName);
+        if (index === -1) {
+          throw new StatusCodeError(`Column name not found: ${headerName}`, 400);
+        }
+        table.headerNames.splice(index, 1);
+        table.rows.forEach((row) => {
+          row.splice(index, 1);
+        });
+        return null;
+      }
+      if (body) {
+        ({ name, index = table.headerNames.length } = body);
+        table.headerNames.splice(index, 0, name);
+        table.rows.forEach((row) => {
+          row.splice(index, 0, '');
+        });
+      }
       if (!name) {
+        // return all columns and their data
         const cols = table.headerNames.map((n) => ({
           name: n,
           values: [[n]],
@@ -142,7 +163,7 @@ function handleTable(container, segs, method, body) {
         };
       }
       const columnName = name;
-      const index = table.headerNames.findIndex((n) => n === columnName);
+      index = table.headerNames.findIndex((n) => n === columnName);
       if (index === -1) {
         throw new StatusCodeError(`Column name not found: ${columnName}`, 400);
       }
