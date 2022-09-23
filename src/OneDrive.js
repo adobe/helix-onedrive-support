@@ -11,13 +11,13 @@
  */
 
 // eslint-disable-next-line max-classes-per-file
-import { keepAliveNoCache } from '@adobe/helix-fetch';
+import { keepAliveNoCache } from '@adobe/fetch';
 import { Workbook } from './excel/Workbook.js';
 import { StatusCodeError } from './StatusCodeError.js';
 import { editDistance, sanitizeName, splitByExtension } from './utils.js';
 import { SharePointSite } from './SharePointSite.js';
 
-const { fetch, reset } = keepAliveNoCache({ userAgent: 'helix-fetch' });
+const { fetch, reset } = keepAliveNoCache({ userAgent: 'adobe-fetch' });
 /**
  * the maximum subscription time in milliseconds
  * @see https://docs.microsoft.com/en-us/graph/api/resources/subscription?view=graph-rest-1.0#maximum-length-of-subscription-per-resource-type

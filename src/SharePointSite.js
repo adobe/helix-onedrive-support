@@ -9,10 +9,10 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { keepAliveNoCache } from '@adobe/helix-fetch';
+import { keepAliveNoCache } from '@adobe/fetch';
 import { StatusCodeError } from './StatusCodeError.js';
 
-const { fetch } = keepAliveNoCache({ userAgent: 'helix-fetch' });
+const { fetch } = keepAliveNoCache({ userAgent: 'adobe-fetch' });
 
 /**
  * Helper class accessing folders and files using the SharePoint V1 API.

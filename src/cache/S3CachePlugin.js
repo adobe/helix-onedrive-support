@@ -15,7 +15,7 @@ import {
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
-import { Response } from '@adobe/helix-fetch';
+import { Response } from '@adobe/fetch';
 import { decrypt, encrypt } from './encrypt.js';
 
 /**
