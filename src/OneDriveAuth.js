@@ -11,13 +11,13 @@
  */
 
 // eslint-disable-next-line max-classes-per-file
-import { keepAliveNoCache } from '@adobe/helix-fetch';
+import { keepAliveNoCache } from '@adobe/fetch';
 import { ConfidentialClientApplication, LogLevel } from '@azure/msal-node';
 import { decodeJwt } from 'jose';
 import { MemCachePlugin } from './cache/MemCachePlugin.js';
 import { StatusCodeError } from './StatusCodeError.js';
 
-const { fetch, reset } = keepAliveNoCache({ userAgent: 'helix-fetch' });
+const { fetch, reset } = keepAliveNoCache({ userAgent: 'adobe-fetch' });
 
 const AZ_AUTHORITY_HOST_URL = 'https://login.windows.net';
 const AZ_COMMON_TENANT = 'common';

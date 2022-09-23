@@ -10,7 +10,7 @@
  * governing permissions and limitations under the License.
  */
 
-import { AbortError, FetchError } from '@adobe/helix-fetch';
+import { AbortError, FetchError } from '@adobe/fetch';
 
 /**
  * Internal error class
