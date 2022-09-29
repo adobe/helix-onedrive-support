@@ -17,8 +17,6 @@ import { decodeJwt } from 'jose';
 import { MemCachePlugin } from './cache/MemCachePlugin.js';
 import { StatusCodeError } from './StatusCodeError.js';
 
-const { fetch, reset } = keepAliveNoCache({ userAgent: 'adobe-fetch' });
-
 const AZ_AUTHORITY_HOST_URL = 'https://login.windows.net';
 const AZ_COMMON_TENANT = 'common';
 
@@ -54,6 +52,8 @@ export class OneDriveAuth {
    * @param {OneDriveAuthOptions} opts Options
    */
   constructor(opts) {
+    this.fetchContext = keepAliveNoCache({ userAgent: 'adobe-fetch' });
+
     if (!opts.clientId) {
       throw new Error('Missing clientId.');
     }
@@ -119,6 +119,7 @@ export class OneDriveAuth {
   async resolveTenant(tenantHostName) {
     const { log } = this;
     const configUrl = `https://login.windows.net/${tenantHostName}.onmicrosoft.com/.well-known/openid-configuration`;
+    const { fetch } = this.fetchContext;
     const res = await fetch(configUrl);
     if (!res.ok) {
       log.info(`error fetching openid-configuration for ${tenantHostName}: ${res.status}. Fallback to 'common'`);
@@ -187,6 +188,7 @@ export class OneDriveAuth {
   // eslint-disable-next-line class-methods-use-this
   async dispose() {
     // TODO: clear other state?
+    const { reset } = this.fetchContext;
     return reset();
   }
 
