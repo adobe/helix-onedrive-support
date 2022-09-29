@@ -1,3 +1,10 @@
+## [8.3.6](https://github.com/adobe/helix-onedrive-support/compare/v8.3.5...v8.3.6) (2022-09-29)
+
+
+### Bug Fixes
+
+* OneDriveAuth: properly scoped fetch context ([#304](https://github.com/adobe/helix-onedrive-support/issues/304)) ([faa92f1](https://github.com/adobe/helix-onedrive-support/commit/faa92f1dcc65f6a0faca7c611f41e303ffa7d9ec))
+
 ## [8.3.5](https://github.com/adobe/helix-onedrive-support/compare/v8.3.4...v8.3.5) (2022-09-29)
 
 
