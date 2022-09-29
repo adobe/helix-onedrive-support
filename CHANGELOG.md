@@ -1,3 +1,10 @@
+## [8.3.5](https://github.com/adobe/helix-onedrive-support/compare/v8.3.4...v8.3.5) (2022-09-29)
+
+
+### Bug Fixes
+
+* properly scoped fetch context ([388bd99](https://github.com/adobe/helix-onedrive-support/commit/388bd9929e8fe47ebcdd51dbad9c354ab19c45f3))
+
 ## [8.3.4](https://github.com/adobe/helix-onedrive-support/compare/v8.3.3...v8.3.4) (2022-09-25)
 
 
