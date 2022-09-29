@@ -17,7 +17,6 @@ import { StatusCodeError } from './StatusCodeError.js';
 import { editDistance, sanitizeName, splitByExtension } from './utils.js';
 import { SharePointSite } from './SharePointSite.js';
 
-const { fetch, reset } = keepAliveNoCache({ userAgent: 'adobe-fetch' });
 /**
  * the maximum subscription time in milliseconds
  * @see https://docs.microsoft.com/en-us/graph/api/resources/subscription?view=graph-rest-1.0#maximum-length-of-subscription-per-resource-type
@@ -87,6 +86,8 @@ export class OneDrive {
    * @param {OneDriveOptions} opts Options
    */
   constructor(opts) {
+    this.fetchContext = keepAliveNoCache({ userAgent: 'adobe-fetch' });
+
     if (!opts.auth) {
       throw new Error('Missing auth.');
     }
@@ -104,6 +105,7 @@ export class OneDrive {
   async dispose() {
     // TODO: clear other state?
     await this.auth.dispose();
+    const { reset } = this.fetchContext;
     return reset();
   }
 
@@ -124,6 +126,7 @@ export class OneDrive {
     opts.headers.authorization = `Bearer ${accessToken}`;
     const url = `https://graph.microsoft.com/v1.0${relUrl}`;
     try {
+      const { fetch } = this.fetchContext;
       const resp = await fetch(url, opts);
       if (!resp.ok) {
         const text = await resp.text();
