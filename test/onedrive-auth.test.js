@@ -94,11 +94,9 @@ describe('OneDriveAuth Tests', () => {
       idToken: '',
       idTokenClaims: {},
       msGraphHost: '',
+      requestId: '',
       scopes: [
         'https://graph.microsoft.com/.default',
-        'openid',
-        'profile',
-        'offline_access',
       ],
       state: '',
       tenantId: '',
