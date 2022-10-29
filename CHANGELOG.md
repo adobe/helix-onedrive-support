@@ -1,3 +1,10 @@
+## [8.3.14](https://github.com/adobe/helix-onedrive-support/compare/v8.3.13...v8.3.14) (2022-10-29)
+
+
+### Bug Fixes
+
+* **deps:** update external fixes ([1db559e](https://github.com/adobe/helix-onedrive-support/commit/1db559efb04e67d76633d15e169e405c1abf9c04))
+
 ## [8.3.13](https://github.com/adobe/helix-onedrive-support/compare/v8.3.12...v8.3.13) (2022-10-25)
 
 
