@@ -101,7 +101,7 @@ export class OneDriveAuth {
               log[MSAL_LOG_LEVELS[loglevel]](message);
             },
             piiLoggingEnabled: false,
-            logLevel: LogLevel.Verbose,
+            logLevel: LogLevel.Warning,
           },
         },
       };

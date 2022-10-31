@@ -38,7 +38,7 @@ export class MemCachePlugin {
   }
 
   async deleteCache() {
-    this.log.info('mem: delete token cache', this.key);
+    this.log.debug('mem: delete token cache', this.key);
     this.caches.delete(this.key);
     if (this.base) {
       await this.base.deleteCache();
@@ -50,16 +50,16 @@ export class MemCachePlugin {
    */
   async beforeCacheAccess(cacheContext) {
     try {
-      this.log.info('mem: read token cache', this.key);
+      this.log.debug('mem: read token cache', this.key);
       const cache = this.caches.get(this.key);
       if (cache) {
         cacheContext.tokenCache.deserialize(cache);
         return true;
       } else if (this.base) {
-        this.log.info('mem: read token cache failed. asking base');
+        this.log.debug('mem: read token cache failed. asking base');
         const ret = await this.base.beforeCacheAccess(cacheContext);
         if (ret) {
-          this.log.info('mem: base updated. remember.');
+          this.log.debug('mem: base updated. remember.');
           this.caches.set(this.key, cacheContext.tokenCache.serialize());
         }
         return ret;
@@ -75,10 +75,10 @@ export class MemCachePlugin {
    */
   async afterCacheAccess(cacheContext) {
     if (cacheContext.cacheHasChanged) {
-      this.log.info('mem: write token cache', this.key);
+      this.log.debug('mem: write token cache', this.key);
       this.caches.set(this.key, cacheContext.tokenCache.serialize());
       if (this.base) {
-        this.log.info('mem: write token cache done. telling base', this.key);
+        this.log.debug('mem: write token cache done. telling base', this.key);
         return this.base.afterCacheAccess(cacheContext);
       }
       return true;

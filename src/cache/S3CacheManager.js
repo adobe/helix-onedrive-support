@@ -59,7 +59,7 @@ export class S3CacheManager {
     const {
       log, s3, bucket, prefix,
     } = this;
-    log.info('s3: list token cache', prefix);
+    log.debug('s3: list token cache', prefix);
     try {
       const res = await s3.send(new ListObjectsV2Command({
         Bucket: bucket,
