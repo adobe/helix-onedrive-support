@@ -1,3 +1,10 @@
+# [8.4.0](https://github.com/adobe/helix-onedrive-support/compare/v8.3.14...v8.4.0) (2022-11-01)
+
+
+### Features
+
+* reduce verbosity in onedrive logs ([#313](https://github.com/adobe/helix-onedrive-support/issues/313)) ([2b2a476](https://github.com/adobe/helix-onedrive-support/commit/2b2a476d4cc29b3841667f3ae705a629e11ec476))
+
 ## [8.3.14](https://github.com/adobe/helix-onedrive-support/compare/v8.3.13...v8.3.14) (2022-10-29)
 
 
