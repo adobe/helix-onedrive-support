@@ -44,7 +44,7 @@ export class S3CachePlugin {
   async deleteCache() {
     const { log, key, bucket } = this;
     try {
-      log.info('s3: read token cache', key);
+      log.debug('s3: read token cache', key);
       await this.s3.send(new DeleteObjectCommand({
         Bucket: bucket,
         Key: key,
@@ -63,7 +63,7 @@ export class S3CachePlugin {
       log, secret, key, bucket,
     } = this;
     try {
-      log.info('s3: read token cache', key);
+      log.debug('s3: read token cache', key);
       const res = await this.s3.send(new GetObjectCommand({
         Bucket: bucket,
         Key: key,
@@ -92,7 +92,7 @@ export class S3CachePlugin {
         log, secret, key, bucket,
       } = this;
       try {
-        log.info('s3: write token cache', key);
+        log.debug('s3: write token cache', key);
         let data = cacheContext.tokenCache.serialize();
         if (secret) {
           data = encrypt(secret, Buffer.from(data, 'utf-8'));
