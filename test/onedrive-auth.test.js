@@ -119,7 +119,7 @@ describe('OneDriveAuth Tests', () => {
 
   it('resolves the tenant from a share link and caches it', async () => {
     nock(AZ_AUTHORITY_HOST_URL)
-      .get('/onedrive.onmicrosoft.com/.well-known/openid-configuration')
+      .get('/somedrive.onmicrosoft.com/.well-known/openid-configuration')
       .reply(200, {
         issuer: 'https://sts.windows.net/c0452eed-9384-4001-b1b1-71b3d5cf28ad/',
       });
@@ -132,7 +132,7 @@ describe('OneDriveAuth Tests', () => {
       tenantCache,
     });
     await od1.initTenantFromMountPoint({
-      url: 'https://onedrive.com/a/b/c/d2',
+      url: 'https://somedrive.com/a/b/c/d2',
     });
 
     const od2 = new OneDriveAuth({
@@ -141,11 +141,35 @@ describe('OneDriveAuth Tests', () => {
       localAuthCache: true,
       tenantCache,
     });
-    await od2.initTenantFromUrl('https://onedrive.com/a/b/c/d2');
+    await od2.initTenantFromUrl('https://somedrive.com/a/b/c/d2');
 
     assert.deepStrictEqual(Object.fromEntries(tenantCache.entries()), {
-      onedrive: 'c0452eed-9384-4001-b1b1-71b3d5cf28ad',
+      somedrive: 'c0452eed-9384-4001-b1b1-71b3d5cf28ad',
     });
+  });
+
+  it('resolves the onedrive.live.com urls', async () => {
+    const od = new OneDriveAuth({
+      clientId: 'foobar',
+      refreshToken: 'dummy',
+      localAuthCache: true,
+    });
+    await od.initTenantFromMountPoint({
+      url: 'https://onedrive.live.com/a/b/c/d2',
+    });
+    assert.strictEqual(od.tenant, 'common');
+  });
+
+  it('resolves the 1drv.ms urls', async () => {
+    const od = new OneDriveAuth({
+      clientId: 'foobar',
+      refreshToken: 'dummy',
+      localAuthCache: true,
+    });
+    await od.initTenantFromMountPoint({
+      url: 'https://1drv.ms/a/b/c/d2',
+    });
+    assert.strictEqual(od.tenant, 'common');
   });
 
   it('resolves the tenant from a sharepoint share link and caches it', async () => {
@@ -170,7 +194,7 @@ describe('OneDriveAuth Tests', () => {
 
   it('resolves the tenant from a share link and ignores cache', async () => {
     nock(AZ_AUTHORITY_HOST_URL)
-      .get('/onedrive.onmicrosoft.com/.well-known/openid-configuration')
+      .get('/sonedrive.onmicrosoft.com/.well-known/openid-configuration')
       .twice()
       .reply(200, {
         issuer: 'https://sts.windows.net/c0452eed-9384-4001-b1b1-71b3d5cf28ad/',
@@ -182,9 +206,9 @@ describe('OneDriveAuth Tests', () => {
       localAuthCache: true,
       noTenantCache: true,
     });
-    await od1.initTenantFromUrl('https://onedrive.com/a/b/c/d2');
+    await od1.initTenantFromUrl('https://sonedrive.com/a/b/c/d2');
     delete od1.tenant;
-    await od1.initTenantFromUrl('https://onedrive.com/a/b/c/d2');
+    await od1.initTenantFromUrl('https://sonedrive.com/a/b/c/d2');
 
     // this should not fetch it again
     await od1.initTenantFromMountPoint({
