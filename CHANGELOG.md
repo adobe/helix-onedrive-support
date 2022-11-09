@@ -1,3 +1,10 @@
+## [8.4.2](https://github.com/adobe/helix-onedrive-support/compare/v8.4.1...v8.4.2) (2022-11-09)
+
+
+### Bug Fixes
+
+* hardcode onedrive tenants for personal accounts ([#315](https://github.com/adobe/helix-onedrive-support/issues/315)) ([8489388](https://github.com/adobe/helix-onedrive-support/commit/8489388190551beffa1ff88e12ee44c7a2115f97))
+
 ## [8.4.1](https://github.com/adobe/helix-onedrive-support/compare/v8.4.0...v8.4.1) (2022-11-07)
 
 
