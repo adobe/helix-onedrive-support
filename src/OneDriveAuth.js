@@ -118,6 +118,10 @@ export class OneDriveAuth {
 
   async resolveTenant(tenantHostName) {
     const { log } = this;
+    if (tenantHostName === 'onedrive' || tenantHostName === '1drv') {
+      log.info(`forcing 'common' tenant for '${tenantHostName}'.`);
+      return AZ_COMMON_TENANT;
+    }
     const configUrl = `https://login.windows.net/${tenantHostName}.onmicrosoft.com/.well-known/openid-configuration`;
     const { fetch } = this.fetchContext;
     const res = await fetch(configUrl);
