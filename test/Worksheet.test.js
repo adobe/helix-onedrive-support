@@ -100,8 +100,8 @@ describe('Worksheet Tests', () => {
   });
   it('Get all data', async () => {
     const range = sheet.usedRange();
-    const address = await range.getData();
-    assert.deepStrictEqual(address, oneDrive.workbooks[0].data.sheets[0].usedRange);
+    const data = await range.getData();
+    assert.deepStrictEqual(data, oneDrive.workbooks[0].data.sheets[0].usedRange);
   });
   it('Get column names', async () => {
     const range = sheet.usedRange();
@@ -110,8 +110,10 @@ describe('Worksheet Tests', () => {
   });
   it('Get rows as objects', async () => {
     const range = sheet.usedRange();
-    const data = await range.getRowsAsObjects();
-    assert.deepStrictEqual(data, [
+    const data = await range.getData();
+    assert.strictEqual(data.address, 'sheet!A1:B4');
+    const rows = await range.getRowsAsObjects();
+    assert.deepStrictEqual(rows, [
       { '  c r e a t e d  ': 2018, project: 'Helix' },
       { '  c r e a t e d  ': 2019, project: 'What' },
       { '  c r e a t e d  ': 2020, project: 'this' },
@@ -127,5 +129,17 @@ describe('Worksheet Tests', () => {
       { 'c r e a t e d': '2020', project: 'this' },
       { 'c r e a t e d': '2021', project: 'Space' },
     ]);
+  });
+  it('Replace usedRange', async () => {
+    const values = [
+      ['', ''],
+      ['', ''],
+      ['', ''],
+      ['', ''],
+      ['', ''],
+    ];
+    const range = sheet.usedRange();
+    await range.update(values);
+    assert.deepStrictEqual(values, await range.getValues());
   });
 });
