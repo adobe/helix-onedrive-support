@@ -691,7 +691,7 @@ describe('OneDrive Tests', () => {
     assert(Buffer.isBuffer(result));
   });
 
-  it('cat getWorkbook', async () => {
+  it('can getWorkbook', async () => {
     const fileItem = {
       parentReference: {
         driveId: '1',
