@@ -131,6 +131,58 @@ describe('OneDriveAuth Tests', () => {
     assert.strictEqual(await od.isAuthenticated(), false);
   });
 
+  it('can authenticate with device code', async () => {
+    nock('https://login.microsoftonline.com')
+      .get('/common/discovery/instance?api-version=1.1&authorization_endpoint=https://login.windows.net/common/oauth2/v2.0/authorize')
+      .reply(200, {
+        tenant_discovery_endpoint: 'https://login.windows.net/common/v2.0/.well-known/openid-configuration',
+        'api-version': '1.1',
+        metadata: [
+          {
+            preferred_network: 'login.microsoftonline.com',
+            preferred_cache: 'login.windows.net',
+            aliases: [
+              'login.microsoftonline.com',
+              'login.windows.net',
+            ],
+          },
+        ],
+      })
+      .get('/common/v2.0/.well-known/openid-configuration')
+      .reply(200, {
+        token_endpoint: 'https://login.microsoftonline.com/common/oauth2/v2.0/token',
+        issuer: 'https://login.microsoftonline.com/{tenantid}/v2.0',
+        authorization_endpoint: 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize',
+      })
+      .post('/common/oauth2/v2.0/devicecode')
+      .reply(200, {
+        device_code: 'DAQABAAEAAAD',
+        expires_in: 900,
+        interval: 5,
+        message: 'To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code DTSWBVY27 to authenticate.',
+        user_code: 'DTSWBVY27',
+        verification_uri: 'https://microsoft.com/devicelogin',
+      })
+      .post('/common/oauth2/v2.0/token')
+      .reply(200, {
+        token_type: 'Bearer',
+        refresh_token: 'dummy',
+        access_token: 'dummy',
+        expires_in: 81000,
+      });
+
+    const od = new OneDriveAuth({
+      clientId: '83ab2922-5f11-4e4d-96f3-d1e0ff152856',
+      clientSecret: 'test-client-secret',
+      resource: 'test-resource',
+      tenant: 'common',
+      onCode: async (code) => {
+        assert.strictEqual(code.userCode, 'DTSWBVY27');
+      },
+    });
+    await od.authenticate();
+  });
+
   it('uses the tenant from a mountpoint', async () => {
     const od = new OneDriveAuth({
       clientId: 'foobar',
