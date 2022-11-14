@@ -14,10 +14,10 @@ import {AuthenticationResult, ClientApplication, ICachePlugin} from "@azure/msal
 export declare interface OneDriveAuthOptions {
   clientId: string;
   clientSecret?: string;
-  refreshToken?: string;
   log?: Console;
   tenant?: string;
   scopes?: string[];
+  onCode?: Function;
   localAuthCache?:boolean;
 
   /**
@@ -75,14 +75,6 @@ export declare class OneDriveAuth {
    * the authority url for login.
    */
   getAuthorityUrl(): string;
-
-  /**
-   * Performs a login using an interactive flow which prompts the user to open a browser window and
-   * enter the authorization code.
-   * @params {function} [onCode] - optional function that gets invoked after code was retrieved.
-   * @returns {Promise<AuthenticationResult>}
-   */
-  acquireTokenByDeviceCode(onCode: Function): Promise<AuthenticationResult>;
 
   /**
    * Sets the access token to use for all requests. if the token is a valid JWT token,
