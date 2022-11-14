@@ -48,7 +48,10 @@ export class FSCachePlugin {
       cacheContext.tokenCache.deserialize(await fs.readFile(filePath, 'utf-8'));
       return true;
     } catch (e) {
-      log.warn('FSCachePlugin: unable to deserialize', e);
+      if (e.code !== 'ENOENT') {
+        // only log warnings if file exists, otherwise ignore
+        log.warn('FSCachePlugin: unable to deserialize', e);
+      }
     }
     return false;
   }

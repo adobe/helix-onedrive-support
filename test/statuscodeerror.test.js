@@ -12,6 +12,7 @@
 
 /* eslint-env mocha */
 
+import { AbortError, FetchError } from '@adobe/fetch';
 import assert from 'assert';
 import { StatusCodeError } from '../src/index.js';
 
@@ -40,5 +41,30 @@ describe('StatusCodeError Tests', () => {
     const e = StatusCodeError.fromErrorResponse(error, 404);
     assert.strictEqual(e.statusCode, 404);
     assert.deepStrictEqual(e.details, { code: 'itemNotFound' });
+  });
+
+  it('fromErrorResponse gets message from inner error', async () => {
+    const error = {
+      message: 'iten was not found',
+    };
+    const e = StatusCodeError.fromErrorResponse({ error }, 404);
+    assert.strictEqual(e.statusCode, 404);
+    assert.deepStrictEqual(e.details, { message: error.message });
+  });
+
+  it('fromError recognizes AbortError', async () => {
+    const error = new AbortError('aborted');
+    const e = StatusCodeError.fromError(error);
+    assert.strictEqual(e.statusCode, 504);
+  });
+
+  it('fromError recognizes FetchError', async () => {
+    let error = new FetchError('whoops!', 'system', { code: 'ECONNRESET' });
+    let e = StatusCodeError.fromError(error);
+    assert.strictEqual(e.statusCode, 504);
+
+    error = new FetchError('whoops!', 'system', { code: 'ETIMEDOUT' });
+    e = StatusCodeError.fromError(error);
+    assert.strictEqual(e.statusCode, 504);
   });
 });

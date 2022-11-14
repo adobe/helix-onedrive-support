@@ -183,6 +183,20 @@ function handleTable(container, segs, method, body) {
 }
 
 /**
+ * Handle operations on a range.
+ * @param {object} range The mock range
+ * @param {string} method Request method
+ * @param {object} body Request body
+ * @returns {object} The response value
+ */
+function handleRange(range, method, body) {
+  if (method === 'PATCH') {
+    range.values = body;
+  }
+  return range;
+}
+
+/**
  * Mock OneDrive client that supports some of the operations the `OneDrive` class does.
  */
 export class OneDriveMock extends OneDrive {
@@ -358,7 +372,7 @@ export class OneDriveMock extends OneDrive {
     const type = segs.shift();
     switch (type) {
       case 'usedRange':
-        return sheet.usedRange;
+        return handleRange(sheet.usedRange, method, body);
       case 'tables':
         return handleTable(sheet, segs, method, body);
       case 'names':

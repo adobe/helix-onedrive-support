@@ -41,6 +41,31 @@ describe('OneDriveAuth Tests', () => {
     assert.ok(auth);
   });
 
+  it('can be disposed.', async () => {
+    const auth = new OneDriveAuth({
+      clientId: 'foo',
+      clientSecret: 'bar',
+    });
+    await assert.doesNotReject(async () => auth.dispose());
+  });
+
+  it('throws when username/password are specified', async () => {
+    assert.throws(() => new OneDriveAuth({
+      clientId: 'foo',
+      clientSecret: 'bar',
+      username: 'bob',
+      password: 'secret',
+    }), Error('Username/password authentication no longer supported.'));
+  });
+
+  it('throws when refresh token is specified', async () => {
+    assert.throws(() => new OneDriveAuth({
+      clientId: 'foo',
+      clientSecret: 'bar',
+      refreshToken: 'dummy',
+    }), Error('Refresh token no longer supported.'));
+  });
+
   it('can authenticate against a resource', async () => {
     nock('https://login.microsoftonline.com')
       .get('/common/discovery/instance?api-version=1.1&authorization_endpoint=https://login.windows.net/common/oauth2/v2.0/authorize')
@@ -103,12 +128,72 @@ describe('OneDriveAuth Tests', () => {
       tokenType: 'Bearer',
       uniqueId: '',
     });
+    assert.strictEqual(await od.isAuthenticated(), false);
+  });
+
+  it('can authenticate with device code', async () => {
+    nock('https://login.microsoftonline.com')
+      .get('/common/discovery/instance?api-version=1.1&authorization_endpoint=https://login.windows.net/common/oauth2/v2.0/authorize')
+      .reply(200, {
+        tenant_discovery_endpoint: 'https://login.windows.net/common/v2.0/.well-known/openid-configuration',
+        'api-version': '1.1',
+        metadata: [
+          {
+            preferred_network: 'login.microsoftonline.com',
+            preferred_cache: 'login.windows.net',
+            aliases: [
+              'login.microsoftonline.com',
+              'login.windows.net',
+            ],
+          },
+        ],
+      })
+      .get('/common/v2.0/.well-known/openid-configuration')
+      .reply(200, {
+        token_endpoint: 'https://login.microsoftonline.com/common/oauth2/v2.0/token',
+        issuer: 'https://login.microsoftonline.com/{tenantid}/v2.0',
+        authorization_endpoint: 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize',
+      })
+      .post('/common/oauth2/v2.0/devicecode')
+      .reply(200, {
+        device_code: 'DAQABAAEAAAD',
+        expires_in: 900,
+        interval: 5,
+        message: 'To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code DTSWBVY27 to authenticate.',
+        user_code: 'DTSWBVY27',
+        verification_uri: 'https://microsoft.com/devicelogin',
+      })
+      .post('/common/oauth2/v2.0/token')
+      .reply(200, {
+        token_type: 'Bearer',
+        refresh_token: 'dummy',
+        access_token: 'dummy',
+        expires_in: 81000,
+        id_token: new UnsecuredJWT({
+          sub: 'test',
+        }).encode(),
+        client_info: Buffer.from(JSON.stringify({
+          uid: 'Bob',
+          utid: 'common',
+        })).toString('base64'),
+      });
+
+    const od = new OneDriveAuth({
+      clientId: '83ab2922-5f11-4e4d-96f3-d1e0ff152856',
+      clientSecret: 'test-client-secret',
+      resource: 'test-resource',
+      tenant: 'common',
+      onCode: async (code) => {
+        assert.strictEqual(code.userCode, 'DTSWBVY27');
+      },
+    });
+    await od.authenticate();
+    assert.strictEqual(await od.isAuthenticated(), true);
   });
 
   it('uses the tenant from a mountpoint', async () => {
     const od = new OneDriveAuth({
       clientId: 'foobar',
-      refreshToken: 'dummy',
       localAuthCache: true,
     });
     await od.initTenantFromMountPoint({
@@ -127,7 +212,6 @@ describe('OneDriveAuth Tests', () => {
     const tenantCache = new Map();
     const od1 = new OneDriveAuth({
       clientId: 'foobar',
-      refreshToken: 'dummy',
       localAuthCache: true,
       tenantCache,
     });
@@ -137,7 +221,6 @@ describe('OneDriveAuth Tests', () => {
 
     const od2 = new OneDriveAuth({
       clientId: 'foobar',
-      refreshToken: 'dummy',
       localAuthCache: true,
       tenantCache,
     });
@@ -148,10 +231,49 @@ describe('OneDriveAuth Tests', () => {
     });
   });
 
+  it('returns common tenant if resolving the tenant fails', async () => {
+    nock(AZ_AUTHORITY_HOST_URL)
+      .get('/somedrive.onmicrosoft.com/.well-known/openid-configuration')
+      .reply(404);
+
+    const tenantCache = new Map();
+    const od = new OneDriveAuth({
+      clientId: 'foobar',
+      localAuthCache: true,
+      tenantCache,
+    });
+    await od.initTenantFromMountPoint({
+      url: 'https://somedrive.com/a/b/c/d2',
+    });
+
+    assert.deepStrictEqual(Object.fromEntries(tenantCache.entries()), {
+      somedrive: 'common',
+    });
+  });
+
+  it('returns common tenant if resolving the tenant returns no issuer', async () => {
+    nock(AZ_AUTHORITY_HOST_URL)
+      .get('/somedrive.onmicrosoft.com/.well-known/openid-configuration')
+      .reply(200, {});
+
+    const tenantCache = new Map();
+    const od = new OneDriveAuth({
+      clientId: 'foobar',
+      localAuthCache: true,
+      tenantCache,
+    });
+    await od.initTenantFromMountPoint({
+      url: 'https://somedrive.com/a/b/c/d2',
+    });
+
+    assert.deepStrictEqual(Object.fromEntries(tenantCache.entries()), {
+      somedrive: 'common',
+    });
+  });
+
   it('resolves the onedrive.live.com urls', async () => {
     const od = new OneDriveAuth({
       clientId: 'foobar',
-      refreshToken: 'dummy',
       localAuthCache: true,
     });
     await od.initTenantFromMountPoint({
@@ -163,7 +285,6 @@ describe('OneDriveAuth Tests', () => {
   it('resolves the 1drv.ms urls', async () => {
     const od = new OneDriveAuth({
       clientId: 'foobar',
-      refreshToken: 'dummy',
       localAuthCache: true,
     });
     await od.initTenantFromMountPoint({
@@ -182,11 +303,12 @@ describe('OneDriveAuth Tests', () => {
     const tenantCache = new Map();
     const od1 = new OneDriveAuth({
       clientId: 'foobar',
-      refreshToken: 'dummy',
       localAuthCache: true,
       tenantCache,
     });
     await od1.initTenantFromUrl(new URL('https://adobe-my.sharepoint.com/a/b/c/d2'));
+    await od1.initTenantFromUrl(new URL('https://adobe-my.sharepoint.com/a/b/c/d2'));
+
     assert.deepStrictEqual(Object.fromEntries(tenantCache.entries()), {
       adobe: 'c0452eed-9384-4001-b1b1-71b3d5cf28ad',
     });
@@ -202,7 +324,6 @@ describe('OneDriveAuth Tests', () => {
 
     const od1 = new OneDriveAuth({
       clientId: 'foobar',
-      refreshToken: 'dummy',
       localAuthCache: true,
       noTenantCache: true,
     });
@@ -225,7 +346,6 @@ describe('OneDriveAuth Tests', () => {
 
     const od = new OneDriveAuth({
       clientId: 'foobar',
-      refreshToken: 'dummy',
       localAuthCache: true,
       noTenantCache: true,
     });
@@ -235,5 +355,35 @@ describe('OneDriveAuth Tests', () => {
     assert.strictEqual(accessToken.accessToken, bearerToken);
     assert.strictEqual(accessToken.tenantId, 'test-tenantid');
     assert.strictEqual(od.tenant, 'test-tenantid');
+  });
+
+  it('getAuthorityUrl without tenant resolution throws', async () => {
+    const od = new OneDriveAuth({
+      clientId: 'foobar',
+      localAuthCache: true,
+      noTenantCache: true,
+    });
+    assert.throws(() => od.getAuthorityUrl());
+  });
+
+  it('setAccessToken warns when token is invalid', async () => {
+    const od = new OneDriveAuth({
+      clientId: 'foobar',
+      localAuthCache: true,
+      noTenantCache: true,
+    });
+    od.setAccessToken('test');
+  });
+
+  it('authenticate returns null when no accounts are there in silent mode', async () => {
+    const od = new OneDriveAuth({
+      clientId: '83ab2922-5f11-4e4d-96f3-d1e0ff152856',
+      clientSecret: 'test-client-secret',
+      resource: 'test-resource',
+      tenant: 'common',
+    });
+
+    const token = await od.authenticate(true);
+    assert.strictEqual(token, null);
   });
 });
