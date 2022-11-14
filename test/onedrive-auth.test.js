@@ -58,6 +58,14 @@ describe('OneDriveAuth Tests', () => {
     }), Error('Username/password authentication no longer supported.'));
   });
 
+  it('throws when refresh token is specified', async () => {
+    assert.throws(() => new OneDriveAuth({
+      clientId: 'foo',
+      clientSecret: 'bar',
+      refreshToken: 'dummy',
+    }), Error('Refresh token no longer supported.'));
+  });
+
   it('can authenticate against a resource', async () => {
     nock('https://login.microsoftonline.com')
       .get('/common/discovery/instance?api-version=1.1&authorization_endpoint=https://login.windows.net/common/oauth2/v2.0/authorize')
@@ -126,7 +134,6 @@ describe('OneDriveAuth Tests', () => {
   it('uses the tenant from a mountpoint', async () => {
     const od = new OneDriveAuth({
       clientId: 'foobar',
-      refreshToken: 'dummy',
       localAuthCache: true,
     });
     await od.initTenantFromMountPoint({
@@ -145,7 +152,6 @@ describe('OneDriveAuth Tests', () => {
     const tenantCache = new Map();
     const od1 = new OneDriveAuth({
       clientId: 'foobar',
-      refreshToken: 'dummy',
       localAuthCache: true,
       tenantCache,
     });
@@ -155,7 +161,6 @@ describe('OneDriveAuth Tests', () => {
 
     const od2 = new OneDriveAuth({
       clientId: 'foobar',
-      refreshToken: 'dummy',
       localAuthCache: true,
       tenantCache,
     });
@@ -174,7 +179,6 @@ describe('OneDriveAuth Tests', () => {
     const tenantCache = new Map();
     const od = new OneDriveAuth({
       clientId: 'foobar',
-      refreshToken: 'dummy',
       localAuthCache: true,
       tenantCache,
     });
@@ -195,7 +199,6 @@ describe('OneDriveAuth Tests', () => {
     const tenantCache = new Map();
     const od = new OneDriveAuth({
       clientId: 'foobar',
-      refreshToken: 'dummy',
       localAuthCache: true,
       tenantCache,
     });
@@ -211,7 +214,6 @@ describe('OneDriveAuth Tests', () => {
   it('resolves the onedrive.live.com urls', async () => {
     const od = new OneDriveAuth({
       clientId: 'foobar',
-      refreshToken: 'dummy',
       localAuthCache: true,
     });
     await od.initTenantFromMountPoint({
@@ -223,7 +225,6 @@ describe('OneDriveAuth Tests', () => {
   it('resolves the 1drv.ms urls', async () => {
     const od = new OneDriveAuth({
       clientId: 'foobar',
-      refreshToken: 'dummy',
       localAuthCache: true,
     });
     await od.initTenantFromMountPoint({
@@ -242,7 +243,6 @@ describe('OneDriveAuth Tests', () => {
     const tenantCache = new Map();
     const od1 = new OneDriveAuth({
       clientId: 'foobar',
-      refreshToken: 'dummy',
       localAuthCache: true,
       tenantCache,
     });
@@ -264,7 +264,6 @@ describe('OneDriveAuth Tests', () => {
 
     const od1 = new OneDriveAuth({
       clientId: 'foobar',
-      refreshToken: 'dummy',
       localAuthCache: true,
       noTenantCache: true,
     });
@@ -287,7 +286,6 @@ describe('OneDriveAuth Tests', () => {
 
     const od = new OneDriveAuth({
       clientId: 'foobar',
-      refreshToken: 'dummy',
       localAuthCache: true,
       noTenantCache: true,
     });
@@ -302,7 +300,6 @@ describe('OneDriveAuth Tests', () => {
   it('getAuthorityUrl without tenant resolution throws', async () => {
     const od = new OneDriveAuth({
       clientId: 'foobar',
-      refreshToken: 'dummy',
       localAuthCache: true,
       noTenantCache: true,
     });
@@ -312,7 +309,6 @@ describe('OneDriveAuth Tests', () => {
   it('setAccessToken warns when token is invalid', async () => {
     const od = new OneDriveAuth({
       clientId: 'foobar',
-      refreshToken: 'dummy',
       localAuthCache: true,
       noTenantCache: true,
     });

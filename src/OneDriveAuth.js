@@ -12,7 +12,7 @@
 
 // eslint-disable-next-line max-classes-per-file
 import { keepAliveNoCache } from '@adobe/fetch';
-import { ConfidentialClientApplication, LogLevel } from '@azure/msal-node';
+import { ConfidentialClientApplication, LogLevel, PublicClientApplication } from '@azure/msal-node';
 import { decodeJwt } from 'jose';
 import { MemCachePlugin } from './cache/MemCachePlugin.js';
 import { StatusCodeError } from './StatusCodeError.js';
@@ -60,14 +60,17 @@ export class OneDriveAuth {
     if (opts.username || opts.password) {
       throw new Error('Username/password authentication no longer supported.');
     }
+    if (opts.refreshToken) {
+      throw new Error('Refresh token no longer supported.');
+    }
 
     this.clientId = opts.clientId;
     this.clientSecret = opts.clientSecret || '';
-    this.refreshToken = opts.refreshToken || '';
     this._log = opts.log || console;
     this.tenant = opts.tenant;
     this.cachePlugin = opts.cachePlugin;
     this.scopes = opts.scopes || DEFAULT_SCOPES;
+    this.onCode = opts.onCode;
 
     if (!opts.noTenantCache && !process.env.HELIX_ONEDRIVE_NO_TENANT_CACHE) {
       /** @type {Map<string, string>} */
@@ -105,13 +108,14 @@ export class OneDriveAuth {
           },
         },
       };
-
       if (cachePlugin) {
         msalConfig.cache = {
           cachePlugin,
         };
       }
-      this._app = new ConfidentialClientApplication(msalConfig);
+      this._app = this.onCode
+        ? new PublicClientApplication(msalConfig)
+        : new ConfidentialClientApplication(msalConfig);
     }
     return this._app;
   }
@@ -218,30 +222,6 @@ export class OneDriveAuth {
   }
 
   /**
-   * Performs a login using an interactive flow which prompts the user to open a browser window and
-   * enter the authorization code.
-   * @params {function} [onCode] - optional function that gets invoked after code was retrieved.
-   * @returns {Promise<AuthenticationResult>}
-   */
-  async acquireTokenByDeviceCode(onCode) {
-    const { log, app } = this;
-    try {
-      return await app.acquireTokenByDeviceCode({
-        deviceCodeCallback: async (code) => {
-          log.info(code.message);
-          if (typeof onCode === 'function') {
-            await onCode(code);
-          }
-        },
-        scopes: this.scopes,
-      });
-    } catch (e) {
-      log.error('Error while requesting access token with device code', e);
-      throw e;
-    }
-  }
-
-  /**
    * Sets the access token to use for all requests. if the token is a valid JWT token,
    * its `tid` claim is used a tenant (if no tenant is already set).
    *
@@ -295,10 +275,13 @@ export class OneDriveAuth {
     }
 
     try {
-      if (this.refreshToken) {
-        log.debug('acquire token with refresh token.');
-        return await app.acquireTokenByRefreshToken({
-          refreshToken: this.refreshToken,
+      if (this.onCode) {
+        log.debug('acquire token with device.');
+        return await app.acquireTokenByDeviceCode({
+          deviceCodeCallback: async (code) => {
+            await this.onCode(code);
+          },
+          scopes: this.scopes,
         });
       } else if (this.clientSecret) {
         log.debug('acquire token with client credentials.');

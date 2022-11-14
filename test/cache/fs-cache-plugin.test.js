@@ -83,7 +83,19 @@ describe('FSCachePlugin Test', () => {
     assert.strictEqual(ctx.tokens, '{ "access_token": "1234" }');
   });
 
-  it('read cache data handles errors', async () => {
+  it('read cache data ignores inexistant file', async () => {
+    const p = new FSCachePlugin({
+      filePath: testRoot,
+    });
+
+    const ctx = new MockTokenCacheContext({
+    });
+    const ret = await p.beforeCacheAccess(ctx);
+    assert.strictEqual(ret, false);
+    assert.strictEqual(ctx.tokens, '');
+  });
+
+  it('read cache data warns about other errors', async () => {
     const p = new FSCachePlugin({
       filePath: testFilePath,
     });
