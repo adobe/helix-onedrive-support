@@ -1,3 +1,15 @@
+# [9.0.0](https://github.com/adobe/helix-onedrive-support/compare/v8.4.3...v9.0.0) (2022-11-14)
+
+
+### Features
+
+* support acquiring token by device code ([#317](https://github.com/adobe/helix-onedrive-support/issues/317)) ([a605ef4](https://github.com/adobe/helix-onedrive-support/commit/a605ef430055b70c0d54b171d0557a7dea3053d4))
+
+
+### BREAKING CHANGES
+
+* refreshToken no longer supported
+
 ## [8.4.3](https://github.com/adobe/helix-onedrive-support/compare/v8.4.2...v8.4.3) (2022-11-14)
 
 
