@@ -15,7 +15,6 @@ import { keepAliveNoCache } from '@adobe/fetch';
 import { ConfidentialClientApplication, LogLevel, PublicClientApplication } from '@azure/msal-node';
 import { decodeJwt } from 'jose';
 import { MemCachePlugin } from './cache/MemCachePlugin.js';
-import { StatusCodeError } from './StatusCodeError.js';
 
 const AZ_AUTHORITY_HOST_URL = 'https://login.windows.net';
 const AZ_COMMON_TENANT = 'common';
@@ -104,7 +103,7 @@ export class OneDriveAuth {
               log[MSAL_LOG_LEVELS[loglevel]](message);
             },
             piiLoggingEnabled: false,
-            logLevel: LogLevel.Warning,
+            logLevel: LogLevel.Info,
           },
         },
       };
@@ -283,16 +282,11 @@ export class OneDriveAuth {
           },
           scopes: this.scopes,
         });
-      } else if (this.clientSecret) {
-        log.debug('acquire token with client credentials.');
-        return await app.acquireTokenByClientCredential({
-          scopes: this.scopes,
-        });
-      } else {
-        const err = new StatusCodeError('No valid authentication credentials supplied.');
-        err.statusCode = 401;
-        throw err;
       }
+      log.debug('acquire token with client credentials.');
+      return await app.acquireTokenByClientCredential({
+        scopes: this.scopes,
+      });
     } catch (e) {
       log.error(`Error while acquiring access token ${e}`);
       throw e;

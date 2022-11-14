@@ -128,7 +128,6 @@ describe('OneDriveAuth Tests', () => {
       tokenType: 'Bearer',
       uniqueId: '',
     });
-    assert.strictEqual(await od.isAuthenticated(), false);
   });
 
   it('can authenticate with device code', async () => {
