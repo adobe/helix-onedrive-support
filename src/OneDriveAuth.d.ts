@@ -59,7 +59,7 @@ export declare class OneDriveAuth {
   /**
    * {@code true} if this client is initialized.
    */
-  isAuthenticated(): boolean;
+  isAuthenticated(): Promise<boolean>;
 
   /**
    * the logger of this client

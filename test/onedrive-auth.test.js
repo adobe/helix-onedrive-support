@@ -41,6 +41,23 @@ describe('OneDriveAuth Tests', () => {
     assert.ok(auth);
   });
 
+  it('can be disposed.', async () => {
+    const auth = new OneDriveAuth({
+      clientId: 'foo',
+      clientSecret: 'bar',
+    });
+    await assert.doesNotReject(async () => auth.dispose());
+  });
+
+  it('throws when username/password are specified', async () => {
+    assert.throws(() => new OneDriveAuth({
+      clientId: 'foo',
+      clientSecret: 'bar',
+      username: 'bob',
+      password: 'secret',
+    }), Error('Username/password authentication no longer supported.'));
+  });
+
   it('can authenticate against a resource', async () => {
     nock('https://login.microsoftonline.com')
       .get('/common/discovery/instance?api-version=1.1&authorization_endpoint=https://login.windows.net/common/oauth2/v2.0/authorize')
@@ -103,6 +120,7 @@ describe('OneDriveAuth Tests', () => {
       tokenType: 'Bearer',
       uniqueId: '',
     });
+    assert.strictEqual(await od.isAuthenticated(), false);
   });
 
   it('uses the tenant from a mountpoint', async () => {
@@ -148,6 +166,48 @@ describe('OneDriveAuth Tests', () => {
     });
   });
 
+  it('returns common tenant if resolving the tenant fails', async () => {
+    nock(AZ_AUTHORITY_HOST_URL)
+      .get('/somedrive.onmicrosoft.com/.well-known/openid-configuration')
+      .reply(404);
+
+    const tenantCache = new Map();
+    const od = new OneDriveAuth({
+      clientId: 'foobar',
+      refreshToken: 'dummy',
+      localAuthCache: true,
+      tenantCache,
+    });
+    await od.initTenantFromMountPoint({
+      url: 'https://somedrive.com/a/b/c/d2',
+    });
+
+    assert.deepStrictEqual(Object.fromEntries(tenantCache.entries()), {
+      somedrive: 'common',
+    });
+  });
+
+  it('returns common tenant if resolving the tenant returns no issuer', async () => {
+    nock(AZ_AUTHORITY_HOST_URL)
+      .get('/somedrive.onmicrosoft.com/.well-known/openid-configuration')
+      .reply(200, {});
+
+    const tenantCache = new Map();
+    const od = new OneDriveAuth({
+      clientId: 'foobar',
+      refreshToken: 'dummy',
+      localAuthCache: true,
+      tenantCache,
+    });
+    await od.initTenantFromMountPoint({
+      url: 'https://somedrive.com/a/b/c/d2',
+    });
+
+    assert.deepStrictEqual(Object.fromEntries(tenantCache.entries()), {
+      somedrive: 'common',
+    });
+  });
+
   it('resolves the onedrive.live.com urls', async () => {
     const od = new OneDriveAuth({
       clientId: 'foobar',
@@ -187,6 +247,8 @@ describe('OneDriveAuth Tests', () => {
       tenantCache,
     });
     await od1.initTenantFromUrl(new URL('https://adobe-my.sharepoint.com/a/b/c/d2'));
+    await od1.initTenantFromUrl(new URL('https://adobe-my.sharepoint.com/a/b/c/d2'));
+
     assert.deepStrictEqual(Object.fromEntries(tenantCache.entries()), {
       adobe: 'c0452eed-9384-4001-b1b1-71b3d5cf28ad',
     });
@@ -235,5 +297,37 @@ describe('OneDriveAuth Tests', () => {
     assert.strictEqual(accessToken.accessToken, bearerToken);
     assert.strictEqual(accessToken.tenantId, 'test-tenantid');
     assert.strictEqual(od.tenant, 'test-tenantid');
+  });
+
+  it('getAuthorityUrl without tenant resolution throws', async () => {
+    const od = new OneDriveAuth({
+      clientId: 'foobar',
+      refreshToken: 'dummy',
+      localAuthCache: true,
+      noTenantCache: true,
+    });
+    assert.throws(() => od.getAuthorityUrl());
+  });
+
+  it('setAccessToken warns when token is invalid', async () => {
+    const od = new OneDriveAuth({
+      clientId: 'foobar',
+      refreshToken: 'dummy',
+      localAuthCache: true,
+      noTenantCache: true,
+    });
+    od.setAccessToken('test');
+  });
+
+  it('authenticate returns null when no accounts are there in silent mode', async () => {
+    const od = new OneDriveAuth({
+      clientId: '83ab2922-5f11-4e4d-96f3-d1e0ff152856',
+      clientSecret: 'test-client-secret',
+      resource: 'test-resource',
+      tenant: 'common',
+    });
+
+    const token = await od.authenticate(true);
+    assert.strictEqual(token, null);
   });
 });

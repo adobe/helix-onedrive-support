@@ -246,4 +246,24 @@ describe('SharePointSite Tests', () => {
     const result = await site.getFilesAndFolders('parent');
     assert(result);
   });
+
+  it('a generic error is turned into a StatusCodeError', async () => {
+    nock('https://login.microsoftonline.com')
+      .post('/tenantId/oauth2/v2.0/token')
+      .reply(200, () => JSON.stringify({
+        access_token: crypto.randomUUID(),
+        expiresIn: 3600,
+      }));
+    nock('https://owner.sharepoint.com')
+      .get('/sites/site/_api/web/GetFolderByServerRelativeUrl(\'\')/Files(\'file\')?$expand=ModifiedBy')
+      .replyWithError(new Error('kaputt'));
+    const site = new SharePointSite({
+      owner: 'owner',
+      site: 'site',
+      clientId: 'clientId',
+      tenantId: 'tenantId',
+      refreshToken: 'REFRESH_TOKEN',
+    });
+    await assert.rejects(() => site.getFile('file'), /kaputt/);
+  });
 });
