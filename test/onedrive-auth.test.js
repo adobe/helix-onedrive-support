@@ -169,6 +169,13 @@ describe('OneDriveAuth Tests', () => {
         refresh_token: 'dummy',
         access_token: 'dummy',
         expires_in: 81000,
+        id_token: new UnsecuredJWT({
+          sub: 'test',
+        }).encode(),
+        client_info: Buffer.from(JSON.stringify({
+          uid: 'Bob',
+          utid: 'common',
+        })).toString('base64'),
       });
 
     const od = new OneDriveAuth({
@@ -181,6 +188,7 @@ describe('OneDriveAuth Tests', () => {
       },
     });
     await od.authenticate();
+    assert.strictEqual(await od.isAuthenticated(), true);
   });
 
   it('uses the tenant from a mountpoint', async () => {
