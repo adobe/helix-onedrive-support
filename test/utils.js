@@ -53,5 +53,46 @@ export function Nock() {
     .post('/common/oauth2/token?api-version=1.0')
     .reply(200, auth);
 
+  nocker.discovery = (tenant = 'common') => nocker('https://login.microsoftonline.com')
+    .get(`/${tenant}/discovery/instance?api-version=1.1&authorization_endpoint=https://login.windows.net/${tenant}/oauth2/v2.0/authorize`)
+    .reply(200, {
+      tenant_discovery_endpoint: `https://login.windows.net/${tenant}/v2.0/.well-known/openid-configuration`,
+      'api-version': '1.1',
+      metadata: [
+        {
+          preferred_network: 'login.microsoftonline.com',
+          preferred_cache: 'login.windows.net',
+          aliases: [
+            'login.microsoftonline.com',
+            'login.windows.net',
+          ],
+        },
+      ],
+    })
+    .get(`/${tenant}/v2.0/.well-known/openid-configuration`)
+    .reply(200, {
+      token_endpoint: `https://login.microsoftonline.com/${tenant}/oauth2/v2.0/token`,
+      issuer: 'https://login.microsoftonline.com/{tenantid}/v2.0',
+      authorization_endpoint: `https://login.microsoftonline.com/${tenant}/oauth2/v2.0/authorize`,
+    });
+
+  nocker.token = (token) => nocker('https://login.microsoftonline.com')
+    .post('/common/oauth2/v2.0/token')
+    .reply(200, token);
+
+  nocker.unauthenticated = () => nocker('https://login.microsoftonline.com')
+    .post('/common/oauth2/v2.0/token')
+    .reply(401, {
+      error: 'invalid_client',
+      error_description: 'AADSTS7000215: Invalid client secret provided.',
+      error_codes: [
+        7000215,
+      ],
+      timestamp: '2022-11-15 14:21:12Z',
+      trace_id: '0360e583-c633-4ec7-a26d-691caf445c00',
+      correlation_id: 'a498e2d2-2c57-41b3-a833-e361099aa522',
+      error_uri: 'https://login.microsoftonline.com/error?code=7000215',
+    });
+
   return nocker;
 }

@@ -390,6 +390,28 @@ describe('OneDrive Tests', () => {
     }]);
   });
 
+  it('returns the first 200 children by default', async () => {
+    const folderItem = OneDrive.driveItemFromURL('onedrive:/drives/123/items/456');
+    const data = {
+      value: [],
+    };
+    for (let i = 0; i < 5000; i += 1) {
+      data.value.push({
+        file: { mimeType: 'dummy' },
+        name: `dummy-document-${i}.docx`,
+      });
+    }
+    data.value.push({
+      file: { mimeType: 'dummy' },
+      name: 'My 1. Document.docx',
+    });
+
+    const drive = new MockDrive()
+      .registerDriveItemChildren('123', '456', data);
+    const list = await drive.listChildren(folderItem, '');
+    assert.strictEqual(list.value.length, 200);
+  });
+
   it('can get the user profile: me', async () => {
     const expected = {
       '@odata.context': 'https://graph.microsoft.com/v1.0/$metadata#users/$entity',

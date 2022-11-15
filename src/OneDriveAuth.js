@@ -262,11 +262,7 @@ export class OneDriveAuth {
           account: accounts[0],
         });
       } catch (e) {
-        if (e.message !== 'Entry not found in cache.') {
-          log.warn(`Unable to acquire token from cache: ${e}`);
-        } else {
-          log.debug(`Unable to acquire token from cache: ${e}`);
-        }
+        log.warn('Error while reacquiring token from cache', e);
       }
     }
     if (silentOnly) {
@@ -288,7 +284,7 @@ export class OneDriveAuth {
         scopes: this.scopes,
       });
     } catch (e) {
-      log.error(`Error while acquiring access token ${e}`);
+      log.error('Error while acquiring access token', e);
       throw e;
     }
   }
