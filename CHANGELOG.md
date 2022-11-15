@@ -1,3 +1,10 @@
+## [9.0.1](https://github.com/adobe/helix-onedrive-support/compare/v9.0.0...v9.0.1) (2022-11-15)
+
+
+### Bug Fixes
+
+* simulate more errors in workflow ([#319](https://github.com/adobe/helix-onedrive-support/issues/319)) ([bd8da60](https://github.com/adobe/helix-onedrive-support/commit/bd8da60d3d885f85127042cfc4dae7938c765bd8))
+
 # [9.0.0](https://github.com/adobe/helix-onedrive-support/compare/v8.4.3...v9.0.0) (2022-11-14)
 
 
