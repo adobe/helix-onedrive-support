@@ -14,6 +14,7 @@
 import assert from 'assert';
 import { UnsecuredJWT } from 'jose';
 import { OneDriveAuth } from '../src/OneDriveAuth.js';
+import { MemCachePlugin } from '../src/cache/MemCachePlugin.js';
 import { Nock } from './utils.js';
 
 const AZ_AUTHORITY_HOST_URL = 'https://login.windows.net';
@@ -67,35 +68,13 @@ describe('OneDriveAuth Tests', () => {
   });
 
   it('can authenticate against a resource', async () => {
-    nock('https://login.microsoftonline.com')
-      .get('/common/discovery/instance?api-version=1.1&authorization_endpoint=https://login.windows.net/common/oauth2/v2.0/authorize')
-      .reply(200, {
-        tenant_discovery_endpoint: 'https://login.windows.net/common/v2.0/.well-known/openid-configuration',
-        'api-version': '1.1',
-        metadata: [
-          {
-            preferred_network: 'login.microsoftonline.com',
-            preferred_cache: 'login.windows.net',
-            aliases: [
-              'login.microsoftonline.com',
-              'login.windows.net',
-            ],
-          },
-        ],
-      })
-      .get('/common/v2.0/.well-known/openid-configuration')
-      .reply(200, {
-        token_endpoint: 'https://login.microsoftonline.com/common/oauth2/v2.0/token',
-        issuer: 'https://login.microsoftonline.com/{tenantid}/v2.0',
-        authorization_endpoint: 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize',
-      })
-      .post('/common/oauth2/v2.0/token')
-      .reply(200, {
-        token_type: 'Bearer',
-        refresh_token: 'dummy',
-        access_token: 'dummy',
-        expires_in: 81000,
-      });
+    nock.discovery();
+    nock.token({
+      token_type: 'Bearer',
+      refresh_token: 'dummy',
+      access_token: 'dummy',
+      expires_in: 81000,
+    });
 
     const od = new OneDriveAuth({
       clientId: '83ab2922-5f11-4e4d-96f3-d1e0ff152856',
@@ -128,32 +107,12 @@ describe('OneDriveAuth Tests', () => {
       tokenType: 'Bearer',
       uniqueId: '',
     });
-    assert.strictEqual(await od.isAuthenticated(), false);
   });
 
   it('can authenticate with device code', async () => {
+    nock.discovery();
+
     nock('https://login.microsoftonline.com')
-      .get('/common/discovery/instance?api-version=1.1&authorization_endpoint=https://login.windows.net/common/oauth2/v2.0/authorize')
-      .reply(200, {
-        tenant_discovery_endpoint: 'https://login.windows.net/common/v2.0/.well-known/openid-configuration',
-        'api-version': '1.1',
-        metadata: [
-          {
-            preferred_network: 'login.microsoftonline.com',
-            preferred_cache: 'login.windows.net',
-            aliases: [
-              'login.microsoftonline.com',
-              'login.windows.net',
-            ],
-          },
-        ],
-      })
-      .get('/common/v2.0/.well-known/openid-configuration')
-      .reply(200, {
-        token_endpoint: 'https://login.microsoftonline.com/common/oauth2/v2.0/token',
-        issuer: 'https://login.microsoftonline.com/{tenantid}/v2.0',
-        authorization_endpoint: 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize',
-      })
       .post('/common/oauth2/v2.0/devicecode')
       .reply(200, {
         device_code: 'DAQABAAEAAAD',
@@ -162,21 +121,16 @@ describe('OneDriveAuth Tests', () => {
         message: 'To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code DTSWBVY27 to authenticate.',
         user_code: 'DTSWBVY27',
         verification_uri: 'https://microsoft.com/devicelogin',
-      })
-      .post('/common/oauth2/v2.0/token')
-      .reply(200, {
-        token_type: 'Bearer',
-        refresh_token: 'dummy',
-        access_token: 'dummy',
-        expires_in: 81000,
-        id_token: new UnsecuredJWT({
-          sub: 'test',
-        }).encode(),
-        client_info: Buffer.from(JSON.stringify({
-          uid: 'Bob',
-          utid: 'common',
-        })).toString('base64'),
       });
+
+    nock.token({
+      token_type: 'Bearer',
+      refresh_token: 'dummy',
+      access_token: 'dummy',
+      expires_in: 81000,
+      id_token: new UnsecuredJWT({ sub: 'test' }).encode(),
+      client_info: Buffer.from(JSON.stringify({ uid: 'Bob', utid: 'common' })).toString('base64'),
+    });
 
     const od = new OneDriveAuth({
       clientId: '83ab2922-5f11-4e4d-96f3-d1e0ff152856',
@@ -189,6 +143,80 @@ describe('OneDriveAuth Tests', () => {
     });
     await od.authenticate();
     assert.strictEqual(await od.isAuthenticated(), true);
+  });
+
+  it('catches 401 errors when authenticating', async () => {
+    nock.discovery();
+    nock.unauthenticated();
+
+    const od = new OneDriveAuth({
+      clientId: '83ab2922-5f11-4e4d-96f3-d1e0ff152856',
+      clientSecret: 'test-client-secret',
+      resource: 'test-resource',
+      tenant: 'common',
+    });
+    await assert.rejects(
+      od.authenticate(false),
+      /Invalid client secret/,
+    );
+  });
+
+  it('returns null when when silent acquire fails', async () => {
+    nock.discovery();
+    nock('https://login.microsoftonline.com')
+      .post('/common/oauth2/v2.0/devicecode')
+      .reply(200, {
+        device_code: 'DAQABAAEAAAD',
+        expires_in: 900,
+        interval: 5,
+        message: 'To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code DTSWBVY27 to authenticate.',
+        user_code: 'DTSWBVY27',
+        verification_uri: 'https://microsoft.com/devicelogin',
+      });
+    nock.token({
+      token_type: 'Bearer',
+      refresh_token: 'dummy',
+      access_token: 'dummy',
+      expires_in: 81000,
+      id_token: new UnsecuredJWT({ sub: 'test' }).encode(),
+      client_info: Buffer.from(JSON.stringify({ uid: 'Bob', utid: 'common' })).toString('base64'),
+    });
+
+    const caches = new Map();
+    const od1 = new OneDriveAuth({
+      clientId: '83ab2922-5f11-4e4d-96f3-d1e0ff152856',
+      clientSecret: 'test-client-secret',
+      resource: 'test-resource',
+      tenant: 'common',
+      onCode: async (code) => {
+        assert.strictEqual(code.userCode, 'DTSWBVY27');
+      },
+      cachePlugin: new MemCachePlugin({
+        key: 'default',
+        caches,
+      }),
+    });
+    await od1.authenticate();
+
+    // make the cached access token expire
+    const entry = JSON.parse(caches.get('default'));
+    entry.AccessToken[Object.keys(entry.AccessToken)[0]].expires_on = Math.floor(Date.now() / 1000);
+    caches.set('default', JSON.stringify(entry));
+
+    nock.discovery();
+    nock.unauthenticated();
+
+    const od2 = new OneDriveAuth({
+      clientId: '83ab2922-5f11-4e4d-96f3-d1e0ff152856',
+      clientSecret: 'test-client-secret',
+      resource: 'test-resource',
+      tenant: 'common',
+      cachePlugin: new MemCachePlugin({
+        key: 'default',
+        caches,
+      }),
+    });
+    assert.strictEqual(await od2.authenticate(true), null);
   });
 
   it('uses the tenant from a mountpoint', async () => {
