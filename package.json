@@ -46,7 +46,7 @@
     "eslint-plugin-import": "2.26.0",
     "husky": "8.0.2",
     "install": "0.13.0",
-    "jsdoc-to-markdown": "7.1.1",
+    "jsdoc-to-markdown": "8.0.0",
     "jsdoc-tsimport-plugin": "1.0.5",
     "junit-report-builder": "3.0.1",
     "lint-staged": "13.0.4",
