@@ -1,6 +1,6 @@
 {
   "name": "@adobe/helix-onedrive-support",
-  "version": "9.0.3",
+  "version": "9.0.4",
   "description": "Helix OneDrive Support",
   "main": "src/index.js",
   "exports": {
