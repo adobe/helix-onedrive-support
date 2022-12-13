@@ -1,3 +1,10 @@
+## [9.0.6](https://github.com/adobe/helix-onedrive-support/compare/v9.0.5...v9.0.6) (2022-12-13)
+
+
+### Bug Fixes
+
+* do not log errors that are rethrown ([#326](https://github.com/adobe/helix-onedrive-support/issues/326)) ([568111c](https://github.com/adobe/helix-onedrive-support/commit/568111c2a2817ec5ba03510ba7ae87ba8d68d9ef))
+
 ## [9.0.5](https://github.com/adobe/helix-onedrive-support/compare/v9.0.4...v9.0.5) (2022-12-10)
 
 
