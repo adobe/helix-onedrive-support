@@ -19,7 +19,7 @@ export declare interface OneDriveAuthOptions {
   scopes?: string[];
   onCode?: Function;
   localAuthCache?:boolean;
-  acquireMethods: string[];
+  acquireMethod?: string;
 
   /**
    * use cache plugin instead for default (global) token cache.
