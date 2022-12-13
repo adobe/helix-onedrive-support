@@ -30,9 +30,8 @@ const MSAL_LOG_LEVELS = [
 ];
 
 export const ACQUIRE_METHODS = {
-  silent: 'silent',
-  byDeviceCode: 'byDeviceCode',
-  byClientCredential: 'byClientCredential',
+  BY_DEVICE_CODE: 'byDeviceCode',
+  BY_CLIENT_CREDENTIAL: 'byClientCredential',
 };
 
 /**
@@ -76,16 +75,14 @@ export class OneDriveAuth {
     this.cachePlugin = opts.cachePlugin;
     this.scopes = opts.scopes || DEFAULT_SCOPES;
     this.onCode = opts.onCode;
-    this.acquireMethods = opts.acquireMethods || [ACQUIRE_METHODS.silent];
+    this.acquireMethod = opts.acquireMethod || '';
 
-    const acquireMethodList = Array.from(Object.values(ACQUIRE_METHODS));
-    this.acquireMethods.forEach((method) => {
-      if (acquireMethodList.indexOf(method) === -1) {
-        throw new Error(`Authentication method unknown: ${method}, should be one or many of: ${acquireMethodList}`);
-      }
-    });
-    if (this.acquireMethods.includes(ACQUIRE_METHODS.byDeviceCode) && !this.onCode) {
-      throw new Error(`Authontication method ${ACQUIRE_METHODS.byDeviceCode} requires 'onCode' parameter`);
+    const validAcquireMethods = Array.from(Object.values(ACQUIRE_METHODS));
+    if (this.acquireMethod && !validAcquireMethods.includes(this.acquireMethod)) {
+      throw new Error(`Authentication method unknown: ${this.acquireMethod}, should be none or one of: ${validAcquireMethods}`);
+    }
+    if (this.acquireMethod === ACQUIRE_METHODS.BY_DEVICE_CODE && !this.onCode) {
+      throw new Error(`Authontication method ${ACQUIRE_METHODS.BY_DEVICE_CODE} requires 'onCode' parameter`);
     }
 
     if (!opts.noTenantCache && !process.env.HELIX_ONEDRIVE_NO_TENANT_CACHE) {
@@ -276,11 +273,9 @@ export class OneDriveAuth {
     const accounts = await app.getTokenCache().getAllAccounts();
     if (accounts.length > 0) {
       try {
-        if (this.acquireMethods.includes(ACQUIRE_METHODS.silent)) {
-          return await app.acquireTokenSilent({
-            account: accounts[0],
-          });
-        }
+        return await app.acquireTokenSilent({
+          account: accounts[0],
+        });
       } catch (e) {
         log.warn('Error while reacquiring token from cache', e);
       }
@@ -290,7 +285,7 @@ export class OneDriveAuth {
     }
 
     try {
-      if (this.onCode) {
+      if (this.acquireMethod === ACQUIRE_METHODS.BY_DEVICE_CODE) {
         log.debug('acquire token with device.');
         return await app.acquireTokenByDeviceCode({
           deviceCodeCallback: async (code) => {
@@ -299,7 +294,7 @@ export class OneDriveAuth {
           scopes: this.scopes,
         });
       }
-      if (this.acquireMethods.includes(ACQUIRE_METHODS.byClientCredential)) {
+      if (this.acquireMethod === ACQUIRE_METHODS.BY_CLIENT_CREDENTIAL) {
         log.debug('acquire token with client credentials.');
         return await app.acquireTokenByClientCredential({
           scopes: this.scopes,
@@ -309,7 +304,8 @@ export class OneDriveAuth {
       log.error('Error while acquiring access token', e);
       throw e;
     }
-    return null;
+
+    throw new Error('Unable to acquire token silently and no other acquire method supplied');
   }
 
   /**
