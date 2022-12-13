@@ -13,7 +13,7 @@
 /* eslint-env mocha */
 import assert from 'assert';
 import { UnsecuredJWT } from 'jose';
-import { OneDriveAuth } from '../src/OneDriveAuth.js';
+import { OneDriveAuth, ACQUIRE_METHODS } from '../src/OneDriveAuth.js';
 import { MemCachePlugin } from '../src/cache/MemCachePlugin.js';
 import { Nock } from './utils.js';
 
@@ -81,6 +81,7 @@ describe('OneDriveAuth Tests', () => {
       clientSecret: 'test-client-secret',
       resource: 'test-resource',
       tenant: 'common',
+      acquireMethods: [ACQUIRE_METHODS.byClientCredential],
     });
     const resp = await od.authenticate();
     delete resp.expiresOn;
@@ -154,6 +155,7 @@ describe('OneDriveAuth Tests', () => {
       clientSecret: 'test-client-secret',
       resource: 'test-resource',
       tenant: 'common',
+      acquireMethods: [ACQUIRE_METHODS.byClientCredential],
     });
     await assert.rejects(
       od.authenticate(false),
