@@ -137,11 +137,6 @@ export class OneDrive {
         } catch {
           err = new StatusCodeError(text, resp.status);
         }
-        if (err.statusCode === 404) {
-          this.log.warn(`${relUrl} : ${err.statusCode} - ${err.message}`);
-        } else {
-          this.log.error(`${relUrl} : ${err.statusCode} - ${err.message}`, err.details);
-        }
         throw err;
       }
       // check content type before trying to parse a response body as JSON
@@ -151,11 +146,10 @@ export class OneDrive {
       // await result in order to be able to catch any error
       return await (rawResponseBody || !json ? resp.buffer() : resp.json());
     } catch (e) {
-      if (e instanceof StatusCodeError) {
-        throw e;
+      let err = e;
+      if (!(e instanceof StatusCodeError)) {
+        err = StatusCodeError.fromError(e);
       }
-      const err = StatusCodeError.fromError(e);
-      this.log.error(`${relUrl} : ${err.statusCode} - ${err.message} - ${err.details}`);
       throw err;
     }
   }
@@ -473,7 +467,6 @@ export class OneDrive {
         };
       } else {
         const error = new StatusCodeError('Received response with neither next nor delta link.', 500);
-        this.log.error(error);
         throw error;
       }
     }
