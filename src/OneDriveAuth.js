@@ -29,6 +29,11 @@ const MSAL_LOG_LEVELS = [
   'trace',
 ];
 
+export const ACQUIRE_METHODS = {
+  BY_DEVICE_CODE: 'byDeviceCode',
+  BY_CLIENT_CREDENTIAL: 'byClientCredential',
+};
+
 /**
  * aliases
  * @typedef {import('@azure/msal-node').AuthenticationResult} AuthenticationResult
@@ -70,6 +75,18 @@ export class OneDriveAuth {
     this.cachePlugin = opts.cachePlugin;
     this.scopes = opts.scopes || DEFAULT_SCOPES;
     this.onCode = opts.onCode;
+    this.acquireMethod = opts.acquireMethod || '';
+
+    const validAcquireMethods = Array.from(Object.values(ACQUIRE_METHODS));
+    if (this.acquireMethod && !validAcquireMethods.includes(this.acquireMethod)) {
+      throw new Error(`Authentication method unknown: ${this.acquireMethod}, should be none or one of: ${validAcquireMethods}`);
+    }
+    if (this.acquireMethod === ACQUIRE_METHODS.BY_DEVICE_CODE && !this.onCode) {
+      throw new Error(`Authontication method ${ACQUIRE_METHODS.BY_DEVICE_CODE} requires 'onCode' parameter`);
+    }
+    if (!this.acquireMethod && this.onCode) {
+      this.acquireMethod = ACQUIRE_METHODS.BY_DEVICE_CODE;
+    }
 
     if (!opts.noTenantCache && !process.env.HELIX_ONEDRIVE_NO_TENANT_CACHE) {
       /** @type {Map<string, string>} */
@@ -255,6 +272,7 @@ export class OneDriveAuth {
    */
   async doAuthenticate(silentOnly) {
     const { log, app } = this;
+
     const accounts = await app.getTokenCache().getAllAccounts();
     if (accounts.length > 0) {
       try {
@@ -270,7 +288,7 @@ export class OneDriveAuth {
     }
 
     try {
-      if (this.onCode) {
+      if (this.acquireMethod === ACQUIRE_METHODS.BY_DEVICE_CODE) {
         log.debug('acquire token with device.');
         return await app.acquireTokenByDeviceCode({
           deviceCodeCallback: async (code) => {
@@ -279,14 +297,18 @@ export class OneDriveAuth {
           scopes: this.scopes,
         });
       }
-      log.debug('acquire token with client credentials.');
-      return await app.acquireTokenByClientCredential({
-        scopes: this.scopes,
-      });
+      if (this.acquireMethod === ACQUIRE_METHODS.BY_CLIENT_CREDENTIAL) {
+        log.debug('acquire token with client credentials.');
+        return await app.acquireTokenByClientCredential({
+          scopes: this.scopes,
+        });
+      }
     } catch (e) {
       log.error('Error while acquiring access token', e);
       throw e;
     }
+
+    throw new Error('Unable to acquire token silently and no other acquire method supplied');
   }
 
   /**

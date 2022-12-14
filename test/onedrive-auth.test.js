@@ -13,7 +13,7 @@
 /* eslint-env mocha */
 import assert from 'assert';
 import { UnsecuredJWT } from 'jose';
-import { OneDriveAuth } from '../src/OneDriveAuth.js';
+import { OneDriveAuth, ACQUIRE_METHODS } from '../src/OneDriveAuth.js';
 import { MemCachePlugin } from '../src/cache/MemCachePlugin.js';
 import { Nock } from './utils.js';
 
@@ -67,6 +67,22 @@ describe('OneDriveAuth Tests', () => {
     }), Error('Refresh token no longer supported.'));
   });
 
+  it('throws when unknown acquire method is specified', async () => {
+    assert.throws(() => new OneDriveAuth({
+      clientId: 'foo',
+      clientSecret: 'bar',
+      acquireMethod: 'magic',
+    }), Error('Authentication method unknown: magic, should be none or one of: byDeviceCode,byClientCredential'));
+  });
+
+  it('throws when onCode acquire method is specified without onCode parameter', async () => {
+    assert.throws(() => new OneDriveAuth({
+      clientId: 'foo',
+      clientSecret: 'bar',
+      acquireMethod: ACQUIRE_METHODS.BY_DEVICE_CODE,
+    }), Error('Authontication method byDeviceCode requires \'onCode\' parameter'));
+  });
+
   it('can authenticate against a resource', async () => {
     nock.discovery();
     nock.token({
@@ -81,6 +97,7 @@ describe('OneDriveAuth Tests', () => {
       clientSecret: 'test-client-secret',
       resource: 'test-resource',
       tenant: 'common',
+      acquireMethod: ACQUIRE_METHODS.BY_CLIENT_CREDENTIAL,
     });
     const resp = await od.authenticate();
     delete resp.expiresOn;
@@ -154,6 +171,7 @@ describe('OneDriveAuth Tests', () => {
       clientSecret: 'test-client-secret',
       resource: 'test-resource',
       tenant: 'common',
+      acquireMethod: ACQUIRE_METHODS.BY_CLIENT_CREDENTIAL,
     });
     await assert.rejects(
       od.authenticate(false),
@@ -161,7 +179,7 @@ describe('OneDriveAuth Tests', () => {
     );
   });
 
-  it('returns null when when silent acquire fails', async () => {
+  it('returns null when silent acquire fails', async () => {
     nock.discovery();
     nock('https://login.microsoftonline.com')
       .post('/common/oauth2/v2.0/devicecode')
@@ -195,6 +213,7 @@ describe('OneDriveAuth Tests', () => {
         key: 'default',
         caches,
       }),
+      acquireMethod: ACQUIRE_METHODS.BY_DEVICE_CODE,
     });
     await od1.authenticate();
 
@@ -217,6 +236,24 @@ describe('OneDriveAuth Tests', () => {
       }),
     });
     assert.strictEqual(await od2.authenticate(true), null);
+
+    nock.discovery();
+    nock.unauthenticated();
+
+    const od3 = new OneDriveAuth({
+      clientId: '83ab2922-5f11-4e4d-96f3-d1e0ff152856',
+      clientSecret: 'test-client-secret',
+      resource: 'test-resource',
+      tenant: 'common',
+      cachePlugin: new MemCachePlugin({
+        key: 'default',
+        caches,
+      }),
+    });
+    await assert.rejects(
+      async () => od3.authenticate(),
+      Error('Unable to acquire token silently and no other acquire method supplied'),
+    );
   });
 
   it('uses the tenant from a mountpoint', async () => {
