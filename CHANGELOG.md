@@ -1,3 +1,10 @@
+# [9.1.0](https://github.com/adobe/helix-onedrive-support/compare/v9.0.6...v9.1.0) (2022-12-14)
+
+
+### Features
+
+* introduce acquireMethod ([#327](https://github.com/adobe/helix-onedrive-support/issues/327)) ([8bca14c](https://github.com/adobe/helix-onedrive-support/commit/8bca14c121900666b34c78e644a7e3d1f7fdb868))
+
 ## [9.0.6](https://github.com/adobe/helix-onedrive-support/compare/v9.0.5...v9.0.6) (2022-12-13)
 
 
