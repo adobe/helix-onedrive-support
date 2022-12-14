@@ -157,7 +157,6 @@ describe('OneDriveAuth Tests', () => {
       onCode: async (code) => {
         assert.strictEqual(code.userCode, 'DTSWBVY27');
       },
-      acquireMethod: ACQUIRE_METHODS.BY_DEVICE_CODE,
     });
     await od.authenticate();
     assert.strictEqual(await od.isAuthenticated(), true);
@@ -252,7 +251,7 @@ describe('OneDriveAuth Tests', () => {
       }),
     });
     await assert.rejects(
-      async () => od3.authenticate(false),
+      async () => od3.authenticate(),
       Error('Unable to acquire token silently and no other acquire method supplied'),
     );
   });

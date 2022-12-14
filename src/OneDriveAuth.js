@@ -84,6 +84,9 @@ export class OneDriveAuth {
     if (this.acquireMethod === ACQUIRE_METHODS.BY_DEVICE_CODE && !this.onCode) {
       throw new Error(`Authontication method ${ACQUIRE_METHODS.BY_DEVICE_CODE} requires 'onCode' parameter`);
     }
+    if (!this.acquireMethod && this.onCode) {
+      this.acquireMethod = ACQUIRE_METHODS.BY_DEVICE_CODE;
+    }
 
     if (!opts.noTenantCache && !process.env.HELIX_ONEDRIVE_NO_TENANT_CACHE) {
       /** @type {Map<string, string>} */
