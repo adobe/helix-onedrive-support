@@ -10,7 +10,7 @@
  * governing permissions and limitations under the License.
  */
 export { OneDrive } from './OneDrive.js';
-export { OneDriveAuth } from './OneDriveAuth.js';
+export { OneDriveAuth, AcquireMethod } from './OneDriveAuth.js';
 
 export { FSCachePlugin } from './cache/FSCachePlugin.js';
 export { FSCacheManager } from './cache/FSCacheManager.js';

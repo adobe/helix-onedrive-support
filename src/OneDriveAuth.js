@@ -29,7 +29,7 @@ const MSAL_LOG_LEVELS = [
   'trace',
 ];
 
-export const ACQUIRE_METHODS = {
+export const AcquireMethod = {
   BY_DEVICE_CODE: 'byDeviceCode',
   BY_CLIENT_CREDENTIAL: 'byClientCredential',
 };
@@ -77,15 +77,15 @@ export class OneDriveAuth {
     this.onCode = opts.onCode;
     this.acquireMethod = opts.acquireMethod || '';
 
-    const validAcquireMethods = Array.from(Object.values(ACQUIRE_METHODS));
+    const validAcquireMethods = Array.from(Object.values(AcquireMethod));
     if (this.acquireMethod && !validAcquireMethods.includes(this.acquireMethod)) {
       throw new Error(`Authentication method unknown: ${this.acquireMethod}, should be none or one of: ${validAcquireMethods}`);
     }
-    if (this.acquireMethod === ACQUIRE_METHODS.BY_DEVICE_CODE && !this.onCode) {
-      throw new Error(`Authontication method ${ACQUIRE_METHODS.BY_DEVICE_CODE} requires 'onCode' parameter`);
+    if (this.acquireMethod === AcquireMethod.BY_DEVICE_CODE && !this.onCode) {
+      throw new Error(`Authontication method ${AcquireMethod.BY_DEVICE_CODE} requires 'onCode' parameter`);
     }
     if (!this.acquireMethod && this.onCode) {
-      this.acquireMethod = ACQUIRE_METHODS.BY_DEVICE_CODE;
+      this.acquireMethod = AcquireMethod.BY_DEVICE_CODE;
     }
 
     if (!opts.noTenantCache && !process.env.HELIX_ONEDRIVE_NO_TENANT_CACHE) {
@@ -288,7 +288,7 @@ export class OneDriveAuth {
     }
 
     try {
-      if (this.acquireMethod === ACQUIRE_METHODS.BY_DEVICE_CODE) {
+      if (this.acquireMethod === AcquireMethod.BY_DEVICE_CODE) {
         log.debug('acquire token with device.');
         return await app.acquireTokenByDeviceCode({
           deviceCodeCallback: async (code) => {
@@ -297,7 +297,7 @@ export class OneDriveAuth {
           scopes: this.scopes,
         });
       }
-      if (this.acquireMethod === ACQUIRE_METHODS.BY_CLIENT_CREDENTIAL) {
+      if (this.acquireMethod === AcquireMethod.BY_CLIENT_CREDENTIAL) {
         log.debug('acquire token with client credentials.');
         return await app.acquireTokenByClientCredential({
           scopes: this.scopes,
