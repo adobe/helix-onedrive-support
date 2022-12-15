@@ -11,6 +11,11 @@
  */
 import {AuthenticationResult, ClientApplication, ICachePlugin} from "@azure/msal-node";
 
+export enum AcquireMethod {
+  BY_CLIENT_CREDENTIAL = 'byClientCredential',
+  BY_DEVICE_CODE = 'byDeviceCode',
+}
+
 export declare interface OneDriveAuthOptions {
   clientId: string;
   clientSecret?: string;
@@ -19,7 +24,7 @@ export declare interface OneDriveAuthOptions {
   scopes?: string[];
   onCode?: Function;
   localAuthCache?:boolean;
-  acquireMethod?: string;
+  acquireMethod?: AcquireMethod;
 
   /**
    * use cache plugin instead for default (global) token cache.

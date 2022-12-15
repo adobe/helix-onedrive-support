@@ -13,7 +13,7 @@
 /* eslint-env mocha */
 import assert from 'assert';
 import { UnsecuredJWT } from 'jose';
-import { OneDriveAuth, ACQUIRE_METHODS } from '../src/OneDriveAuth.js';
+import { OneDriveAuth, AcquireMethod } from '../src/OneDriveAuth.js';
 import { MemCachePlugin } from '../src/cache/MemCachePlugin.js';
 import { Nock } from './utils.js';
 
@@ -79,7 +79,7 @@ describe('OneDriveAuth Tests', () => {
     assert.throws(() => new OneDriveAuth({
       clientId: 'foo',
       clientSecret: 'bar',
-      acquireMethod: ACQUIRE_METHODS.BY_DEVICE_CODE,
+      acquireMethod: AcquireMethod.BY_DEVICE_CODE,
     }), Error('Authontication method byDeviceCode requires \'onCode\' parameter'));
   });
 
@@ -97,7 +97,7 @@ describe('OneDriveAuth Tests', () => {
       clientSecret: 'test-client-secret',
       resource: 'test-resource',
       tenant: 'common',
-      acquireMethod: ACQUIRE_METHODS.BY_CLIENT_CREDENTIAL,
+      acquireMethod: AcquireMethod.BY_CLIENT_CREDENTIAL,
     });
     const resp = await od.authenticate();
     delete resp.expiresOn;
@@ -171,7 +171,7 @@ describe('OneDriveAuth Tests', () => {
       clientSecret: 'test-client-secret',
       resource: 'test-resource',
       tenant: 'common',
-      acquireMethod: ACQUIRE_METHODS.BY_CLIENT_CREDENTIAL,
+      acquireMethod: AcquireMethod.BY_CLIENT_CREDENTIAL,
     });
     await assert.rejects(
       od.authenticate(false),
@@ -213,7 +213,7 @@ describe('OneDriveAuth Tests', () => {
         key: 'default',
         caches,
       }),
-      acquireMethod: ACQUIRE_METHODS.BY_DEVICE_CODE,
+      acquireMethod: AcquireMethod.BY_DEVICE_CODE,
     });
     await od1.authenticate();
 
