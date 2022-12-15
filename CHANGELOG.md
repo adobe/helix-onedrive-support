@@ -1,3 +1,10 @@
+## [9.1.1](https://github.com/adobe/helix-onedrive-support/compare/v9.1.0...v9.1.1) (2022-12-15)
+
+
+### Bug Fixes
+
+* export AcquireMethod to let imports use symbolic names ([#328](https://github.com/adobe/helix-onedrive-support/issues/328)) ([d8ebfe1](https://github.com/adobe/helix-onedrive-support/commit/d8ebfe1c65e900ff910efa03edc08046e7b8c067))
+
 # [9.1.0](https://github.com/adobe/helix-onedrive-support/compare/v9.0.6...v9.1.0) (2022-12-14)
 
 
