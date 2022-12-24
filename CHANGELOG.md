@@ -1,3 +1,10 @@
+## [9.1.3](https://github.com/adobe/helix-onedrive-support/compare/v9.1.2...v9.1.3) (2022-12-24)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @aws-sdk/client-s3 to v3.238.0 ([bca79ce](https://github.com/adobe/helix-onedrive-support/commit/bca79ce7e2847b608531a1a04c4766507f3259a4))
+
 ## [9.1.2](https://github.com/adobe/helix-onedrive-support/compare/v9.1.1...v9.1.2) (2022-12-17)
 
 
