@@ -9,3 +9,4 @@ logs
 test-results.xml
 *.tgz
 .env
+.git/
