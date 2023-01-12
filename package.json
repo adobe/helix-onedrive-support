@@ -11,7 +11,6 @@
   "types": "src/index.d.ts",
   "scripts": {
     "test": "c8 mocha --spec=test/**/*.test.js",
-    "test-ci": "c8 mocha  --spec=test/**/*.test.js && codecov",
     "lint": "./node_modules/.bin/eslint .",
     "semantic-release": "semantic-release",
     "docs": "npx jsdoc2md -c .jsdoc.json --files 'src/*.js'  > docs/API.md",
