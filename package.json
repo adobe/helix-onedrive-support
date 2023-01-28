@@ -28,7 +28,7 @@
   "homepage": "https://github.com/adobe/helix-onedrive-support#readme",
   "dependencies": {
     "@adobe/fetch": "3.6.0",
-    "@aws-sdk/client-s3": "3.254.0",
+    "@aws-sdk/client-s3": "3.259.0",
     "@azure/msal-node": "1.14.6",
     "jose": "4.11.2"
   },
@@ -52,7 +52,7 @@
     "mocha": "10.2.0",
     "mocha-multi-reporters": "1.5.1",
     "nock": "13.3.0",
-    "npm": "9.3.1",
+    "npm": "9.4.0",
     "semantic-release": "19.0.5"
   },
   "lint-staged": {
