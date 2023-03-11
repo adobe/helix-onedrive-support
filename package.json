@@ -28,8 +28,8 @@
   "homepage": "https://github.com/adobe/helix-onedrive-support#readme",
   "dependencies": {
     "@adobe/fetch": "4.0.4",
-    "@aws-sdk/client-s3": "3.282.0",
-    "@azure/msal-node": "1.15.0",
+    "@aws-sdk/client-s3": "3.289.0",
+    "@azure/msal-node": "1.16.0",
     "jose": "4.13.1"
   },
   "devDependencies": {
@@ -40,7 +40,7 @@
     "c8": "7.13.0",
     "codecov": "3.8.3",
     "dotenv": "16.0.3",
-    "eslint": "8.35.0",
+    "eslint": "8.36.0",
     "eslint-plugin-header": "3.1.1",
     "eslint-plugin-import": "2.27.5",
     "husky": "8.0.3",
@@ -48,11 +48,11 @@
     "jsdoc-to-markdown": "8.0.0",
     "jsdoc-tsimport-plugin": "1.0.5",
     "junit-report-builder": "3.0.1",
-    "lint-staged": "13.1.2",
+    "lint-staged": "13.2.0",
     "mocha": "10.2.0",
     "mocha-multi-reporters": "1.5.1",
     "nock": "13.3.0",
-    "npm": "9.6.0",
+    "npm": "9.6.1",
     "semantic-release": "20.1.1"
   },
   "lint-staged": {
