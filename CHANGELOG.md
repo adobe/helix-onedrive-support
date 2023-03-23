@@ -1,3 +1,10 @@
+## [9.1.23](https://github.com/adobe/helix-onedrive-support/compare/v9.1.22...v9.1.23) (2023-03-23)
+
+
+### Bug Fixes
+
+* clear mem cache and retry on auth fail ([#359](https://github.com/adobe/helix-onedrive-support/issues/359)) ([e43dd5d](https://github.com/adobe/helix-onedrive-support/commit/e43dd5d51d2e40946e92d4331831721979b5925c))
+
 ## [9.1.22](https://github.com/adobe/helix-onedrive-support/compare/v9.1.21...v9.1.22) (2023-03-21)
 
 
