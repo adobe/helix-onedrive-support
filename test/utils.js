@@ -76,6 +76,14 @@ export function Nock() {
       authorization_endpoint: `https://login.microsoftonline.com/${tenant}/oauth2/v2.0/authorize`,
     });
 
+  nocker.openid = (tenant = 'common') => nocker('https://login.microsoftonline.com')
+    .get(`/${tenant}/v2.0/.well-known/openid-configuration`)
+    .reply(200, {
+      token_endpoint: `https://login.microsoftonline.com/${tenant}/oauth2/v2.0/token`,
+      issuer: 'https://login.microsoftonline.com/{tenantid}/v2.0',
+      authorization_endpoint: `https://login.microsoftonline.com/${tenant}/oauth2/v2.0/authorize`,
+    });
+
   nocker.token = (token) => nocker('https://login.microsoftonline.com')
     .post('/common/oauth2/v2.0/token')
     .reply(200, token);

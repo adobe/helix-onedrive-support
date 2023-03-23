@@ -282,6 +282,18 @@ export class OneDriveAuth {
       } catch (e) {
         log.warn('Error while reacquiring token from cache', e);
       }
+      // try again with fresh mem cache
+      if (this.cachePlugin instanceof MemCachePlugin) {
+        this.cachePlugin.clear();
+        try {
+          return await app.acquireTokenSilent({
+            forceRefresh: true,
+            account: accounts[0],
+          });
+        } catch (e) {
+          log.warn('Error while reacquiring token from cache (forced)', e);
+        }
+      }
     }
     if (silentOnly) {
       return null;

@@ -224,6 +224,8 @@ describe('OneDriveAuth Tests', () => {
 
     nock.discovery();
     nock.unauthenticated();
+    nock.openid();
+    nock.unauthenticated();
 
     const od2 = new OneDriveAuth({
       clientId: '83ab2922-5f11-4e4d-96f3-d1e0ff152856',
@@ -236,9 +238,6 @@ describe('OneDriveAuth Tests', () => {
       }),
     });
     assert.strictEqual(await od2.authenticate(true), null);
-
-    nock.discovery();
-    nock.unauthenticated();
 
     const od3 = new OneDriveAuth({
       clientId: '83ab2922-5f11-4e4d-96f3-d1e0ff152856',
