@@ -1,3 +1,10 @@
+## [9.1.27](https://github.com/adobe/helix-onedrive-support/compare/v9.1.26...v9.1.27) (2023-04-12)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/fetch to v4.0.7 ([6df5589](https://github.com/adobe/helix-onedrive-support/commit/6df5589f52132b2415b2251d2c25a640d9512ae7))
+
 ## [9.1.26](https://github.com/adobe/helix-onedrive-support/compare/v9.1.25...v9.1.26) (2023-04-08)
 
 
