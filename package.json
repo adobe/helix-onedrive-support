@@ -28,9 +28,9 @@
   "homepage": "https://github.com/adobe/helix-onedrive-support#readme",
   "dependencies": {
     "@adobe/fetch": "4.0.8",
-    "@aws-sdk/client-s3": "3.309.0",
+    "@aws-sdk/client-s3": "3.312.0",
     "@azure/msal-node": "1.17.0",
-    "jose": "4.13.1"
+    "jose": "4.14.0"
   },
   "devDependencies": {
     "@adobe/eslint-config-helix": "2.0.2",
