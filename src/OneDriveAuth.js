@@ -13,8 +13,8 @@
 // eslint-disable-next-line max-classes-per-file
 import { keepAliveNoCache } from '@adobe/fetch';
 import { ConfidentialClientApplication, LogLevel, PublicClientApplication } from '@azure/msal-node';
+import { MemCachePlugin } from '@adobe/helix-shared-tokencache';
 import { decodeJwt } from 'jose';
-import { MemCachePlugin } from './cache/MemCachePlugin.js';
 
 const AZ_AUTHORITY_HOST_URL = 'https://login.windows.net';
 const AZ_COMMON_TENANT = 'common';

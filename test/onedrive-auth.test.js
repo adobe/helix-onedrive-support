@@ -13,8 +13,8 @@
 /* eslint-env mocha */
 import assert from 'assert';
 import { UnsecuredJWT } from 'jose';
+import { MemCachePlugin } from '@adobe/helix-shared-tokencache';
 import { OneDriveAuth, AcquireMethod } from '../src/OneDriveAuth.js';
-import { MemCachePlugin } from '../src/cache/MemCachePlugin.js';
 import { Nock } from './utils.js';
 
 const AZ_AUTHORITY_HOST_URL = 'https://login.windows.net';

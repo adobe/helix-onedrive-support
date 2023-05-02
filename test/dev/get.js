@@ -9,7 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { S3CachePlugin } from '../../src/index.js';
+import { S3CachePlugin } from '@adobe/helix-shared-tokencache';
 
 async function run() {
   const contentBusId = process.argv[2] || 'default';

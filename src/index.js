@@ -12,11 +12,6 @@
 export { OneDrive } from './OneDrive.js';
 export { OneDriveAuth, AcquireMethod } from './OneDriveAuth.js';
 
-export { FSCachePlugin } from './cache/FSCachePlugin.js';
-export { FSCacheManager } from './cache/FSCacheManager.js';
-export { MemCachePlugin } from './cache/MemCachePlugin.js';
-export { S3CachePlugin } from './cache/S3CachePlugin.js';
-export { S3CacheManager } from './cache/S3CacheManager.js';
 export { OneDriveMock } from './OneDriveMock.js';
 export { StatusCodeError } from './StatusCodeError.js';
 
