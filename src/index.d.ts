@@ -18,9 +18,3 @@ export * from './excel/Worksheet';
 export * from './excel/NamedItem';
 export * from './excel/Table';
 export * from './excel/Range';
-
-export * from './cache/FSCacheManager';
-export * from './cache/FSCachePlugin';
-export * from './cache/MemCachePlugin';
-export * from './cache/S3CacheManager';
-export * from './cache/S3CachePlugin';

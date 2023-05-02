@@ -28,6 +28,7 @@
   "homepage": "https://github.com/adobe/helix-onedrive-support#readme",
   "dependencies": {
     "@adobe/fetch": "4.0.10",
+    "@adobe/helix-shared-tokencache": "1.0.0",
     "@aws-sdk/client-s3": "3.321.1",
     "@azure/msal-node": "1.17.1",
     "jose": "4.14.3"
