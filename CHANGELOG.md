@@ -1,3 +1,10 @@
+## [10.0.1](https://github.com/adobe/helix-onedrive-support/compare/v10.0.0...v10.0.1) (2023-05-03)
+
+
+### Bug Fixes
+
+* provide username and location in error message ([#374](https://github.com/adobe/helix-onedrive-support/issues/374)) ([a50819d](https://github.com/adobe/helix-onedrive-support/commit/a50819d2520391ee43cc6954123680cfe1b47a21))
+
 # [10.0.0](https://github.com/adobe/helix-onedrive-support/compare/v9.1.32...v10.0.0) (2023-05-02)
 
 
