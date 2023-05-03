@@ -102,5 +102,20 @@ export function Nock() {
       error_uri: 'https://login.microsoftonline.com/error?code=7000215',
     });
 
+  nocker.revoked = () => nocker('https://login.microsoftonline.com')
+    .post('/common/oauth2/v2.0/token')
+    .reply(400, {
+      error: 'invalid_grant',
+      error_description: 'AADSTS50173: The provided grant has expired due to it being revoked, a fresh auth token is needed. The user might have changed or reset their password.',
+      error_codes: [
+        50173,
+      ],
+      timestamp: '2022-11-15 14:21:12Z',
+      trace_id: '0360e583-c633-4ec7-a26d-691caf445c00',
+      correlation_id: 'a498e2d2-2c57-41b3-a833-e361099aa522',
+      error_uri: 'https://login.microsoftonline.com/error?code=50173',
+      suberror: 'badtoken',
+    });
+
   return nocker;
 }
