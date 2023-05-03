@@ -265,6 +265,13 @@ export class OneDriveAuth {
     return this;
   }
 
+  handleAcquireError(account, e, forced = false) {
+    const { log } = this;
+    const msg = `Error while reacquiring token from cache${forced ? ' (forced)' : ''}.`;
+
+    log.warn(`${msg}\nUsername: ${account.username}\nAuth-Location: ${this.cachePlugin.location}\nMessage: ${e.message}`);
+  }
+
   /**
    * Authenticates against MS
    * @param {boolean} silentOnly
@@ -275,23 +282,24 @@ export class OneDriveAuth {
 
     const accounts = await app.getTokenCache().getAllAccounts();
     if (accounts.length > 0) {
+      const account = accounts[0];
+
       try {
-        return await app.acquireTokenSilent({
-          account: accounts[0],
-        });
+        return await app.acquireTokenSilent({ account });
       } catch (e) {
-        log.warn('Error while reacquiring token from cache', e);
+        this.handleAcquireError(account, e);
       }
+
       // try again with fresh mem cache
       if (this.cachePlugin instanceof MemCachePlugin) {
         this.cachePlugin.clear();
         try {
           return await app.acquireTokenSilent({
             forceRefresh: true,
-            account: accounts[0],
+            account,
           });
         } catch (e) {
-          log.warn('Error while reacquiring token from cache (forced)', e);
+          this.handleAcquireError(account, e, true);
         }
       }
     }
@@ -316,7 +324,7 @@ export class OneDriveAuth {
         });
       }
     } catch (e) {
-      log.error('Error while acquiring access token', e);
+      log.error(`Error while acquiring access token (${this.acquireMethod}).\nMessage: ${e.message}`);
       throw e;
     }
 
