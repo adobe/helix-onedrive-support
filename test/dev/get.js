@@ -9,16 +9,11 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { S3CachePlugin } from '@adobe/helix-shared-tokencache';
+import { S3CacheManager } from '@adobe/helix-shared-tokencache';
+import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
-async function run() {
-  const contentBusId = process.argv[2] || 'default';
-  const p = new S3CachePlugin({
-    bucket: 'helix-content-bus',
-    key: `${contentBusId}/.helix-auth/auth-onedrive-content.json`,
-    secret: contentBusId,
-  });
-  const ctx = {
+function createCacheContext() {
+  return {
     tokenCache: {
       deserialize(json) {
         const data = JSON.parse(json);
@@ -31,9 +26,65 @@ async function run() {
           console.log('no access token');
         }
       },
+
     },
   };
-  await p.beforeCacheAccess(ctx);
+}
+
+async function run() {
+  const [, , owner, repo, type = 'onedrive'] = process.argv;
+  if (!owner) {
+    console.error('usage: node get owner repo [type = onedrive]');
+    process.exit(1);
+  }
+
+  let contentBusId;
+  if (owner !== 'default') {
+    const s3 = new S3Client();
+    const res = await s3.send(new GetObjectCommand({
+      Bucket: 'helix-code-bus',
+      Key: `${owner}/${repo}/main/helix-config.json`,
+    }));
+    contentBusId = res.Metadata['x-contentbus-id'].substring(2);
+    if (!contentBusId) {
+      throw Error('no contentBusId');
+    }
+  } else {
+    contentBusId = 'default';
+  }
+
+  const projectCache = new S3CacheManager({
+    log: console,
+    prefix: `${contentBusId}/.helix-auth`,
+    secret: contentBusId,
+    bucket: 'helix-content-bus',
+    type,
+  });
+  const orgCache = new S3CacheManager({
+    log: console,
+    prefix: `${owner}/.helix-auth`,
+    secret: owner,
+    bucket: 'helix-code-bus',
+    type,
+  });
+
+  console.log('project cache');
+  console.log('-----------------------------------');
+  if (await projectCache.hasCache('content')) {
+    const p = await projectCache.getCache('content');
+    await p.beforeCacheAccess(createCacheContext());
+  } else {
+    console.log('n/a');
+  }
+
+  console.log('\norg cache');
+  console.log('-----------------------------------');
+  if (await orgCache.hasCache('content')) {
+    const p = await orgCache.getCache('content');
+    await p.beforeCacheAccess(createCacheContext());
+  } else {
+    console.log('n/a');
+  }
 }
 
 run().catch(console.error);
