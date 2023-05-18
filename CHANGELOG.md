@@ -1,3 +1,10 @@
+## [10.0.9](https://github.com/adobe/helix-onedrive-support/compare/v10.0.8...v10.0.9) (2023-05-18)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/fetch to v4.0.13 ([a635d60](https://github.com/adobe/helix-onedrive-support/commit/a635d6075e6abcae1386f912ca303e08a6b0efe2))
+
 ## [10.0.8](https://github.com/adobe/helix-onedrive-support/compare/v10.0.7...v10.0.8) (2023-05-14)
 
 
