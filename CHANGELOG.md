@@ -1,3 +1,10 @@
+## [10.0.10](https://github.com/adobe/helix-onedrive-support/compare/v10.0.9...v10.0.10) (2023-05-22)
+
+
+### Bug Fixes
+
+* refresh base when MemCache is cleared ([#387](https://github.com/adobe/helix-onedrive-support/issues/387)) ([094bdc3](https://github.com/adobe/helix-onedrive-support/commit/094bdc33d4470b3032e049ecb3aa249d95c6ece5))
+
 ## [10.0.9](https://github.com/adobe/helix-onedrive-support/compare/v10.0.8...v10.0.9) (2023-05-18)
 
 
