@@ -280,7 +280,7 @@ export class OneDriveAuth {
   async doAuthenticate(silentOnly) {
     const { log, app } = this;
 
-    const accounts = await app.getTokenCache().getAllAccounts();
+    let accounts = await app.getTokenCache().getAllAccounts();
     if (accounts.length > 0) {
       const account = accounts[0];
 
@@ -289,10 +289,15 @@ export class OneDriveAuth {
       } catch (e) {
         this.handleAcquireError(account, e);
       }
+    }
 
-      // try again with fresh mem cache
-      if (this.cachePlugin instanceof MemCachePlugin) {
-        this.cachePlugin.clear();
+    // try again with fresh mem cache
+    if (this.cachePlugin instanceof MemCachePlugin) {
+      this.cachePlugin.clear();
+
+      accounts = await app.getTokenCache().getAllAccounts();
+      if (accounts.length > 0) {
+        const account = accounts[0];
         try {
           return await app.acquireTokenSilent({
             forceRefresh: true,
@@ -303,6 +308,7 @@ export class OneDriveAuth {
         }
       }
     }
+
     if (silentOnly) {
       return null;
     }
