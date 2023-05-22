@@ -16,11 +16,11 @@ import fs from 'fs/promises';
 
 async function run() {
   if (process.argv.length < 3) {
-    console.error('usage: node src/decrypt.js <file>');
+    console.error('usage: node src/decrypt.js <file> [secret]');
     return -1;
   }
   const data = await fs.readFile(process.argv[2]);
-  const decrypted = decrypt('***', data);
+  const decrypted = decrypt(process.argv[3] || '***', data);
   process.stdout.write(JSON.stringify(JSON.parse(decrypted.toString('utf-8')), null, 2));
   process.stdout.write('\n');
   return 0;

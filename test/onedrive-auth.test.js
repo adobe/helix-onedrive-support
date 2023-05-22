@@ -227,6 +227,7 @@ describe('OneDriveAuth Tests', () => {
     nock.openid();
     nock.revoked();
 
+    let baseRefreshed = false;
     const od2 = new OneDriveAuth({
       clientId: '83ab2922-5f11-4e4d-96f3-d1e0ff152856',
       clientSecret: 'test-client-secret',
@@ -234,10 +235,19 @@ describe('OneDriveAuth Tests', () => {
       tenant: 'common',
       cachePlugin: new MemCachePlugin({
         key: 'default',
+        base: {
+          beforeCacheAccess: () => {
+            baseRefreshed = true;
+          },
+        },
         caches,
       }),
     });
-    assert.strictEqual(await od2.authenticate(true), null);
+
+    const result = await od2.authenticate(true);
+    assert.strictEqual(result, null);
+    assert.strictEqual(caches.size, 0);
+    assert.strictEqual(baseRefreshed, true);
 
     const od3 = new OneDriveAuth({
       clientId: '83ab2922-5f11-4e4d-96f3-d1e0ff152856',
