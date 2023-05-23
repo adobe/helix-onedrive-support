@@ -282,29 +282,30 @@ export class OneDriveAuth {
 
     let accounts = await app.getTokenCache().getAllAccounts();
     if (accounts.length > 0) {
-      const account = accounts[0];
+      let account = accounts[0];
 
       try {
         return await app.acquireTokenSilent({ account });
       } catch (e) {
         this.handleAcquireError(account, e);
       }
-    }
 
-    // try again with fresh mem cache
-    if (this.cachePlugin instanceof MemCachePlugin) {
-      this.cachePlugin.clear();
+      // try again with fresh mem cache
+      if (this.cachePlugin instanceof MemCachePlugin) {
+        this.cachePlugin.clear();
 
-      accounts = await app.getTokenCache().getAllAccounts();
-      if (accounts.length > 0) {
-        const account = accounts[0];
-        try {
-          return await app.acquireTokenSilent({
-            forceRefresh: true,
-            account,
-          });
-        } catch (e) {
-          this.handleAcquireError(account, e, true);
+        accounts = await app.getTokenCache().getAllAccounts();
+        if (accounts.length > 0) {
+          [account] = accounts;
+
+          try {
+            return await app.acquireTokenSilent({
+              forceRefresh: true,
+              account,
+            });
+          } catch (e) {
+            this.handleAcquireError(account, e, true);
+          }
         }
       }
     }
