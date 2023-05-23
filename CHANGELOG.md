@@ -1,3 +1,10 @@
+## [10.0.12](https://github.com/adobe/helix-onedrive-support/compare/v10.0.11...v10.0.12) (2023-05-23)
+
+
+### Bug Fixes
+
+* retry only when some account was found ([#389](https://github.com/adobe/helix-onedrive-support/issues/389)) ([f581ff5](https://github.com/adobe/helix-onedrive-support/commit/f581ff58b9dc2f8029fcd4c778f74d41a048d085))
+
 ## [10.0.11](https://github.com/adobe/helix-onedrive-support/compare/v10.0.10...v10.0.11) (2023-05-22)
 
 
