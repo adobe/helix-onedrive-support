@@ -64,7 +64,7 @@ export class RateLimit {
   }
 
   toString() {
-    let s = `\n  limit: ${this.limit}\n  remaining: ${this.remaining}\n  reset: ${this.reset}`;
+    let s = `\n  limit: ${this.limit}\n  remaining: ${this.remaining}\n  reset: ${this.reset} seconds`;
     if (this.retryAfter) {
       s = `${s}\n  retry after: ${this.retryAfter}`;
     }
