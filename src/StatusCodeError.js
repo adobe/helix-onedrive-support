@@ -39,15 +39,16 @@ export class StatusCodeError extends Error {
    * Converts a Graph API error response to a status code error.
    * @param {object} errorBody The parsed error response body
    * @param {number} statusCode The status code of the error response
+   * @param {RateLimit} rateLimit rate limit or null
    * @param {object} details The underlying error
    * @returns {StatusCodeError} status code error
    */
-  static fromErrorResponse(errorBody, statusCode) {
+  static fromErrorResponse(errorBody, statusCode, rateLimit) {
     if (errorBody.error && errorBody.error.message) {
       // eslint-disable-next-line no-param-reassign
       errorBody = errorBody.error;
     }
-    return new StatusCodeError(errorBody.message, statusCode, errorBody);
+    return new StatusCodeError(errorBody.message, statusCode, errorBody, rateLimit);
   }
 
   /**
@@ -56,10 +57,12 @@ export class StatusCodeError extends Error {
    * @param {string} msg Error message
    * @param {number} statusCode Status code of the error response
    * @param {object} details underlying error
+   * @param {RateLimit} rateLimit rate limit or null
    */
-  constructor(msg, statusCode, details) {
+  constructor(msg, statusCode, details, rateLimit) {
     super(msg?.value ?? msg);
     this.statusCode = statusCode;
     this.details = details;
+    this.rateLimit = rateLimit;
   }
 }

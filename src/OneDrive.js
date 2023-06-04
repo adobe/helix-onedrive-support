@@ -16,6 +16,7 @@ import { Workbook } from './excel/Workbook.js';
 import { StatusCodeError } from './StatusCodeError.js';
 import { editDistance, sanitizeName, splitByExtension } from './utils.js';
 import { SharePointSite } from './SharePointSite.js';
+import { RateLimit } from './RateLimit.js';
 
 /**
  * the maximum subscription time in milliseconds
@@ -128,12 +129,18 @@ export class OneDrive {
     try {
       const { fetch } = this.fetchContext;
       const resp = await fetch(url, opts);
+      const rateLimit = RateLimit.fromHeaders(resp.headers);
+
+      if (rateLimit) {
+        this.log.warn(`Rate limit reported: ${rateLimit.toString()}\nfor tenant: ${this.auth.tenant}`);
+      }
+
       if (!resp.ok) {
         const text = await resp.text();
         let err;
         try {
           // try to parse json
-          err = StatusCodeError.fromErrorResponse(JSON.parse(text), resp.status);
+          err = StatusCodeError.fromErrorResponse(JSON.parse(text), resp.status, rateLimit);
         } catch {
           err = new StatusCodeError(text, resp.status);
         }

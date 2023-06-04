@@ -474,6 +474,10 @@ describe('OneDrive Tests', () => {
       .get('/shares/u!aHR0cHM6Ly9vbmVkcml2ZS5jb20vYS9iL2MvZDA/driveItem')
       .reply(200, {
         id: 'some-id',
+      }, {
+        'RateLimit-Limit': '1200',
+        'RateLimit-Remaining': '120',
+        'RateLimit-Reset': '5',
       });
 
     const od = new OneDrive({
