@@ -1,3 +1,10 @@
+# [10.1.0](https://github.com/adobe/helix-onedrive-support/compare/v10.0.14...v10.1.0) (2023-06-05)
+
+
+### Features
+
+* add rate limit in log and StatusCodeError ([#394](https://github.com/adobe/helix-onedrive-support/issues/394)) ([d9289fd](https://github.com/adobe/helix-onedrive-support/commit/d9289fd12fd290ad6482f3604ab9a3b1b9f1200d))
+
 ## [10.0.14](https://github.com/adobe/helix-onedrive-support/compare/v10.0.13...v10.0.14) (2023-06-03)
 
 
