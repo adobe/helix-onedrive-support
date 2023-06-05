@@ -64,10 +64,14 @@ export class RateLimit {
   }
 
   toString() {
-    let s = `\n  limit: ${this.limit}\n  remaining: ${this.remaining}\n  reset: ${this.reset} seconds`;
+    const o = {
+      limit: this.limit,
+      remaining: this.remaining,
+      reset: this.reset,
+    };
     if (this.retryAfter) {
-      s = `${s}\n  retry after: ${this.retryAfter}`;
+      o.retryAfter = this.retryAfter;
     }
-    return s;
+    return JSON.stringify(o);
   }
 }
