@@ -50,7 +50,7 @@ export class NamedItemContainer {
       });
     } catch (e) {
       if ((e.details && e.details.code === 'ItemAlreadyExists') && e.statusCode !== 409) {
-        throw new StatusCodeError(e.message, 409, e.code, e);
+        throw new StatusCodeError(e.message, 409);
       }
       throw e;
     }
@@ -64,7 +64,7 @@ export class NamedItemContainer {
       });
     } catch (e) {
       if ((e.details && e.details.code === 'ItemNotFound') && e.statusCode !== 404) {
-        throw new StatusCodeError(e.message, 404, e.code, e);
+        throw new StatusCodeError(e.message, 404);
       }
       throw e;
     }
