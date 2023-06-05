@@ -132,7 +132,7 @@ export class OneDrive {
       const rateLimit = RateLimit.fromHeaders(resp.headers);
 
       if (rateLimit) {
-        this.log.warn(`Rate limit reported: ${rateLimit.toString()} for tenant: ${this.auth.tenant}`);
+        this.log.warn({ sharepointRateLimit: { tenant: this.auth.tenant, ...rateLimit.toJSON() } });
       }
 
       if (!resp.ok) {

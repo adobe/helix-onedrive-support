@@ -35,15 +35,15 @@ describe('RateLimit Tests', () => {
 
   it('Creates RateLimit object when some headers are present', async () => {
     const headers = new Headers();
-    headers.set('RateLimit-Limit', 10);
+    headers.set('RateLimit-Limit', '10');
     const rateLimit = RateLimit.fromHeaders(headers);
-    assert.notStrictEqual(rateLimit?.toString(), null);
+    assert.notStrictEqual(rateLimit, null);
   });
 
   it('Returns retryAfter when header is present', async () => {
     const headers = new Headers();
-    headers.set('Retry-After', 30);
+    headers.set('Retry-After', '30');
     const rateLimit = RateLimit.fromHeaders(headers);
-    assert.notStrictEqual(rateLimit?.toString(), null);
+    assert.strictEqual(rateLimit.toJSON().retryAfter, 30);
   });
 });

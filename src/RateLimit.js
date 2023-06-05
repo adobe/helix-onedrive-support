@@ -63,7 +63,7 @@ export class RateLimit {
     return this._retryAfter;
   }
 
-  toString() {
+  toJSON() {
     const o = {
       limit: this.limit,
       remaining: this.remaining,
@@ -72,6 +72,6 @@ export class RateLimit {
     if (this.retryAfter) {
       o.retryAfter = this.retryAfter;
     }
-    return JSON.stringify(o);
+    return o;
   }
 }
