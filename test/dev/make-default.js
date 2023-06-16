@@ -13,15 +13,19 @@ import { S3CacheManager } from '@adobe/helix-shared-tokencache';
 import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
 async function run() {
-  const [, , owner, repo, type = 'onedrive', key = 'content'] = process.argv;
-  if (!owner) {
-    console.error('usage: node get owner repo [type = onedrive] [key = content]');
+  const [, , srcOwnerRepo, owner, type = 'onedrive', key = 'content'] = process.argv;
+  if (!srcOwnerRepo) {
+    console.error('usage: node make-default.js owner/repo [dst-owner] [type = onedrive] [key = content]');
     process.exit(1);
+  }
+  let dstOwner = owner;
+  if (!dstOwner) {
+    [dstOwner] = srcOwnerRepo.split['/'];
   }
   const s3 = new S3Client();
   const res = await s3.send(new GetObjectCommand({
     Bucket: 'helix-code-bus',
-    Key: `${owner}/${repo}/main/helix-config.json`,
+    Key: `${srcOwnerRepo}/main/helix-config.json`,
   }));
   const contentBusId = res.Metadata['x-contentbus-id'].substring(2);
   if (!contentBusId) {
@@ -37,8 +41,8 @@ async function run() {
   });
   const orgCache = new S3CacheManager({
     log: console,
-    prefix: `${owner}/.helix-auth`,
-    secret: owner,
+    prefix: `${dstOwner}/.helix-auth`,
+    secret: dstOwner,
     bucket: 'helix-code-bus',
     type,
   });
