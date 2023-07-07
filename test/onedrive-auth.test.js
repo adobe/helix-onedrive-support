@@ -31,7 +31,7 @@ describe('OneDriveAuth Tests', () => {
   });
 
   it('throws when required parameters are not specified.', async () => {
-    assert.throws(() => new OneDriveAuth({}), Error('Either of clientId or accessToken must not be null.'));
+    assert.throws(() => new OneDriveAuth({}), Error('Either clientId or accessToken must not be null.'));
   });
 
   it('can be constructed.', async () => {
