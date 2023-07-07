@@ -1,3 +1,10 @@
+# [10.2.0](https://github.com/adobe/helix-onedrive-support/compare/v10.1.3...v10.2.0) (2023-07-07)
+
+
+### Features
+
+* support onedrive-auth initialisation with accessToken without clientId ([d616cdd](https://github.com/adobe/helix-onedrive-support/commit/d616cdd12b5eda8f50471a98ea2555763ed4e61a))
+
 ## [10.1.3](https://github.com/adobe/helix-onedrive-support/compare/v10.1.2...v10.1.3) (2023-07-04)
 
 
