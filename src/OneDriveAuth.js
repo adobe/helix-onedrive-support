@@ -58,8 +58,8 @@ export class OneDriveAuth {
   constructor(opts) {
     this.fetchContext = keepAliveNoCache({ userAgent: 'adobe-fetch' });
 
-    if (!opts.clientId) {
-      throw new Error('Missing clientId.');
+    if (!opts.clientId && !opts.accessToken) {
+      throw new Error('Either of clientId or accessToken must not be null.');
     }
     if (opts.username || opts.password) {
       throw new Error('Username/password authentication no longer supported.');
@@ -99,6 +99,10 @@ export class OneDriveAuth {
         key: 'default',
         caches: new Map(),
       });
+    }
+
+    if (opts.accessToken) {
+      this.setAccessToken(opts.accessToken);
     }
   }
 
