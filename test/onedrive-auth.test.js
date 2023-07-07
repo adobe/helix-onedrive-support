@@ -31,7 +31,7 @@ describe('OneDriveAuth Tests', () => {
   });
 
   it('throws when required parameters are not specified.', async () => {
-    assert.throws(() => new OneDriveAuth({}), Error('Missing clientId.'));
+    assert.throws(() => new OneDriveAuth({}), Error('Either clientId or accessToken must not be null.'));
   });
 
   it('can be constructed.', async () => {
@@ -40,6 +40,15 @@ describe('OneDriveAuth Tests', () => {
       clientSecret: 'bar',
     });
     assert.ok(auth);
+  });
+
+  it('can be constructed with accesToken without clientId.', async () => {
+    const auth = new OneDriveAuth({
+      accessToken: 'Bearer dummy',
+    });
+    assert.ok(auth);
+    const accessToken = await auth.authenticate();
+    assert.strictEqual(accessToken.accessToken, 'Bearer dummy');
   });
 
   it('can be disposed.', async () => {

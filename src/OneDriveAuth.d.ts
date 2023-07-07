@@ -17,7 +17,7 @@ export enum AcquireMethod {
 }
 
 export declare interface OneDriveAuthOptions {
-  clientId: string;
+  clientId?: string;
   clientSecret?: string;
   log?: Console;
   tenant?: string;
@@ -25,6 +25,7 @@ export declare interface OneDriveAuthOptions {
   onCode?: Function;
   localAuthCache?:boolean;
   acquireMethod?: AcquireMethod;
+  accessToken?: string;
 
   /**
    * use cache plugin instead for default (global) token cache.
