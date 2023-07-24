@@ -82,7 +82,7 @@ export class OneDriveAuth {
       throw new Error(`Authentication method unknown: ${this.acquireMethod}, should be none or one of: ${validAcquireMethods}`);
     }
     if (this.acquireMethod === AcquireMethod.BY_DEVICE_CODE && !this.onCode) {
-      throw new Error(`Authontication method ${AcquireMethod.BY_DEVICE_CODE} requires 'onCode' parameter`);
+      throw new Error(`Authentication method ${AcquireMethod.BY_DEVICE_CODE} requires 'onCode' parameter`);
     }
     if (!this.acquireMethod && this.onCode) {
       this.acquireMethod = AcquireMethod.BY_DEVICE_CODE;
@@ -133,7 +133,7 @@ export class OneDriveAuth {
           cachePlugin,
         };
       }
-      this._app = this.onCode
+      this._app = this.acquireMethod === AcquireMethod.BY_DEVICE_CODE
         ? new PublicClientApplication(msalConfig)
         : new ConfidentialClientApplication(msalConfig);
     }
@@ -328,7 +328,9 @@ export class OneDriveAuth {
           scopes: this.scopes,
         });
       }
-      if (this.acquireMethod === AcquireMethod.BY_CLIENT_CREDENTIAL) {
+      if (this.acquireMethod === AcquireMethod.BY_CLIENT_CREDENTIAL
+          // check if plugin wants us to use client credentials
+          || (await this.cachePlugin.getPluginMetadata() || {}).useClientCredentials) {
         log.debug('acquire token with client credentials.');
         return await app.acquireTokenByClientCredential({
           scopes: this.scopes,

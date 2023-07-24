@@ -89,7 +89,7 @@ describe('OneDriveAuth Tests', () => {
       clientId: 'foo',
       clientSecret: 'bar',
       acquireMethod: AcquireMethod.BY_DEVICE_CODE,
-    }), Error('Authontication method byDeviceCode requires \'onCode\' parameter'));
+    }), Error('Authentication method byDeviceCode requires \'onCode\' parameter'));
   });
 
   it('can authenticate against a resource', async () => {
@@ -107,6 +107,60 @@ describe('OneDriveAuth Tests', () => {
       resource: 'test-resource',
       tenant: 'common',
       acquireMethod: AcquireMethod.BY_CLIENT_CREDENTIAL,
+    });
+    const resp = await od.authenticate();
+    delete resp.expiresOn;
+    delete resp.extExpiresOn;
+    delete resp.correlationId;
+    assert.deepStrictEqual(resp, {
+      accessToken: 'dummy',
+      account: null,
+      authority: 'https://login.microsoftonline.com/common/',
+      cloudGraphHostName: '',
+      code: undefined,
+      familyId: '',
+      fromCache: false,
+      fromNativeBroker: false,
+      idToken: '',
+      idTokenClaims: {},
+      msGraphHost: '',
+      requestId: '',
+      scopes: [
+        'https://graph.microsoft.com/.default',
+      ],
+      state: '',
+      tenantId: '',
+      tokenType: 'Bearer',
+      uniqueId: '',
+    });
+  });
+
+  it('can authenticate against a resource (by plugin)', async () => {
+    nock.discovery();
+    nock.token({
+      token_type: 'Bearer',
+      refresh_token: 'dummy',
+      access_token: 'dummy',
+      expires_in: 81000,
+    });
+
+    const caches = new Map();
+    const cachePlugin = new MemCachePlugin({
+      key: 'default',
+      caches,
+    });
+    caches.set('default', {
+      metadata: {
+        useClientCredentials: true,
+      },
+    });
+
+    const od = new OneDriveAuth({
+      clientId: '83ab2922-5f11-4e4d-96f3-d1e0ff152856',
+      clientSecret: 'test-client-secret',
+      resource: 'test-resource',
+      tenant: 'common',
+      cachePlugin,
     });
     const resp = await od.authenticate();
     delete resp.expiresOn;
@@ -227,9 +281,9 @@ describe('OneDriveAuth Tests', () => {
     await od1.authenticate();
 
     // make the cached access token expire
-    const entry = JSON.parse(caches.get('default'));
+    const entry = JSON.parse(caches.get('default').data);
     entry.AccessToken[Object.keys(entry.AccessToken)[0]].expires_on = Math.floor(Date.now() / 1000);
-    caches.set('default', JSON.stringify(entry));
+    caches.get('default').data = JSON.stringify(entry);
 
     nock.discovery();
     nock.unauthenticated();
@@ -255,8 +309,8 @@ describe('OneDriveAuth Tests', () => {
 
     const result = await od2.authenticate(true);
     assert.strictEqual(result, null);
-    assert.strictEqual(caches.size, 0);
     assert.strictEqual(baseRefreshed, true);
+    assert.strictEqual(caches.get('default').data, undefined);
 
     const od3 = new OneDriveAuth({
       clientId: '83ab2922-5f11-4e4d-96f3-d1e0ff152856',

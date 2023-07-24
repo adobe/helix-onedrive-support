@@ -9,7 +9,8 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import {AuthenticationResult, ClientApplication, ICachePlugin} from "@azure/msal-node";
+import {AuthenticationResult, ClientApplication } from "@azure/msal-node";
+import { CachePlugin } from "@adobe/helix-shared-tokencache";
 
 export enum AcquireMethod {
   BY_CLIENT_CREDENTIAL = 'byClientCredential',
@@ -30,7 +31,7 @@ export declare interface OneDriveAuthOptions {
   /**
    * use cache plugin instead for default (global) token cache.
    */
-  cachePlugin?: ICachePlugin,
+  cachePlugin?: CachePlugin,
 
   /**
    * Disables the cache for the tenant lookup.

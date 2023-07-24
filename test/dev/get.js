@@ -21,7 +21,12 @@ function createCacheContext() {
       deserialize(json) {
         const data = JSON.parse(json);
         console.log(data);
-        console.log(`\n\nAccount: ${Object.values(data.Account)[0].username}`);
+        const accounts = Object.values(data.Account);
+        if (accounts.length > 0) {
+          console.log(`\n\nAccount: ${accounts[0].username}`);
+        } else {
+          console.log('\n\nNo Accounts.');
+        }
         if (data.AccessToken) {
           const accessToken = Object.values(data.AccessToken)[0];
           console.log(`Access token expires on: ${new Date(Number(accessToken.expires_on) * 1000).toISOString()}`);
@@ -76,6 +81,8 @@ async function run() {
   if (await projectCache.hasCache('content')) {
     const p = await projectCache.getCache('content');
     await p.beforeCacheAccess(createCacheContext());
+    console.log('plugin metadata:');
+    console.log(await p.getPluginMetadata());
   } else {
     console.log('n/a');
   }
