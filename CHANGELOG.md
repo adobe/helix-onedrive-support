@@ -1,3 +1,10 @@
+# [10.3.0](https://github.com/adobe/helix-onedrive-support/compare/v10.2.2...v10.3.0) (2023-07-24)
+
+
+### Features
+
+* cacheplugin can suggest auth via client credentials ([#411](https://github.com/adobe/helix-onedrive-support/issues/411)) ([bd1d02a](https://github.com/adobe/helix-onedrive-support/commit/bd1d02a99550262a26caf1a0a34de555482401a3))
+
 ## [10.2.2](https://github.com/adobe/helix-onedrive-support/compare/v10.2.1...v10.2.2) (2023-07-16)
 
 
