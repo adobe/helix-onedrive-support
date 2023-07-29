@@ -12,8 +12,8 @@
 
 /* eslint-env mocha */
 
-import { AbortError, FetchError } from '@adobe/fetch';
 import assert from 'assert';
+import { AbortError, FetchError } from '@adobe/fetch';
 import { StatusCodeError } from '../src/index.js';
 
 describe('StatusCodeError Tests', () => {

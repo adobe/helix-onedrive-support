@@ -11,8 +11,8 @@
  */
 
 /* eslint-disable no-console */
-import { decrypt } from '@adobe/helix-shared-tokencache';
 import fs from 'fs/promises';
+import { decrypt } from '@adobe/helix-shared-tokencache';
 
 async function run() {
   if (process.argv.length < 3) {
