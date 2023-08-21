@@ -30,6 +30,7 @@ function createCacheContext() {
         if (data.AccessToken) {
           const accessToken = Object.values(data.AccessToken)[0];
           console.log(`Access token expires on: ${new Date(Number(accessToken.expires_on) * 1000).toISOString()}`);
+          console.log(`Access token cached at:  ${new Date(Number(accessToken.cached_at) * 1000).toISOString()}`);
         } else {
           console.log('no access token');
         }
