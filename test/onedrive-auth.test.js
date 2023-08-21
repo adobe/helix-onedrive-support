@@ -105,7 +105,7 @@ describe('OneDriveAuth Tests', () => {
       clientId: '83ab2922-5f11-4e4d-96f3-d1e0ff152856',
       clientSecret: 'test-client-secret',
       resource: 'test-resource',
-      tenant: 'common',
+      tenant: 'adobe',
       acquireMethod: AcquireMethod.BY_CLIENT_CREDENTIAL,
     });
     const resp = await od.authenticate();
@@ -115,7 +115,7 @@ describe('OneDriveAuth Tests', () => {
     assert.deepStrictEqual(resp, {
       accessToken: 'dummy',
       account: null,
-      authority: 'https://login.microsoftonline.com/common/',
+      authority: 'https://login.microsoftonline.com/adobe/',
       cloudGraphHostName: '',
       code: undefined,
       familyId: '',
@@ -159,7 +159,7 @@ describe('OneDriveAuth Tests', () => {
       clientId: '83ab2922-5f11-4e4d-96f3-d1e0ff152856',
       clientSecret: 'test-client-secret',
       resource: 'test-resource',
-      tenant: 'common',
+      tenant: 'adobe',
       cachePlugin,
     });
     const resp = await od.authenticate();
@@ -169,7 +169,7 @@ describe('OneDriveAuth Tests', () => {
     assert.deepStrictEqual(resp, {
       accessToken: 'dummy',
       account: null,
-      authority: 'https://login.microsoftonline.com/common/',
+      authority: 'https://login.microsoftonline.com/adobe/',
       cloudGraphHostName: '',
       code: undefined,
       familyId: '',
@@ -193,7 +193,7 @@ describe('OneDriveAuth Tests', () => {
     nock.discovery();
 
     nock('https://login.microsoftonline.com')
-      .post('/common/oauth2/v2.0/devicecode')
+      .post('/adobe/oauth2/v2.0/devicecode')
       .reply(200, {
         device_code: 'DAQABAAEAAAD',
         expires_in: 900,
@@ -209,14 +209,14 @@ describe('OneDriveAuth Tests', () => {
       access_token: 'dummy',
       expires_in: 81000,
       id_token: new UnsecuredJWT({ sub: 'test' }).encode(),
-      client_info: Buffer.from(JSON.stringify({ uid: 'Bob', utid: 'common' })).toString('base64'),
+      client_info: Buffer.from(JSON.stringify({ uid: 'Bob', utid: 'adobe' })).toString('base64'),
     });
 
     const od = new OneDriveAuth({
       clientId: '83ab2922-5f11-4e4d-96f3-d1e0ff152856',
       clientSecret: 'test-client-secret',
       resource: 'test-resource',
-      tenant: 'common',
+      tenant: 'adobe',
       onCode: async (code) => {
         assert.strictEqual(code.userCode, 'DTSWBVY27');
       },
@@ -233,7 +233,7 @@ describe('OneDriveAuth Tests', () => {
       clientId: '83ab2922-5f11-4e4d-96f3-d1e0ff152856',
       clientSecret: 'test-client-secret',
       resource: 'test-resource',
-      tenant: 'common',
+      tenant: 'adobe',
       acquireMethod: AcquireMethod.BY_CLIENT_CREDENTIAL,
     });
     await assert.rejects(
@@ -245,7 +245,7 @@ describe('OneDriveAuth Tests', () => {
   it('returns null when silent acquire fails', async () => {
     nock.discovery();
     nock('https://login.microsoftonline.com')
-      .post('/common/oauth2/v2.0/devicecode')
+      .post('/adobe/oauth2/v2.0/devicecode')
       .reply(200, {
         device_code: 'DAQABAAEAAAD',
         expires_in: 900,
@@ -260,7 +260,7 @@ describe('OneDriveAuth Tests', () => {
       access_token: 'dummy',
       expires_in: 81000,
       id_token: new UnsecuredJWT({ sub: 'test' }).encode(),
-      client_info: Buffer.from(JSON.stringify({ uid: 'Bob', utid: 'common' })).toString('base64'),
+      client_info: Buffer.from(JSON.stringify({ uid: 'Bob', utid: 'adobe' })).toString('base64'),
     });
 
     const caches = new Map();
@@ -268,7 +268,7 @@ describe('OneDriveAuth Tests', () => {
       clientId: '83ab2922-5f11-4e4d-96f3-d1e0ff152856',
       clientSecret: 'test-client-secret',
       resource: 'test-resource',
-      tenant: 'common',
+      tenant: 'adobe',
       onCode: async (code) => {
         assert.strictEqual(code.userCode, 'DTSWBVY27');
       },
@@ -287,7 +287,7 @@ describe('OneDriveAuth Tests', () => {
 
     nock.discovery();
     nock.unauthenticated();
-    nock.openid();
+    // nock.openid();
     nock.revoked();
 
     let baseRefreshed = false;
@@ -295,7 +295,7 @@ describe('OneDriveAuth Tests', () => {
       clientId: '83ab2922-5f11-4e4d-96f3-d1e0ff152856',
       clientSecret: 'test-client-secret',
       resource: 'test-resource',
-      tenant: 'common',
+      tenant: 'adobe',
       cachePlugin: new MemCachePlugin({
         key: 'default',
         base: {
@@ -316,7 +316,7 @@ describe('OneDriveAuth Tests', () => {
       clientId: '83ab2922-5f11-4e4d-96f3-d1e0ff152856',
       clientSecret: 'test-client-secret',
       resource: 'test-resource',
-      tenant: 'common',
+      tenant: 'adobe',
       cachePlugin: new MemCachePlugin({
         key: 'default',
         caches,
@@ -517,7 +517,7 @@ describe('OneDriveAuth Tests', () => {
       clientId: '83ab2922-5f11-4e4d-96f3-d1e0ff152856',
       clientSecret: 'test-client-secret',
       resource: 'test-resource',
-      tenant: 'common',
+      tenant: 'adobe',
     });
 
     const token = await od.authenticate(true);
