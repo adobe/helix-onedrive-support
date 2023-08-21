@@ -53,8 +53,8 @@ export function Nock() {
     .post('/common/oauth2/token?api-version=1.0')
     .reply(200, auth);
 
-  nocker.discovery = (tenant = 'common') => nocker('https://login.microsoftonline.com')
-    .get(`/${tenant}/discovery/instance?api-version=1.1&authorization_endpoint=https://login.windows.net/${tenant}/oauth2/v2.0/authorize`)
+  nocker.discovery = (tenant = 'adobe') => nocker('https://login.microsoftonline.com')
+    .get(`/common/discovery/instance?api-version=1.1&authorization_endpoint=https://login.windows.net/${tenant}/oauth2/v2.0/authorize`)
     .reply(200, {
       tenant_discovery_endpoint: `https://login.windows.net/${tenant}/v2.0/.well-known/openid-configuration`,
       'api-version': '1.1',
@@ -74,9 +74,10 @@ export function Nock() {
       token_endpoint: `https://login.microsoftonline.com/${tenant}/oauth2/v2.0/token`,
       issuer: 'https://login.microsoftonline.com/{tenantid}/v2.0',
       authorization_endpoint: `https://login.microsoftonline.com/${tenant}/oauth2/v2.0/authorize`,
+      jwks_uri: `https://login.microsoftonline.com/${tenant}/discovery/v2.0/keys`,
     });
 
-  nocker.openid = (tenant = 'common') => nocker('https://login.microsoftonline.com')
+  nocker.openid = (tenant = 'adobe') => nocker('https://login.microsoftonline.com')
     .get(`/${tenant}/v2.0/.well-known/openid-configuration`)
     .reply(200, {
       token_endpoint: `https://login.microsoftonline.com/${tenant}/oauth2/v2.0/token`,
@@ -85,11 +86,11 @@ export function Nock() {
     });
 
   nocker.token = (token) => nocker('https://login.microsoftonline.com')
-    .post('/common/oauth2/v2.0/token')
+    .post('/adobe/oauth2/v2.0/token')
     .reply(200, token);
 
   nocker.unauthenticated = () => nocker('https://login.microsoftonline.com')
-    .post('/common/oauth2/v2.0/token')
+    .post('/adobe/oauth2/v2.0/token')
     .reply(401, {
       error: 'invalid_client',
       error_description: 'AADSTS7000215: Invalid client secret provided.',
@@ -103,7 +104,7 @@ export function Nock() {
     });
 
   nocker.revoked = () => nocker('https://login.microsoftonline.com')
-    .post('/common/oauth2/v2.0/token')
+    .post('/adobe/oauth2/v2.0/token')
     .reply(400, {
       error: 'invalid_grant',
       error_description: 'AADSTS50173: The provided grant has expired due to it being revoked, a fresh auth token is needed. The user might have changed or reset their password.',
