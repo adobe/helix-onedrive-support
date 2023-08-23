@@ -13,7 +13,13 @@
 /* eslint-disable no-console,no-await-in-loop */
 
 import { S3CacheManager } from '@adobe/helix-shared-tokencache';
-import { ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3';
+import { GetObjectCommand, ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3';
+import { Console } from 'node:console';
+
+const out = process.stdout.write.bind(process.stdout);
+
+// eslint-disable-next-line no-global-assign
+console = new Console(process.stderr, process.stderr);
 
 async function list(s3, bucket, prefix, deep = false) {
   let ContinuationToken;
@@ -45,13 +51,27 @@ async function list(s3, bucket, prefix, deep = false) {
   return objects;
 }
 
-function createCacheContext(type) {
+async function loadInfo(s3, id) {
+  try {
+    const ret = await s3.send(new GetObjectCommand({
+      Bucket: 'helix-content-bus',
+      Key: `${id}/.hlx.json`,
+    }));
+    return JSON.parse(await ret.Body.transformToString('utf-8'));
+  } catch (e) {
+    console.error(`unable to load .hlx.json for ${id}`, e);
+    return null;
+  }
+}
+
+function createCacheContext(type, project) {
   return {
     tokenCache: {
       deserialize(json) {
         const data = JSON.parse(json);
-        // console.log(data);
-        console.log(`\n\n${type} Account: ${Object.values(data.Account)[0].username}`);
+        project.type = type;
+        project.user = Object.values(data.Account)[0]?.username;
+        console.log(`\n\n${type} Account: ${Object.values(data.Account)[0]?.username}`);
         if (data.AccessToken) {
           const accessToken = Object.values(data.AccessToken)[0];
           console.log(`Access token expires on: ${new Date(Number(accessToken.expires_on) * 1000).toISOString()}`);
@@ -71,9 +91,27 @@ async function run() {
     .map(({ key }) => key)
     .filter((key) => key.length === 59);
   console.log('loading projects.... done', ids.length);
-  const onedriveContext = createCacheContext('OneDrive');
-  const googleContext = createCacheContext('Google');
+  const projects = {};
+  let counter = 0;
   for (const id of ids) {
+    // eslint-disable-next-line no-plusplus
+    if (++counter % 100 === 0) {
+      console.log('processing projects', counter, '/', ids.length);
+    }
+    const getProject = async () => {
+      let p = projects[id];
+      if (!p) {
+        p = {};
+        const info = await loadInfo(s3, id);
+        if (info) {
+          p.repository = info['original-repository'];
+          p.mountpoint = info.mountpoint;
+        }
+        projects[id] = p;
+      }
+      return p;
+    };
+
     const onedriveCache = new S3CacheManager({
       log: console,
       prefix: `${id}/.helix-auth`,
@@ -89,14 +127,19 @@ async function run() {
       type: 'google',
     });
     if (await onedriveCache.hasCache('content')) {
+      const project = await getProject();
+      const onedriveContext = createCacheContext('OneDrive', project);
       const p = await onedriveCache.getCache('content');
       await p.beforeCacheAccess(onedriveContext);
-    }
-    if (await googleCache.hasCache('content')) {
+    } else if (await googleCache.hasCache('content')) {
+      const project = await getProject();
+      const googleContext = createCacheContext('Google', project);
       const p = await googleCache.getCache('content');
       await p.beforeCacheAccess(googleContext);
     }
   }
+
+  out(JSON.stringify(projects, null, 2));
 }
 
 run().catch(console.error);
