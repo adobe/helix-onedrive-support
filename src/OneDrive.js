@@ -127,12 +127,18 @@ export class OneDrive {
     opts.headers.authorization = `Bearer ${accessToken}`;
     const url = `https://graph.microsoft.com/v1.0${relUrl}`;
     try {
+      const { log, auth: { label, tenant } } = this;
+      if (label) {
+        const method = opts.method || 'GET';
+        log.info(`OneDrive API [${tenant}/${label}]: ${method} ${relUrl}`);
+      }
+
       const { fetch } = this.fetchContext;
       const resp = await fetch(url, opts);
       const rateLimit = RateLimit.fromHeaders(resp.headers);
 
       if (rateLimit) {
-        this.log.warn({ sharepointRateLimit: { tenant: this.auth.tenant, ...rateLimit.toJSON() } });
+        log.warn({ sharepointRateLimit: { tenant, ...rateLimit.toJSON() } });
       }
 
       if (!resp.ok) {

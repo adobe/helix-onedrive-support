@@ -76,6 +76,7 @@ export class OneDriveAuth {
     this.scopes = opts.scopes || DEFAULT_SCOPES;
     this.onCode = opts.onCode;
     this.acquireMethod = opts.acquireMethod || '';
+    this.label = opts.label;
 
     const validAcquireMethods = Array.from(Object.values(AcquireMethod));
     if (this.acquireMethod && !validAcquireMethods.includes(this.acquireMethod)) {

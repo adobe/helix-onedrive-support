@@ -29,6 +29,11 @@ export declare interface OneDriveAuthOptions {
   accessToken?: string;
 
   /**
+   * An optional label. If set, API calls will be logged with that label.
+   */
+  label?: string;
+
+  /**
    * use cache plugin instead for default (global) token cache.
    */
   cachePlugin?: CachePlugin,

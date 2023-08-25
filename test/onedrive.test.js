@@ -481,7 +481,7 @@ describe('OneDrive Tests', () => {
       });
 
     const od = new OneDrive({
-      auth: DEFAULT_AUTH(),
+      auth: DEFAULT_AUTH({ label: 'ovner/repo' }),
     });
     const item1 = await od.getDriveItemFromShareLink('https://onedrive.com/a/b/c/d0');
     assert.deepStrictEqual(item1, {
@@ -655,7 +655,7 @@ describe('OneDrive Tests', () => {
         id: driveItem.id,
       });
     const drive = new OneDrive({
-      auth: DEFAULT_AUTH(),
+      auth: DEFAULT_AUTH({ label: 'ovner/repo' }),
     });
     const result = await drive.uploadDriveItem(Buffer.alloc(2), driveItem);
     assert(result);
