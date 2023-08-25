@@ -355,6 +355,10 @@ export class OneDriveMock extends OneDrive {
       segs.shift();
       if (segs[0]) {
         const sheetName = segs.shift();
+        if (method === 'DELETE' && segs.length === 0) {
+          data.sheets = data.sheets.filter((s) => (s.name !== sheetName));
+          return data.sheets;
+        }
         sheet = data.sheets.find((s) => (s.name === sheetName));
         if (!sheet) {
           throw new StatusCodeError(sheetName, 404);
@@ -363,6 +367,11 @@ export class OneDriveMock extends OneDrive {
           // if no more segments, return the sheet data
           return { value: sheet };
         }
+      } else if (method === 'POST') {
+        data.sheets.push({
+          name: body.name,
+        });
+        return { value: data.sheets.map((st) => ({ name: st.name })) };
       } else {
         return { value: data.sheets.map((st) => ({ name: st.name })) };
       }

@@ -349,6 +349,13 @@ export class OneDrive {
 
   /**
    */
+  async getParentDriveItem(driveItem) {
+    const parentURI = `/drives/${driveItem.parentReference.driveId}/items/${driveItem.parentReference.id}`;
+    return this.doFetch(parentURI, false);
+  }
+
+  /**
+   */
   async downloadDriveItem(driveItem) {
     const uri = `/drives/${driveItem.parentReference.driveId}/items/${driveItem.id}/content`;
     return this.doFetch(uri, true);

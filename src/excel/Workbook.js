@@ -38,6 +38,24 @@ export class Workbook extends NamedItemContainer {
     return new Worksheet(this._oneDrive, `${this._uri}/worksheets`, name, this._log);
   }
 
+  async createWorksheet(sheetName) {
+    const uri = `${this.uri}/worksheets`;
+    await this._oneDrive.doFetch(uri, false, {
+      method: 'POST',
+      body: { name: sheetName },
+      headers: { 'content-type': 'application/json' },
+    });
+    return this.worksheet(sheetName);
+  }
+
+  async deleteWorksheet(sheetName) {
+    const uri = `${this.uri}/worksheets/${sheetName}`;
+    return this._oneDrive.doFetch(uri, false, {
+      method: 'DELETE',
+      headers: { 'content-type': 'application/json' },
+    });
+  }
+
   async getTableNames() {
     this.log.debug(`get table names from ${this._uri}/tables`);
     const result = await this._oneDrive.doFetch(`${this._uri}/tables`);

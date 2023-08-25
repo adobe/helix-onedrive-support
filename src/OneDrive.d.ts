@@ -149,6 +149,14 @@ export declare class OneDrive extends EventEmitter {
    */
   getDriveItem(folderItem: DriveItem, relPath?: string, download?: boolean): Promise<GraphResult>;
 
+
+   /**
+   * Returns the parentdrive item for the given driveItem
+   *
+   * @param {DriveItem} driveItem Drive Item.
+   */
+   getParentDriveItem(driveItem: DriveItemn): Promise<GraphResult>;
+
   /**
    * Tries to get the drive items for the given folder and relative path, by loading the files of
    * the respective directory and returning the item with the best matching filename. Please note,

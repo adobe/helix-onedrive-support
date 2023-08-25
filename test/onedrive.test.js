@@ -717,6 +717,30 @@ describe('OneDrive Tests', () => {
     assert(Buffer.isBuffer(result));
   });
 
+  it('getParentDriveItem returns item', async () => {
+    const data = {
+      folder: { childCount: 1 },
+      name: 'test',
+    };
+
+    const driveItem = {
+      parentReference: {
+        driveId: '1',
+        id: '2',
+      },
+      id: '3',
+    };
+
+    nock('https://graph.microsoft.com/v1.0')
+      .get(`/drives/${driveItem.parentReference.driveId}/items/${driveItem.parentReference.id}`)
+      .reply(200, data);
+    const od = new OneDrive({
+      auth: DEFAULT_AUTH(),
+    });
+    const result = await od.getParentDriveItem(driveItem);
+    assert.deepStrictEqual(result, data);
+  });
+
   it('can getWorkbook', async () => {
     const fileItem = {
       parentReference: {
