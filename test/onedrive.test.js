@@ -481,7 +481,7 @@ describe('OneDrive Tests', () => {
       });
 
     const od = new OneDrive({
-      auth: DEFAULT_AUTH(),
+      auth: DEFAULT_AUTH({ logFields: { project: 'owner/repo' } }),
     });
     const item1 = await od.getDriveItemFromShareLink('https://onedrive.com/a/b/c/d0');
     assert.deepStrictEqual(item1, {

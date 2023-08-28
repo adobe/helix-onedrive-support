@@ -29,6 +29,11 @@ export declare interface OneDriveAuthOptions {
   accessToken?: string;
 
   /**
+   * Optional log fields, as key-value object.
+   */
+  logFields?: object;
+
+  /**
    * use cache plugin instead for default (global) token cache.
    */
   cachePlugin?: CachePlugin,

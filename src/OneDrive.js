@@ -125,14 +125,19 @@ export class OneDrive {
       opts.headers = {};
     }
     opts.headers.authorization = `Bearer ${accessToken}`;
+
+    const { log, auth: { logFields, tenant } } = this;
     const url = `https://graph.microsoft.com/v1.0${relUrl}`;
+    const method = opts.method || 'GET';
+
     try {
       const { fetch } = this.fetchContext;
       const resp = await fetch(url, opts);
-      const rateLimit = RateLimit.fromHeaders(resp.headers);
+      log.info(`OneDrive API [tenant:${tenant}] ${logFields}: ${method} ${relUrl} ${resp.status}`);
 
+      const rateLimit = RateLimit.fromHeaders(resp.headers);
       if (rateLimit) {
-        this.log.warn({ sharepointRateLimit: { tenant: this.auth.tenant, ...rateLimit.toJSON() } });
+        log.warn({ sharepointRateLimit: { tenant, ...rateLimit.toJSON() } });
       }
 
       if (!resp.ok) {
@@ -157,6 +162,7 @@ export class OneDrive {
       if (!(e instanceof StatusCodeError)) {
         err = StatusCodeError.fromError(e);
       }
+      log.info(`OneDrive API [tenant:${tenant}] ${logFields}: ${method} ${relUrl} ${e.statusCode}`);
       throw err;
     }
   }
