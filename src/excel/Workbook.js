@@ -50,7 +50,7 @@ export class Workbook extends NamedItemContainer {
 
   async deleteWorksheet(sheetName) {
     const uri = `${this.uri}/worksheets/${sheetName}`;
-    return this._oneDrive.doFetch(uri, false, {
+    await this._oneDrive.doFetch(uri, false, {
       method: 'DELETE',
       headers: { 'content-type': 'application/json' },
     });

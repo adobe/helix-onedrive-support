@@ -32,7 +32,6 @@ export declare interface Workbook {
    * @returns Worksheet
    * 
    */
-
   createWorksheet(sheetName: string): Worksheet;
 
    /**
@@ -40,7 +39,6 @@ export declare interface Workbook {
     * @param {string} sheetName sheet name
     * 
     */
- 
   deleteWorksheet(sheetName: string): Promise<void>;
 
   /**
