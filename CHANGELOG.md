@@ -1,3 +1,10 @@
+# [10.4.0](https://github.com/adobe/helix-onedrive-support/compare/v10.3.7...v10.4.0) (2023-08-28)
+
+
+### Features
+
+* add log fields for API call logging ([#425](https://github.com/adobe/helix-onedrive-support/issues/425)) ([36f88db](https://github.com/adobe/helix-onedrive-support/commit/36f88db697db73a7fc24da062f66d66aeab32bc0))
+
 ## [10.3.7](https://github.com/adobe/helix-onedrive-support/compare/v10.3.6...v10.3.7) (2023-08-21)
 
 
