@@ -53,6 +53,9 @@ export default {
       ],
     },
   },
+  {
+    name: 'sheet2',
+  },
   ],
   namedItems,
 };

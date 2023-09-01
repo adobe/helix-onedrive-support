@@ -65,7 +65,7 @@ describe('Workbook Tests', () => {
 
   it('Get sheet names', async () => {
     const values = await book.getWorksheetNames();
-    assert.deepStrictEqual(values, ['sheet']);
+    assert.deepStrictEqual(values, ['sheet', 'sheet2']);
   });
   it('Get table names', async () => {
     const values = await book.getTableNames();
@@ -122,5 +122,20 @@ describe('Workbook Tests', () => {
   it('Delete named item that doesn\'t exist', async () => {
     const name = 'fred';
     await assert.rejects(async () => book.deleteNamedItem(name), /Named item not found/);
+  });
+
+  it('create worksheet', async () => {
+    const sheetName = 'TestSheet';
+    await book.createWorksheet(sheetName);
+    const sheetNames = await book.getWorksheetNames();
+    assert.strictEqual(sheetNames.includes(sheetName), true);
+  });
+
+  it('delete worksheet that already exists', async () => {
+    const sheetName = 'sheet2';
+    await book.deleteWorksheet(sheetName);
+    const sheetNames = await book.getWorksheetNames();
+    console.log(sheetNames);
+    assert.strictEqual(sheetNames.includes(sheetName), false);
   });
 });
