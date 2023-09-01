@@ -25,20 +25,18 @@ export declare interface Workbook {
   getWorksheetNames(): Promise<string[]>;
 
 
-   /**
+  /**
    * Create the worksheet with given name in the workbook.
-   *
    * @param {string} sheetName sheet name
    * @returns Worksheet
    * 
    */
   createWorksheet(sheetName: string): Worksheet;
 
-   /**
-    * Delete the worksheet with given name in the workbook.
-    * @param {string} sheetName sheet name
-    * 
-    */
+  /**
+   * Delete the worksheet with given name in the workbook.
+   * @param {string} sheetName sheet name
+   */
   deleteWorksheet(sheetName: string): Promise<void>;
 
   /**
