@@ -1,3 +1,10 @@
+# [10.5.0](https://github.com/adobe/helix-onedrive-support/compare/v10.4.0...v10.5.0) (2023-09-01)
+
+
+### Features
+
+* added excel workbook functionalities ([8782e56](https://github.com/adobe/helix-onedrive-support/commit/8782e560593b02e56dcb33595256089ffaa35132))
+
 # [10.4.0](https://github.com/adobe/helix-onedrive-support/compare/v10.3.7...v10.4.0) (2023-08-28)
 
 
