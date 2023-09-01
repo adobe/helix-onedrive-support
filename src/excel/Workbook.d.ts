@@ -24,7 +24,6 @@ export declare interface Workbook {
    */
   getWorksheetNames(): Promise<string[]>;
 
-
   /**
    * Create the worksheet with given name in the workbook.
    * @param {string} sheetName sheet name
