@@ -1,3 +1,10 @@
+# [10.6.0](https://github.com/adobe/helix-onedrive-support/compare/v10.5.1...v10.6.0) (2023-09-04)
+
+
+### Features
+
+* support insert and delete range operations ([#430](https://github.com/adobe/helix-onedrive-support/issues/430)) ([7fda231](https://github.com/adobe/helix-onedrive-support/commit/7fda2313ac90dba164fc9d75d45fd24eb5feefba))
+
 ## [10.5.1](https://github.com/adobe/helix-onedrive-support/compare/v10.5.0...v10.5.1) (2023-09-02)
 
 
