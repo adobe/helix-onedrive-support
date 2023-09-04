@@ -387,17 +387,19 @@ export class OneDriveMock extends OneDrive {
       case 'names':
         return handleNamedItems(sheet, segs, method, body);
       default:
-        if (type && type.startsWith('range(address=')) {
+        if (type?.startsWith('range(address=') && sheet.usedRange?.values) {
           const address = type.match(/range\(address='([^)]+)'\)/)[1];
           const operation = segs.shift();
           const usedRangeValues = [...sheet.usedRange.values];
           if (operation === 'delete') {
+            // todo: properly splice
             if (address === 'A2:B2') {
               usedRangeValues.splice(1, 1);
               sheet.usedRange.values = usedRangeValues;
             }
           } else if (operation === 'insert') {
             if (address === 'A2:B2') {
+              // todo: properly splice
               usedRangeValues.splice(2, 0, ['', '']);
               sheet.usedRange.values = usedRangeValues;
             }
