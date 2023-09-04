@@ -60,4 +60,19 @@ export declare interface Range {
    *               array dimension as the range addressed
    */
   update(values: object): Promise<void>;
+
+  /**
+   * Deletes the cells associated with the range.
+   * @param shiftValue Specifies which way to shift the cells. 
+   *                   The possible values are: Up, Left.
+   */
+  delete(shiftValue: string): Promise<void>;
+
+  /**
+   * Inserts a cell or a range of cells into the worksheet in place of this range, 
+   * and shifts the other cells to make space.
+   * @param shiftValue Specifies which way to shift the cells. 
+   *                   The possible values are: Down, Right.
+   */
+  insert(shiftValue: string): Promise<void>;
 }

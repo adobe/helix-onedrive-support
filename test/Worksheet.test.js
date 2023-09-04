@@ -142,4 +142,30 @@ describe('Worksheet Tests', () => {
     await range.update(values);
     assert.deepStrictEqual(values, await range.getValues());
   });
+
+  it('Delete range', async () => {
+    const range = sheet.range('A2:B2');
+    await range.delete();
+    const updatedRange = sheet.usedRange();
+    const data = await updatedRange.getRowsAsObjects();
+    assert.deepStrictEqual(data, [
+      { '  c r e a t e d  ': 2019, project: 'What' },
+      { '  c r e a t e d  ': 2020, project: 'this' },
+      { '  c r e a t e d  ': '\t 2021 ', project: ' Space\u200B ' },
+    ]);
+  });
+
+  it('Insert range', async () => {
+    const range = sheet.range('A2:B2');
+    await range.insert();
+    const updatedRange = sheet.usedRange();
+    const data = await updatedRange.getRowsAsObjects();
+    assert.deepStrictEqual(data, [
+      { '  c r e a t e d  ': 2018, project: 'Helix' },
+      { '  c r e a t e d  ': '', project: '' },
+      { '  c r e a t e d  ': 2019, project: 'What' },
+      { '  c r e a t e d  ': 2020, project: 'this' },
+      { '  c r e a t e d  ': '\t 2021 ', project: ' Space\u200B ' },
+    ]);
+  });
 });

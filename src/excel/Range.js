@@ -85,4 +85,21 @@ export class Range {
     });
     this._values = result.values;
   }
+
+  async delete(shift = 'Up') {
+    await this._oneDrive.doFetch(`${this.uri}/delete`, false, {
+      method: 'POST',
+      body: { shift },
+    });
+    this._values = null;
+    this._data = null;
+  }
+
+  async insert(shift = 'Down') {
+    const result = await this._oneDrive.doFetch(`${this.uri}/insert`, false, {
+      method: 'POST',
+      body: { shift },
+    });
+    this._values = result.values;
+  }
 }
