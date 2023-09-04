@@ -1,3 +1,10 @@
+## [10.6.2](https://github.com/adobe/helix-onedrive-support/compare/v10.6.1...v10.6.2) (2023-09-04)
+
+
+### Bug Fixes
+
+* guard agains empty sheet ([#431](https://github.com/adobe/helix-onedrive-support/issues/431)) ([6dba2ec](https://github.com/adobe/helix-onedrive-support/commit/6dba2ecd0801bd92d39f3842afc21dc4e409ff68))
+
 ## [10.6.1](https://github.com/adobe/helix-onedrive-support/compare/v10.6.0...v10.6.1) (2023-09-04)
 
 
