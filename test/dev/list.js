@@ -68,18 +68,25 @@ function createCacheContext(type, project) {
   return {
     tokenCache: {
       deserialize(json) {
-        const data = JSON.parse(json);
-        project.type = type;
-        project.user = Object.values(data.Account)[0]?.username;
-        console.log(`\n\n${type} Account: ${Object.values(data.Account)[0]?.username}`);
-        if (data.AccessToken) {
-          const accessToken = Object.values(data.AccessToken)[0];
-          console.log(`Access token expires on: ${new Date(Number(accessToken.expires_on) * 1000).toISOString()}`);
-        } else {
-          console.log('no access token');
+        try {
+          const data = JSON.parse(json);
+          // console.log(data);
+          project.type = type;
+          console.log('Mountpoint:', project.mountpoint);
+          console.log('Repository:', project.repository);
+          if (data.Account) {
+            project.account = Object.values(data.Account)[0]?.username;
+            console.log(`   Account: ${project.account}`);
+          }
+          if (data.id_token) {
+            const payload = JSON.parse(Buffer.from(data.id_token.split('.')[1], 'base64'));
+            project.user = payload.email;
+            console.log(`      User: ${project.user}`);
+          }
+        } catch (e) {
+          console.error('error deserializing cache', e);
         }
       },
-
     },
   };
 }
@@ -131,7 +138,8 @@ async function run() {
       const onedriveContext = createCacheContext('OneDrive', project);
       const p = await onedriveCache.getCache('content');
       await p.beforeCacheAccess(onedriveContext);
-    } else if (await googleCache.hasCache('content')) {
+    }
+    if (await googleCache.hasCache('content')) {
       const project = await getProject();
       const googleContext = createCacheContext('Google', project);
       const p = await googleCache.getCache('content');
