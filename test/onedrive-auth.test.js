@@ -124,6 +124,7 @@ describe('OneDriveAuth Tests', () => {
       idToken: '',
       idTokenClaims: {},
       msGraphHost: '',
+      refreshOn: undefined,
       requestId: '',
       scopes: [
         'https://graph.microsoft.com/.default',
@@ -177,6 +178,7 @@ describe('OneDriveAuth Tests', () => {
       fromNativeBroker: false,
       idToken: '',
       idTokenClaims: {},
+      refreshOn: undefined,
       msGraphHost: '',
       requestId: '',
       scopes: [
