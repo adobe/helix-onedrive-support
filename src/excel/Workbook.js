@@ -39,7 +39,7 @@ export class Workbook extends NamedItemContainer {
   }
 
   async createSession() {
-    const sessionId = this._oneDrive.getWorkbookSessionId(this._uri);
+    const sessionId = this._oneDrive.workbookSessionId;
     if (sessionId) {
       return sessionId;
     } else {
@@ -47,13 +47,13 @@ export class Workbook extends NamedItemContainer {
       const result = await this._oneDrive.doFetch(uri, false, {
         method: 'POST',
       });
-      this._oneDrive.setWorkbookSessionId(this._uri, result.id);
+      this._oneDrive.setWorkbookSessionId(result.id);
       return result.id;
     }
   }
 
   setSessionId(sessionId) {
-    this._oneDrive.setWorkbookSessionId(this._uri, sessionId);
+    this._oneDrive.setWorkbookSessionId(sessionId);
   }
 
   async createWorksheet(sheetName) {

@@ -103,5 +103,5 @@ export declare interface Workbook {
    * Sets the sessionId of the workbook
    * @param sessionId 
    */
-  setSessionId(sessionId: string): string;
+  setSessionId(sessionId: string): void;
 }

@@ -71,12 +71,12 @@ export class Table {
     return result.values[0];
   }
 
-  async addRow(values, index) {
+  async addRow(values, index = null) {
     const result = await this.addRows([values], index);
     return result;
   }
 
-  async addRows(values, index) {
+  async addRows(values, index = null) {
     const result = await this._oneDrive.doFetch(`${this.uri}/rows/add`, false, {
       method: 'POST',
       body: {

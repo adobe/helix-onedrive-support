@@ -111,7 +111,7 @@ function handleTable(container, segs, method, body) {
       }
       const subCommand = segs.shift();
       if (subCommand === 'add') {
-        if (body.index >= 0) {
+        if (body.index && body.index >= 0) {
           table.rows.splice(body.index, 0, ...body.values);
           return { index: body.index };
         } else {
