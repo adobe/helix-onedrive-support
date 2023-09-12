@@ -118,6 +118,10 @@ export class OneDrive {
     return this._log;
   }
 
+  getWorkbookSessionId(workbookUri) {
+    return this._workbookSessionIdMap[workbookUri];
+  }
+
   setWorkbookSessionId(workbookUri, workbookSessionId) {
     this._workbookSessionIdMap[workbookUri] = workbookSessionId;
   }

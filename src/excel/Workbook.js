@@ -39,11 +39,17 @@ export class Workbook extends NamedItemContainer {
   }
 
   async createSession() {
-    const uri = `${this.uri}/createSession`;
-    const result = await this._oneDrive.doFetch(uri, false, {
-      method: 'POST',
-    });
-    return result.id;
+    const sessionId = this._oneDrive.getWorkbookSessionId(this._uri);
+    if (sessionId) {
+      return sessionId;
+    } else {
+      const uri = `${this.uri}/createSession`;
+      const result = await this._oneDrive.doFetch(uri, false, {
+        method: 'POST',
+      });
+      this._oneDrive.setWorkbookSessionId(this._uri, result.id);
+      return result.id;
+    }
   }
 
   setSessionId(sessionId) {

@@ -146,6 +146,8 @@ describe('Workbook Tests', () => {
   it('workbook create session', async () => {
     const resp = await book.createSession();
     assert.strictEqual(resp, 'test-session-id');
+    const existingSessionId = await book.createSession();
+    assert.strictEqual(existingSessionId, 'test-session-id');
   });
 
   it('workbook get tables with session id', async () => {
