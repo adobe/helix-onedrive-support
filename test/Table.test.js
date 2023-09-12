@@ -94,6 +94,12 @@ describe('Table Tests', () => {
     const index = await table.addRow(row);
     assert.deepStrictEqual(row, sampleTable.rows[index]);
   });
+
+  it('Add row to table at index', async () => {
+    const row = ['Heisenberg', 'Werner'];
+    const index = await table.addRow(row, 2);
+    assert.deepStrictEqual(row, sampleTable.rows[index]);
+  });
   it('Add rows to table', async () => {
     const rows = [['Heisenberg', 'Werner'], ['Planck', 'Max']];
     const index = await table.addRows(rows);

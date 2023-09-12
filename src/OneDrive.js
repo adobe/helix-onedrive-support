@@ -99,6 +99,7 @@ export class OneDrive {
       /** @type {Map<string, string>} */
       this.shareLinkCache = opts.shareLinkCache || globalShareLinkCache;
     }
+    this._workbookSessionIdMap = {};
   }
 
   /**
@@ -106,6 +107,7 @@ export class OneDrive {
   async dispose() {
     // TODO: clear other state?
     await this.auth.dispose();
+    this._workbookSessionIdMap = {};
     const { reset } = this.fetchContext;
     return reset();
   }
@@ -114,6 +116,10 @@ export class OneDrive {
    */
   get log() {
     return this._log;
+  }
+
+  setWorkbookSessionId(workbookUri, workbookSessionId) {
+    this._workbookSessionIdMap[workbookUri] = workbookSessionId;
   }
 
   /**
@@ -126,6 +132,12 @@ export class OneDrive {
     }
     opts.headers.authorization = `Bearer ${accessToken}`;
 
+    if (this._workbookSessionIdMap) {
+      const uri = [...Object.keys(this._workbookSessionIdMap)].find((k) => relUrl.includes(k));
+      if (uri) {
+        opts.headers['Workbook-Session-Id'] = this._workbookSessionIdMap[uri];
+      }
+    }
     const { log, auth: { logFields, tenant } } = this;
     const url = `https://graph.microsoft.com/v1.0${relUrl}`;
     const method = opts.method || 'GET';

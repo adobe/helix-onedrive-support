@@ -93,4 +93,15 @@ export declare interface Workbook {
    * @param name name
    */
   deleteNamedItem(name: string): Promise<void>;
+
+  /**
+   * creates a new session
+   */
+  createSession(): Promise<string>;
+
+  /**
+   * Sets the sessionId of the workbook
+   * @param sessionId 
+   */
+  setSessionId(sessionId: string): string;
 }

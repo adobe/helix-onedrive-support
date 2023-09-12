@@ -56,9 +56,10 @@ export declare interface Table {
   /**
    * Add a row to the table
    * @param values values for new row
+   * @param index zero-based index or missing to add at end
    * @returns zero-based index of new row
    */
-  addRow(values: string[]): Promise<number>;
+  addRow(values: string[], index?: number): Promise<number>;
 
   /**
    * Replace a row in the table

@@ -38,6 +38,18 @@ export class Workbook extends NamedItemContainer {
     return new Worksheet(this._oneDrive, `${this._uri}/worksheets`, name, this._log);
   }
 
+  async createSession() {
+    const uri = `${this.uri}/createSession`;
+    const result = await this._oneDrive.doFetch(uri, false, {
+      method: 'POST',
+    });
+    return result.id;
+  }
+
+  setSessionId(sessionId) {
+    this._oneDrive.setWorkbookSessionId(this._uri, sessionId);
+  }
+
   async createWorksheet(sheetName) {
     const uri = `${this.uri}/worksheets`;
     await this._oneDrive.doFetch(uri, false, {
