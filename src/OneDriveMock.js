@@ -384,6 +384,8 @@ export class OneDriveMock extends OneDrive {
       return {
         id: 'test-session-id',
       };
+    } else if (segs[0] === 'refreshSession' || segs[0] === 'closeSession') {
+      return {};
     }
 
     // handle the operations on the workbook / worksheet

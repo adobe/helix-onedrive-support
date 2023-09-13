@@ -100,6 +100,16 @@ export declare interface Workbook {
   createSession(): Promise<string>;
 
   /**
+   * closes the session
+   */
+  closeSession(): Promise<void>;
+
+   /**
+   * refreshes the session
+   */
+  refreshSession(): Promise<void>;
+
+  /**
    * Sets the sessionId of the workbook
    * @param sessionId 
    */

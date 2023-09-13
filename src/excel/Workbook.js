@@ -52,6 +52,29 @@ export class Workbook extends NamedItemContainer {
     }
   }
 
+  async closeSession() {
+    if (this._oneDrive.workbookSessionId) {
+      const uri = `${this.uri}/closeSession`;
+      await this._oneDrive.doFetch(uri, false, {
+        method: 'POST',
+      });
+      this._oneDrive.setWorkbookSessionId(null);
+    } else {
+      throw new StatusCodeError('Please create a session first!', 400);
+    }
+  }
+
+  async refreshSession() {
+    if (this._oneDrive.workbookSessionId) {
+      const uri = `${this.uri}/refreshSession`;
+      await this._oneDrive.doFetch(uri, false, {
+        method: 'POST',
+      });
+    } else {
+      throw new StatusCodeError('Please create a session first!', 400);
+    }
+  }
+
   setSessionId(sessionId) {
     this._oneDrive.setWorkbookSessionId(sessionId);
   }

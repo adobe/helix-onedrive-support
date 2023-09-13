@@ -150,6 +150,26 @@ describe('Workbook Tests', () => {
     assert.strictEqual(existingSessionId, 'test-session-id');
   });
 
+  it('workbook close session', async () => {
+    const resp = await book.createSession();
+    assert.strictEqual(resp, 'test-session-id');
+    await book.closeSession();
+  });
+
+  it('workbook close session without creating', async () => {
+    assert.rejects(async () => book.closeSession(), /Please create a session first!/);
+  });
+
+  it('workbook refresh session', async () => {
+    const resp = await book.createSession();
+    assert.strictEqual(resp, 'test-session-id');
+    await book.refreshSession();
+  });
+
+  it('workbook refresh session without creating', async () => {
+    assert.rejects(async () => book.refreshSession(), /Please create a session first!/);
+  });
+
   it('workbook get tables with session id', async () => {
     const nock = new Nock();
     const folderItem = {
