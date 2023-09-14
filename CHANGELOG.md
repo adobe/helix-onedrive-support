@@ -1,3 +1,10 @@
+# [10.7.0](https://github.com/adobe/helix-onedrive-support/compare/v10.6.5...v10.7.0) (2023-09-14)
+
+
+### Features
+
+* add row at index and workbook session upport ([bba1aab](https://github.com/adobe/helix-onedrive-support/commit/bba1aab486ed1f12bc08de43c66e44d08e521a05))
+
 ## [10.6.5](https://github.com/adobe/helix-onedrive-support/compare/v10.6.4...v10.6.5) (2023-09-13)
 
 
