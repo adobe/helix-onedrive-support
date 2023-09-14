@@ -12,8 +12,12 @@
 
 /* eslint-env mocha */
 import assert from 'assert';
+import { UnsecuredJWT } from 'jose';
 import { OneDriveMock, StatusCodeError } from '../src/index.js';
 import exampleBook from './fixtures/book.js';
+import { OneDrive } from '../src/OneDrive.js';
+import { OneDriveAuth } from '../src/OneDriveAuth.js';
+import { Nock } from './utils.js';
 
 const TEST_SHARE_LINK = 'https://adobe.sharepoint.com/:x:/r/sites/cg-helix/Shared%20Documents/data-embed-unit-tests/example-data.xlsx';
 
@@ -137,5 +141,64 @@ describe('Workbook Tests', () => {
     const sheetNames = await book.getWorksheetNames();
     console.log(sheetNames);
     assert.strictEqual(sheetNames.includes(sheetName), false);
+  });
+
+  it('workbook create session', async () => {
+    const resp = await book.createSession();
+    assert.strictEqual(resp, 'test-session-id');
+    const existingSessionId = await book.createSession();
+    assert.strictEqual(existingSessionId, 'test-session-id');
+  });
+
+  it('workbook close session', async () => {
+    const resp = await book.createSession();
+    assert.strictEqual(resp, 'test-session-id');
+    await book.closeSession();
+  });
+
+  it('workbook close session without creating', async () => {
+    assert.rejects(async () => book.closeSession(), /Please create a session first!/);
+  });
+
+  it('workbook refresh session', async () => {
+    const resp = await book.createSession();
+    assert.strictEqual(resp, 'test-session-id');
+    await book.refreshSession();
+  });
+
+  it('workbook refresh session without creating', async () => {
+    assert.rejects(async () => book.refreshSession(), /Please create a session first!/);
+  });
+
+  it('workbook get tables with session id', async () => {
+    const nock = new Nock();
+    const folderItem = {
+      parentReference: {
+        driveId: 'drive-id',
+      },
+      id: 'item-id',
+    };
+    nock('https://graph.microsoft.com/v1.0')
+      .get(`/drives/${folderItem.parentReference.driveId}/items/${folderItem.id}/workbook/tables`)
+      .matchHeader('Workbook-Session-Id', 'test-session-id')
+      .reply(200, { value: [{ name: 'table1' }, { name: 'table2' }] });
+    const DEFAULT_AUTH = (opts = {}) => new OneDriveAuth({
+      clientId: 'foo',
+      localAuthCache: true,
+      noTenantCache: true,
+      ...opts,
+    }).setAccessToken(new UnsecuredJWT({
+      email: 'bob',
+      tid: 'test-tenantid',
+    }).encode());
+    const od = new OneDrive({
+      auth: DEFAULT_AUTH(),
+    });
+    const item = OneDrive.driveItemFromURL(new URL(`onedrive:/drives/${folderItem.parentReference.driveId}/items/${folderItem.id}`));
+    const workbook = od.getWorkbook(item);
+    workbook.setSessionId('test-session-id');
+    const result = await workbook.getTableNames();
+    assert.deepStrictEqual(result, ['table1', 'table2']);
+    nock.done();
   });
 });

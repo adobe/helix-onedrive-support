@@ -111,8 +111,13 @@ function handleTable(container, segs, method, body) {
       }
       const subCommand = segs.shift();
       if (subCommand === 'add') {
-        table.rows.push(...body.values);
-        return { index: table.rows.length - 1 };
+        if (body.index && body.index >= 0) {
+          table.rows.splice(body.index, 0, ...body.values);
+          return { index: body.index };
+        } else {
+          table.rows.push(...body.values);
+          return { index: table.rows.length - 1 };
+        }
       }
       index = parseInt(subCommand.replace(/itemAt\(index=([0-9]+)\)/, '$1'), 10);
       if (index < 0 || index >= table.rows.length) {
@@ -375,6 +380,12 @@ export class OneDriveMock extends OneDrive {
       } else {
         return { value: data.sheets.map((st) => ({ name: st.name })) };
       }
+    } else if (segs[0] === 'createSession') {
+      return {
+        id: 'test-session-id',
+      };
+    } else if (segs[0] === 'refreshSession' || segs[0] === 'closeSession') {
+      return {};
     }
 
     // handle the operations on the workbook / worksheet

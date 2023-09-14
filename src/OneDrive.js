@@ -116,6 +116,14 @@ export class OneDrive {
     return this._log;
   }
 
+  get workbookSessionId() {
+    return this._sessionId;
+  }
+
+  setWorkbookSessionId(workbookSessionId) {
+    this._sessionId = workbookSessionId;
+  }
+
   /**
    */
   async doFetch(relUrl, rawResponseBody = false, options = {}) {
@@ -126,6 +134,9 @@ export class OneDrive {
     }
     opts.headers.authorization = `Bearer ${accessToken}`;
 
+    if (this._sessionId) {
+      opts.headers['Workbook-Session-Id'] = this._sessionId;
+    }
     const { log, auth: { logFields, tenant } } = this;
     const url = `https://graph.microsoft.com/v1.0${relUrl}`;
     const method = opts.method || 'GET';

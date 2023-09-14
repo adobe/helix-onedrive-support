@@ -38,6 +38,47 @@ export class Workbook extends NamedItemContainer {
     return new Worksheet(this._oneDrive, `${this._uri}/worksheets`, name, this._log);
   }
 
+  async createSession() {
+    const sessionId = this._oneDrive.workbookSessionId;
+    if (sessionId) {
+      return sessionId;
+    } else {
+      const uri = `${this.uri}/createSession`;
+      const result = await this._oneDrive.doFetch(uri, false, {
+        method: 'POST',
+      });
+      this._oneDrive.setWorkbookSessionId(result.id);
+      return result.id;
+    }
+  }
+
+  async closeSession() {
+    if (this._oneDrive.workbookSessionId) {
+      const uri = `${this.uri}/closeSession`;
+      await this._oneDrive.doFetch(uri, false, {
+        method: 'POST',
+      });
+      this._oneDrive.setWorkbookSessionId(null);
+    } else {
+      throw new StatusCodeError('Please create a session first!', 400);
+    }
+  }
+
+  async refreshSession() {
+    if (this._oneDrive.workbookSessionId) {
+      const uri = `${this.uri}/refreshSession`;
+      await this._oneDrive.doFetch(uri, false, {
+        method: 'POST',
+      });
+    } else {
+      throw new StatusCodeError('Please create a session first!', 400);
+    }
+  }
+
+  setSessionId(sessionId) {
+    this._oneDrive.setWorkbookSessionId(sessionId);
+  }
+
   async createWorksheet(sheetName) {
     const uri = `${this.uri}/worksheets`;
     await this._oneDrive.doFetch(uri, false, {
