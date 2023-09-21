@@ -158,7 +158,7 @@ export class OneDrive {
           // try to parse json
           err = StatusCodeError.fromErrorResponse(JSON.parse(text), resp.status, rateLimit);
         } catch {
-          err = new StatusCodeError(text, resp.status);
+          err = new StatusCodeError(text, resp.status, null, rateLimit);
         }
         throw err;
       }
