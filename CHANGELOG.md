@@ -1,3 +1,10 @@
+## [10.7.2](https://github.com/adobe/helix-onedrive-support/compare/v10.7.1...v10.7.2) (2023-09-21)
+
+
+### Bug Fixes
+
+* propagate ratelimit on errors ([#440](https://github.com/adobe/helix-onedrive-support/issues/440)) ([1adb124](https://github.com/adobe/helix-onedrive-support/commit/1adb124d301da573e17e0ae04e1f5ccfdfa118e3))
+
 ## [10.7.1](https://github.com/adobe/helix-onedrive-support/compare/v10.7.0...v10.7.1) (2023-09-16)
 
 
