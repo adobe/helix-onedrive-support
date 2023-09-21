@@ -59,7 +59,7 @@ export class StatusCodeError extends Error {
    * @param {object} details underlying error
    * @param {RateLimit} rateLimit rate limit or null
    */
-  constructor(msg, statusCode, details, rateLimit) {
+  constructor(msg, statusCode, details = null, rateLimit = null) {
     super(msg?.value ?? msg);
     this.statusCode = statusCode;
     this.details = details;
