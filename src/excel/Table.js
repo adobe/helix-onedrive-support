@@ -10,6 +10,7 @@
  * governing permissions and limitations under the License.
  */
 import { superTrim } from '../utils.js';
+import { Range } from './Range.js';
 
 export class Table {
   constructor(oneDrive, prefix, name, log) {
@@ -141,5 +142,9 @@ export class Table {
 
   get log() {
     return this._log;
+  }
+
+  range() {
+    return new Range(this._oneDrive, `${this.uri}/range`, this._log);
   }
 }

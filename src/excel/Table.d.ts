@@ -10,6 +10,7 @@
  * governing permissions and limitations under the License.
  */
 import {DriveItem, GraphResult} from '../OneDrive';
+import { Range } from './Range';
 
 export declare interface FormatOptions {
   /**
@@ -100,4 +101,9 @@ export declare interface Table {
    * @param name column name
    */
   deleteColumn(name: string): Promise<void>;
+
+  /**
+   * Returns the range object associated with the entire table.
+   */
+  range(): Range;
 }
