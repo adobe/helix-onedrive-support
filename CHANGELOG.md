@@ -1,3 +1,10 @@
+# [10.8.0](https://github.com/adobe/helix-onedrive-support/compare/v10.7.2...v10.8.0) (2023-09-26)
+
+
+### Features
+
+* support get range for table ([#442](https://github.com/adobe/helix-onedrive-support/issues/442)) ([0a8affe](https://github.com/adobe/helix-onedrive-support/commit/0a8affec901dd67e1be8bf66f784537760a6dff5))
+
 ## [10.7.2](https://github.com/adobe/helix-onedrive-support/compare/v10.7.1...v10.7.2) (2023-09-21)
 
 
