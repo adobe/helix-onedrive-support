@@ -179,6 +179,12 @@ function handleTable(container, segs, method, body) {
         ],
       };
     }
+    case 'range': {
+      return {
+        address: 'sheet!A1:B10',
+        addressLocal: 'A1:B10',
+      };
+    }
     default:
       if (body) {
         table.name = body.name;

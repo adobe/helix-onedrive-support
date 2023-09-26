@@ -149,4 +149,10 @@ describe('Table Tests', () => {
     await table.deleteRow(index);
     assert.deepStrictEqual(rowAfter, sampleTable.rows[index]);
   });
+
+  it('Get range associated with a table', async () => {
+    const tableRange = table.range();
+    const rangeAddress = await tableRange.getAddress();
+    assert.strictEqual(rangeAddress, 'sheet!A1:B10');
+  });
 });
