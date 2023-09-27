@@ -609,6 +609,17 @@ describe('OneDrive Tests', () => {
     await assert.rejects(od.me(), new StatusCodeError('wrong input', 400));
   }).timeout(5000);
 
+  it('detects html errors', async () => {
+    nock('https://graph.microsoft.com/v1.0')
+      .get('/me')
+      .reply(503, '<!DOCTYPE html><div class="title">Something went wrong</div>');
+
+    const od = new OneDrive({
+      auth: DEFAULT_AUTH(),
+    });
+    await assert.rejects(od.me(), new StatusCodeError('Something went wrong: HTML error from graph api.', 503));
+  }).timeout(5000);
+
   it('propagates 404s as warnings', async () => {
     nock('https://graph.microsoft.com/v1.0')
       .get('/me')
