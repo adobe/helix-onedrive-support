@@ -1,3 +1,10 @@
+## [10.8.2](https://github.com/adobe/helix-onedrive-support/compare/v10.8.1...v10.8.2) (2023-09-27)
+
+
+### Bug Fixes
+
+* better html error ([#445](https://github.com/adobe/helix-onedrive-support/issues/445)) ([1284b28](https://github.com/adobe/helix-onedrive-support/commit/1284b2856b19c4d3b9ac6c17f9b2e8607e18a54b)), closes [#444](https://github.com/adobe/helix-onedrive-support/issues/444)
+
 ## [10.8.1](https://github.com/adobe/helix-onedrive-support/compare/v10.8.0...v10.8.1) (2023-09-27)
 
 
