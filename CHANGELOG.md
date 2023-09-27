@@ -1,3 +1,10 @@
+## [10.8.3](https://github.com/adobe/helix-onedrive-support/compare/v10.8.2...v10.8.3) (2023-09-27)
+
+
+### Bug Fixes
+
+* trigger release ([e7cd84f](https://github.com/adobe/helix-onedrive-support/commit/e7cd84f82abb4ebeee7354b958997ccee51f2cba))
+
 ## [10.8.2](https://github.com/adobe/helix-onedrive-support/compare/v10.8.1...v10.8.2) (2023-09-27)
 
 
