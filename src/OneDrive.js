@@ -152,12 +152,16 @@ export class OneDrive {
       }
 
       if (!resp.ok) {
-        const text = await resp.text();
+        let text = await resp.text();
         let err;
         try {
           // try to parse json
           err = StatusCodeError.fromErrorResponse(JSON.parse(text), resp.status, rateLimit);
         } catch {
+          if (text.startsWith('<!DOCTYPE html>')) {
+            log.warn('onedrive returned html response', text);
+            text = 'Something went wrong: HTML error from graph api.';
+          }
           err = new StatusCodeError(text, resp.status, null, rateLimit);
         }
         throw err;
