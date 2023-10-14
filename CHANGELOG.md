@@ -1,3 +1,15 @@
+# [11.0.0](https://github.com/adobe/helix-onedrive-support/compare/v10.8.5...v11.0.0) (2023-10-14)
+
+
+* fix(excel)!: store session in workbook (#450) ([f7e3abc](https://github.com/adobe/helix-onedrive-support/commit/f7e3abc433d6a1209b3abec58cefedc8066701b3)), closes [#450](https://github.com/adobe/helix-onedrive-support/issues/450)
+
+
+### BREAKING CHANGES
+
+* semantics of setting sessions changed
+
+* fix: add getSessionId
+
 ## [10.8.5](https://github.com/adobe/helix-onedrive-support/compare/v10.8.4...v10.8.5) (2023-10-08)
 
 
