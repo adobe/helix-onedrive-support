@@ -145,6 +145,7 @@ describe('Workbook Tests', () => {
   it('workbook create session', async () => {
     const resp = await book.createSession();
     assert.strictEqual(resp, 'test-session-id');
+    assert.strictEqual(book.getSessionId(), 'test-session-id');
   });
 
   it('rejects creating workbook session twice', async () => {

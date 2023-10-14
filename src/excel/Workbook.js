@@ -64,6 +64,10 @@ export class Workbook extends NamedItemContainer {
     throw new StatusCodeError('No session associated with workbook', 400);
   }
 
+  getSessionId() {
+    return this._sessionId;
+  }
+
   setSessionId(sessionId) {
     if (this._sessionId) {
       throw new StatusCodeError('This workbook is already associated with a session', 400);
