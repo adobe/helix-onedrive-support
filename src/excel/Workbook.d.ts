@@ -28,7 +28,7 @@ export declare interface Workbook {
    * Create the worksheet with given name in the workbook.
    * @param {string} sheetName sheet name
    * @returns Worksheet
-   * 
+   *
    */
   createWorksheet(sheetName: string): Worksheet;
 
@@ -110,8 +110,14 @@ export declare interface Workbook {
   refreshSession(): Promise<void>;
 
   /**
+   * Returns the sessionId of the workbook
+   * @returns {string} sessionId or null
+   */
+  getSessionId(): string;
+
+  /**
    * Sets the sessionId of the workbook
-   * @param sessionId 
+   * @param {string} sessionId session id
    */
   setSessionId(sessionId: string): void;
 }

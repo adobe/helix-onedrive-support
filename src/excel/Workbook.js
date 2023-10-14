@@ -23,65 +23,87 @@ export class Workbook extends NamedItemContainer {
     this._log = log;
   }
 
+  async createSession() {
+    if (this._sessionId) {
+      throw new StatusCodeError('This workbook is already associated with a session', 400);
+    }
+    const uri = `${this.uri}/createSession`;
+    const result = await this._oneDrive.doFetch(uri, false, {
+      method: 'POST',
+    });
+    this._sessionId = result.id;
+    return this._sessionId;
+  }
+
+  async closeSession() {
+    if (this._sessionId) {
+      const uri = `${this.uri}/closeSession`;
+      await this._oneDrive.doFetch(uri, false, {
+        method: 'POST',
+        headers: {
+          'Workbook-Session-Id': this._sessionId,
+        },
+      });
+      this._sessionId = null;
+      return;
+    }
+    throw new StatusCodeError('No session associated with workbook', 400);
+  }
+
+  async refreshSession() {
+    if (this._sessionId) {
+      const uri = `${this.uri}/refreshSession`;
+      await this._oneDrive.doFetch(uri, false, {
+        method: 'POST',
+        headers: {
+          'Workbook-Session-Id': this._sessionId,
+        },
+      });
+      return;
+    }
+    throw new StatusCodeError('No session associated with workbook', 400);
+  }
+
+  getSessionId() {
+    return this._sessionId;
+  }
+
+  setSessionId(sessionId) {
+    if (this._sessionId) {
+      throw new StatusCodeError('This workbook is already associated with a session', 400);
+    }
+    this._sessionId = sessionId;
+  }
+
+  async doFetch(relUrl, rawResponseBody, options) {
+    const opts = { ...options };
+    if (!opts.headers) {
+      opts.headers = {};
+    }
+    if (this._sessionId) {
+      opts.headers['Workbook-Session-Id'] = this._sessionId;
+    }
+    return this._oneDrive.doFetch(relUrl, rawResponseBody, opts);
+  }
+
   async getData() {
-    const result = await this._oneDrive.doFetch(this._uri);
+    const result = await this.doFetch(this._uri);
     return result.value;
   }
 
   async getWorksheetNames() {
     this.log.debug(`get worksheet names from ${this._uri}/worksheets`);
-    const result = await this._oneDrive.doFetch(`${this._uri}/worksheets`);
+    const result = await this.doFetch(`${this._uri}/worksheets`);
     return result.value.map((v) => v.name);
   }
 
   worksheet(name) {
-    return new Worksheet(this._oneDrive, `${this._uri}/worksheets`, name, this._log);
-  }
-
-  async createSession() {
-    const sessionId = this._oneDrive.workbookSessionId;
-    if (sessionId) {
-      return sessionId;
-    } else {
-      const uri = `${this.uri}/createSession`;
-      const result = await this._oneDrive.doFetch(uri, false, {
-        method: 'POST',
-      });
-      this._oneDrive.setWorkbookSessionId(result.id);
-      return result.id;
-    }
-  }
-
-  async closeSession() {
-    if (this._oneDrive.workbookSessionId) {
-      const uri = `${this.uri}/closeSession`;
-      await this._oneDrive.doFetch(uri, false, {
-        method: 'POST',
-      });
-      this._oneDrive.setWorkbookSessionId(null);
-    } else {
-      throw new StatusCodeError('Please create a session first!', 400);
-    }
-  }
-
-  async refreshSession() {
-    if (this._oneDrive.workbookSessionId) {
-      const uri = `${this.uri}/refreshSession`;
-      await this._oneDrive.doFetch(uri, false, {
-        method: 'POST',
-      });
-    } else {
-      throw new StatusCodeError('Please create a session first!', 400);
-    }
-  }
-
-  setSessionId(sessionId) {
-    this._oneDrive.setWorkbookSessionId(sessionId);
+    return new Worksheet(this, `${this._uri}/worksheets`, name, this._log);
   }
 
   async createWorksheet(sheetName) {
     const uri = `${this.uri}/worksheets`;
-    await this._oneDrive.doFetch(uri, false, {
+    await this.doFetch(uri, false, {
       method: 'POST',
       body: { name: sheetName },
       headers: { 'content-type': 'application/json' },
@@ -91,7 +113,7 @@ export class Workbook extends NamedItemContainer {
 
   async deleteWorksheet(sheetName) {
     const uri = `${this.uri}/worksheets/${sheetName}`;
-    await this._oneDrive.doFetch(uri, false, {
+    await this.doFetch(uri, false, {
       method: 'DELETE',
       headers: { 'content-type': 'application/json' },
     });
@@ -99,12 +121,12 @@ export class Workbook extends NamedItemContainer {
 
   async getTableNames() {
     this.log.debug(`get table names from ${this._uri}/tables`);
-    const result = await this._oneDrive.doFetch(`${this._uri}/tables`);
+    const result = await this.doFetch(`${this._uri}/tables`);
     return result.value.map((v) => v.name);
   }
 
   table(name) {
-    return new Table(this._oneDrive, `${this._uri}/tables`, name, this._log);
+    return new Table(this, `${this._uri}/tables`, name, this._log);
   }
 
   async addTable(address, hasHeaders, name) {
@@ -114,7 +136,7 @@ export class Workbook extends NamedItemContainer {
         throw new StatusCodeError(`Table name already exists: ${name}`, 409);
       }
     }
-    const result = await this._oneDrive.doFetch(`${this.uri}/tables/add`, false, {
+    const result = await this.doFetch(`${this.uri}/tables/add`, false, {
       method: 'POST',
       body: {
         address,
