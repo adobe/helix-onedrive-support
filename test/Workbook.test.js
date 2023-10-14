@@ -139,15 +139,24 @@ describe('Workbook Tests', () => {
     const sheetName = 'sheet2';
     await book.deleteWorksheet(sheetName);
     const sheetNames = await book.getWorksheetNames();
-    console.log(sheetNames);
     assert.strictEqual(sheetNames.includes(sheetName), false);
   });
 
   it('workbook create session', async () => {
     const resp = await book.createSession();
     assert.strictEqual(resp, 'test-session-id');
-    const existingSessionId = await book.createSession();
-    assert.strictEqual(existingSessionId, 'test-session-id');
+  });
+
+  it('rejects creating workbook session twice', async () => {
+    const resp = await book.createSession();
+    assert.strictEqual(resp, 'test-session-id');
+    assert.rejects(async () => book.createSession(), /This workbook is already associated with a session/);
+  });
+
+  it('rejects setting session in workbook associated with a session', async () => {
+    const resp = await book.createSession();
+    assert.strictEqual(resp, 'test-session-id');
+    assert.rejects(async () => book.setSessionId('humpty-dumpty'), /This workbook is already associated with a session/);
   });
 
   it('workbook close session', async () => {

@@ -24,13 +24,14 @@ export class Workbook extends NamedItemContainer {
   }
 
   async createSession() {
-    if (!this._sessionId) {
-      const uri = `${this.uri}/createSession`;
-      const result = await this._oneDrive.doFetch(uri, false, {
-        method: 'POST',
-      });
-      this._sessionId = result.id;
+    if (this._sessionId) {
+      throw new StatusCodeError('This workbook is already associated with a session', 400);
     }
+    const uri = `${this.uri}/createSession`;
+    const result = await this._oneDrive.doFetch(uri, false, {
+      method: 'POST',
+    });
+    this._sessionId = result.id;
     return this._sessionId;
   }
 
@@ -44,9 +45,9 @@ export class Workbook extends NamedItemContainer {
         },
       });
       this._sessionId = null;
-    } else {
-      throw new StatusCodeError('Please create a session first!', 400);
+      return;
     }
+    throw new StatusCodeError('No session associated with workbook', 400);
   }
 
   async refreshSession() {
@@ -58,12 +59,15 @@ export class Workbook extends NamedItemContainer {
           'Workbook-Session-Id': this._sessionId,
         },
       });
-    } else {
-      throw new StatusCodeError('Please create a session first!', 400);
+      return;
     }
+    throw new StatusCodeError('No session associated with workbook', 400);
   }
 
   setSessionId(sessionId) {
+    if (this._sessionId) {
+      throw new StatusCodeError('This workbook is already associated with a session', 400);
+    }
     this._sessionId = sessionId;
   }
 
