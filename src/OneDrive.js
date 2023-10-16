@@ -116,6 +116,25 @@ export class OneDrive {
     return this._log;
   }
 
+  async #handleBadResponse(resp, rateLimit) {
+    const { log } = this;
+
+    let text = await resp.text();
+    let err;
+
+    try {
+      // try to parse json
+      err = StatusCodeError.fromErrorResponse(JSON.parse(text), resp.status, rateLimit);
+    } catch {
+      if (text.startsWith('<!DOCTYPE html>')) {
+        log.warn('onedrive returned html response', text);
+        text = 'Something went wrong: HTML error from graph api.';
+      }
+      err = new StatusCodeError(text, resp.status, null, rateLimit);
+    }
+    throw err;
+  }
+
   /**
    */
   async doFetch(relUrl, rawResponseBody = false, options = {}) {
@@ -129,46 +148,32 @@ export class OneDrive {
     const { log, auth: { logFields, tenant } } = this;
     const url = `https://graph.microsoft.com/v1.0${relUrl}`;
     const method = opts.method || 'GET';
+    let resp;
 
     try {
       const { fetch } = this.fetchContext;
-      const resp = await fetch(url, opts);
+      resp = await fetch(url, opts);
       log.info(`OneDrive API [tenant:${tenant}] ${logFields}: ${method} ${relUrl} ${resp.status}`);
-
-      const rateLimit = RateLimit.fromHeaders(resp.headers);
-      if (rateLimit) {
-        log.warn({ sharepointRateLimit: { tenant, ...rateLimit.toJSON() } });
-      }
-
-      if (!resp.ok) {
-        let text = await resp.text();
-        let err;
-        try {
-          // try to parse json
-          err = StatusCodeError.fromErrorResponse(JSON.parse(text), resp.status, rateLimit);
-        } catch {
-          if (text.startsWith('<!DOCTYPE html>')) {
-            log.warn('onedrive returned html response', text);
-            text = 'Something went wrong: HTML error from graph api.';
-          }
-          err = new StatusCodeError(text, resp.status, null, rateLimit);
-        }
-        throw err;
-      }
-      // check content type before trying to parse a response body as JSON
-      const contentType = resp.headers.get('content-type');
-      const json = contentType && contentType.startsWith('application/json');
-
-      // await result in order to be able to catch any error
-      return await (rawResponseBody || !json ? resp.buffer() : resp.json());
     } catch (e) {
-      let err = e;
-      if (!(e instanceof StatusCodeError)) {
-        err = StatusCodeError.fromError(e);
-      }
-      log.info(`OneDrive API [tenant:${tenant}] ${logFields}: ${method} ${relUrl} ${e.statusCode}`);
-      throw err;
+      log.info(`OneDrive API [tenant:${tenant}] ${logFields}: ${method} ${relUrl} ${e.message}`);
+      throw StatusCodeError.fromError(e);
     }
+
+    const rateLimit = RateLimit.fromHeaders(resp.headers);
+    if (rateLimit) {
+      log.warn({ sharepointRateLimit: { tenant, ...rateLimit.toJSON() } });
+    }
+
+    if (!resp.ok) {
+      return this.#handleBadResponse(resp, rateLimit);
+    }
+
+    // check content type before trying to parse a response body as JSON
+    const contentType = resp.headers.get('content-type');
+    const json = contentType && contentType.startsWith('application/json');
+
+    // await result in order to be able to catch any error
+    return (rawResponseBody || !json ? resp.buffer() : resp.json());
   }
 
   async me() {
