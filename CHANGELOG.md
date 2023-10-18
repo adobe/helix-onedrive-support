@@ -1,3 +1,10 @@
+## [11.0.1](https://github.com/adobe/helix-onedrive-support/compare/v11.0.0...v11.0.1) (2023-10-18)
+
+
+### Bug Fixes
+
+* log errors once ([#453](https://github.com/adobe/helix-onedrive-support/issues/453)) ([018c1c2](https://github.com/adobe/helix-onedrive-support/commit/018c1c22a3257805fa126b56ad8e59afd7e1fc0f))
+
 # [11.0.0](https://github.com/adobe/helix-onedrive-support/compare/v10.8.5...v11.0.0) (2023-10-14)
 
 
