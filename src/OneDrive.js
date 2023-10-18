@@ -116,6 +116,32 @@ export class OneDrive {
     return this._log;
   }
 
+  async #handleBadResponse(resp, rateLimit) {
+    const { log } = this;
+
+    let text;
+    let err;
+
+    try {
+      text = await resp.text();
+      /* c8 ignore next 4 */
+    } catch (e) {
+      log.warn(`Unable to fetch response text: ${e.message}`);
+      throw StatusCodeError.fromError(e);
+    }
+
+    try {
+      err = StatusCodeError.fromErrorResponse(JSON.parse(text), resp.status, rateLimit);
+    } catch (e) {
+      if (text.startsWith('<!DOCTYPE html>')) {
+        log.warn('Graph API returned html response', text);
+        text = 'Something went wrong: HTML error from graph api.';
+      }
+      err = new StatusCodeError(text, resp.status, null, rateLimit);
+    }
+    throw err;
+  }
+
   /**
    */
   async doFetch(relUrl, rawResponseBody = false, options = {}) {
@@ -129,45 +155,37 @@ export class OneDrive {
     const { log, auth: { logFields, tenant } } = this;
     const url = `https://graph.microsoft.com/v1.0${relUrl}`;
     const method = opts.method || 'GET';
+    let resp;
 
     try {
       const { fetch } = this.fetchContext;
-      const resp = await fetch(url, opts);
+      resp = await fetch(url, opts);
       log.info(`OneDrive API [tenant:${tenant}] ${logFields}: ${method} ${relUrl} ${resp.status}`);
+    } catch (e) {
+      log.info(`OneDrive API [tenant:${tenant}] ${logFields}: ${method} ${relUrl} ${e.message}`);
+      throw StatusCodeError.fromError(e);
+    }
 
-      const rateLimit = RateLimit.fromHeaders(resp.headers);
-      if (rateLimit) {
-        log.warn({ sharepointRateLimit: { tenant, ...rateLimit.toJSON() } });
-      }
+    const rateLimit = RateLimit.fromHeaders(resp.headers);
+    if (rateLimit) {
+      log.warn({ sharepointRateLimit: { tenant, ...rateLimit.toJSON() } });
+    }
 
-      if (!resp.ok) {
-        let text = await resp.text();
-        let err;
-        try {
-          // try to parse json
-          err = StatusCodeError.fromErrorResponse(JSON.parse(text), resp.status, rateLimit);
-        } catch {
-          if (text.startsWith('<!DOCTYPE html>')) {
-            log.warn('onedrive returned html response', text);
-            text = 'Something went wrong: HTML error from graph api.';
-          }
-          err = new StatusCodeError(text, resp.status, null, rateLimit);
-        }
-        throw err;
-      }
+    if (!resp.ok) {
+      return this.#handleBadResponse(resp, rateLimit);
+    }
+
+    try {
       // check content type before trying to parse a response body as JSON
       const contentType = resp.headers.get('content-type');
       const json = contentType && contentType.startsWith('application/json');
 
       // await result in order to be able to catch any error
       return await (rawResponseBody || !json ? resp.buffer() : resp.json());
+      /* c8 ignore next 4 */
     } catch (e) {
-      let err = e;
-      if (!(e instanceof StatusCodeError)) {
-        err = StatusCodeError.fromError(e);
-      }
-      log.info(`OneDrive API [tenant:${tenant}] ${logFields}: ${method} ${relUrl} ${e.statusCode}`);
-      throw err;
+      log.warn(`Unable to fetch response buffer or json: ${e.message}`);
+      throw StatusCodeError.fromError(e);
     }
   }
 
