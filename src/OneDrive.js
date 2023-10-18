@@ -119,15 +119,22 @@ export class OneDrive {
   async #handleBadResponse(resp, rateLimit) {
     const { log } = this;
 
-    let text = await resp.text();
+    let text;
     let err;
 
     try {
-      // try to parse json
+      text = await resp.text();
+      /* c8 ignore next 4 */
+    } catch (e) {
+      log.warn(`Unable to fetch response text: ${e.message}`);
+      throw StatusCodeError.fromError(e);
+    }
+
+    try {
       err = StatusCodeError.fromErrorResponse(JSON.parse(text), resp.status, rateLimit);
-    } catch {
+    } catch (e) {
       if (text.startsWith('<!DOCTYPE html>')) {
-        log.warn('onedrive returned html response', text);
+        log.warn('Graph API returned html response', text);
         text = 'Something went wrong: HTML error from graph api.';
       }
       err = new StatusCodeError(text, resp.status, null, rateLimit);
@@ -168,12 +175,18 @@ export class OneDrive {
       return this.#handleBadResponse(resp, rateLimit);
     }
 
-    // check content type before trying to parse a response body as JSON
-    const contentType = resp.headers.get('content-type');
-    const json = contentType && contentType.startsWith('application/json');
+    try {
+      // check content type before trying to parse a response body as JSON
+      const contentType = resp.headers.get('content-type');
+      const json = contentType && contentType.startsWith('application/json');
 
-    // await result in order to be able to catch any error
-    return (rawResponseBody || !json ? resp.buffer() : resp.json());
+      // await result in order to be able to catch any error
+      return await (rawResponseBody || !json ? resp.buffer() : resp.json());
+      /* c8 ignore next 4 */
+    } catch (e) {
+      log.warn(`Unable to fetch response buffer or json: ${e.message}`);
+      throw StatusCodeError.fromError(e);
+    }
   }
 
   async me() {
