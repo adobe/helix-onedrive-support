@@ -326,7 +326,10 @@ describe('OneDriveAuth Tests', () => {
     });
     await assert.rejects(
       async () => od3.authenticate(),
-      Error('Unable to acquire token silently and no other acquire method supplied'),
+      {
+        name: 'Error',
+        message: 'Unable to acquire token silently and no other acquire method supplied',
+      },
     );
   });
 

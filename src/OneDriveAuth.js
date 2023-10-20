@@ -15,6 +15,7 @@ import { keepAliveNoCache } from '@adobe/fetch';
 import { ConfidentialClientApplication, LogLevel, PublicClientApplication } from '@azure/msal-node';
 import { MemCachePlugin } from '@adobe/helix-shared-tokencache';
 import { decodeJwt } from 'jose';
+import { StatusCodeError } from './StatusCodeError.js';
 
 const AZ_AUTHORITY_HOST_URL = 'https://login.windows.net';
 const AZ_COMMON_TENANT = 'common';
@@ -343,7 +344,7 @@ export class OneDriveAuth {
       throw e;
     }
 
-    throw new Error('Unable to acquire token silently and no other acquire method supplied');
+    throw new StatusCodeError('Unable to acquire token silently and no other acquire method supplied', 401, { code: 'authFailed' });
   }
 
   /**
