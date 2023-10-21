@@ -1,3 +1,10 @@
+## [11.0.3](https://github.com/adobe/helix-onedrive-support/compare/v11.0.2...v11.0.3) (2023-10-21)
+
+
+### Bug Fixes
+
+* report authenticate failures as 401 ([#454](https://github.com/adobe/helix-onedrive-support/issues/454)) ([26caba0](https://github.com/adobe/helix-onedrive-support/commit/26caba08586beecb08bf88ed5e0afe9032fbb9ae))
+
 ## [11.0.2](https://github.com/adobe/helix-onedrive-support/compare/v11.0.1...v11.0.2) (2023-10-20)
 
 
