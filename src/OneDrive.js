@@ -218,7 +218,7 @@ export class OneDrive {
     try {
       return await this.doFetch(`/shares/${link}/driveItem`);
     } catch (e) {
-      if ((e.statusCode === 401 && e.details?.code !== 'authFailed') || e.statusCode === 403) {
+      if ((e.statusCode === 401 && e.details?.code !== 'silentAcquireFailed') || e.statusCode === 403) {
         // an inexistent share returns either 401 or 403, we prefer to just say it wasn't found
         throw new StatusCodeError(e.message, 404, e.details);
       }
@@ -535,7 +535,7 @@ export class OneDrive {
         log: this.log,
       });
     } catch (e) {
-      if (e.statusCode === 401 && e.details?.code !== 'authFailed') {
+      if (e.statusCode === 401 && e.details?.code !== 'silentAcquireFailed') {
         // an inexistant share returns 401, we prefer to just say it wasn't found
         throw new StatusCodeError(e.message, 404, e.details);
       }

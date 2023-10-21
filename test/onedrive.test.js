@@ -584,9 +584,12 @@ describe('OneDrive Tests', () => {
   });
 
   it('returns original error when fetching a share link returns 401 becaue of auth failure', async () => {
+    const message = 'Unable to acquire token silently and no other acquire method supplied';
+    const code = 'silentAcquireFailed';
+
     nock('https://graph.microsoft.com/v1.0')
       .get('/shares/u!aHR0cHM6Ly9vbmVkcml2ZS5jb20vYS9iL2MvZDI/driveItem')
-      .reply(401, '{"message":"Authentication failed","code":"authFailed"}');
+      .reply(401, JSON.stringify({ code, message }));
 
     const od = new OneDrive({
       auth: DEFAULT_AUTH(),
@@ -595,7 +598,12 @@ describe('OneDrive Tests', () => {
       async () => od.getDriveItemFromShareLink('https://onedrive.com/a/b/c/d2'),
       {
         name: 'Error',
-        message: 'Authentication failed',
+        message,
+        statusCode: 401,
+        details: {
+          code,
+          message,
+        },
       },
     );
   });
@@ -962,10 +970,13 @@ describe('OneDrive Tests', () => {
   });
 
   it('leaves 401 when authentication fails', async () => {
+    const message = 'Unable to acquire token silently and no other acquire method supplied';
+    const code = 'silentAcquireFailed';
+
     const od = new OneDrive({
       auth: {
         authenticate: async () => {
-          throw new StatusCodeError('Unable to acquire token silently and no other acquire method supplied', 401, { code: 'authFailed' });
+          throw new StatusCodeError(message, 401, { code, message });
         },
         log: console,
       },
@@ -974,8 +985,12 @@ describe('OneDrive Tests', () => {
       async () => od.getSite('https://hlx-my.sharepoint.com/sites/mysites/site1'),
       {
         name: 'Error',
-        message: 'Unable to acquire token silently and no other acquire method supplied',
+        message,
         statusCode: 401,
+        details: {
+          code,
+          message,
+        },
       },
     );
   });

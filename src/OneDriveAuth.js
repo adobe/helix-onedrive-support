@@ -344,7 +344,8 @@ export class OneDriveAuth {
       throw e;
     }
 
-    throw new StatusCodeError('Unable to acquire token silently and no other acquire method supplied', 401, { code: 'authFailed' });
+    const message = 'Unable to acquire token silently and no other acquire method supplied';
+    throw new StatusCodeError(message, 401, { code: 'silentAcquireFailed', message });
   }
 
   /**
