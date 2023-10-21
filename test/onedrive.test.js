@@ -583,6 +583,31 @@ describe('OneDrive Tests', () => {
     );
   });
 
+  it('returns original error when fetching a share link returns 401 becaue of auth failure', async () => {
+    const message = 'Unable to acquire token silently and no other acquire method supplied';
+    const code = 'silentAcquireFailed';
+
+    nock('https://graph.microsoft.com/v1.0')
+      .get('/shares/u!aHR0cHM6Ly9vbmVkcml2ZS5jb20vYS9iL2MvZDI/driveItem')
+      .reply(401, JSON.stringify({ code, message }));
+
+    const od = new OneDrive({
+      auth: DEFAULT_AUTH(),
+    });
+    await assert.rejects(
+      async () => od.getDriveItemFromShareLink('https://onedrive.com/a/b/c/d2'),
+      {
+        name: 'Error',
+        message,
+        statusCode: 401,
+        details: {
+          code,
+          message,
+        },
+      },
+    );
+  });
+
   it('returns original error when fetching a share link returns neither 401 nor 403', async () => {
     nock('https://graph.microsoft.com/v1.0')
       .get('/shares/u!aHR0cHM6Ly9vbmVkcml2ZS5jb20vYS9iL2MvZDI/driveItem')
@@ -929,7 +954,7 @@ describe('OneDrive Tests', () => {
     assert(site);
   });
 
-  it('turns 401 into 404 when authentication fails', async () => {
+  it('turns 401 into 404 when unauthenticated', async () => {
     const od = new OneDrive({
       auth: {
         authenticate: async () => {
@@ -941,6 +966,32 @@ describe('OneDrive Tests', () => {
     await assert.rejects(
       async () => od.getSite('https://hlx-my.sharepoint.com/sites/mysites/site1'),
       new StatusCodeError('Unauthenticated', 404),
+    );
+  });
+
+  it('leaves 401 when authentication fails', async () => {
+    const message = 'Unable to acquire token silently and no other acquire method supplied';
+    const code = 'silentAcquireFailed';
+
+    const od = new OneDrive({
+      auth: {
+        authenticate: async () => {
+          throw new StatusCodeError(message, 401, { code, message });
+        },
+        log: console,
+      },
+    });
+    await assert.rejects(
+      async () => od.getSite('https://hlx-my.sharepoint.com/sites/mysites/site1'),
+      {
+        name: 'Error',
+        message,
+        statusCode: 401,
+        details: {
+          code,
+          message,
+        },
+      },
     );
   });
 
