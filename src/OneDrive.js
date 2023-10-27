@@ -423,7 +423,11 @@ export class OneDrive {
   /**
    */
   getWorkbook(driveItem) {
-    return new Workbook(this, `/drives/${driveItem.parentReference.driveId}/items/${driveItem.id}/workbook`, this.log);
+    return this.getWorkbookFromPath(`/drives/${driveItem.parentReference.driveId}/items/${driveItem.id}/workbook`);
+  }
+
+  getWorkbookFromPath(path) {
+    return new Workbook(this, path, this.log);
   }
 
   /**

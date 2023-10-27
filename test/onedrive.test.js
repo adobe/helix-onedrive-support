@@ -787,8 +787,11 @@ describe('OneDrive Tests', () => {
     const od = new OneDrive({
       auth: DEFAULT_AUTH(),
     });
+    const workbookPath = `/drives/${fileItem.parentReference.driveId}/items/${fileItem.id}/workbook`;
     const workbook = od.getWorkbook(fileItem);
-    assert.strictEqual(workbook.uri, `/drives/${fileItem.parentReference.driveId}/items/${fileItem.id}/workbook`);
+    assert.strictEqual(workbook.uri, workbookPath);
+    const workbook2 = od.getWorkbookFromPath(workbookPath);
+    assert.strictEqual(workbook2.uri, workbookPath);
   });
 
   it('can list subscriptions', async () => {
