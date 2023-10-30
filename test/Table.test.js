@@ -157,29 +157,33 @@ describe('Table Tests', () => {
   });
 
   it('Test table filters', async () => {
-     await table.clearFilters();
-     await table.applyFilter('Name', {filterOn: 'values', values: ['Bohr', 'Kepler'] });
-     const filteredData = await table.getVisibleRowsAsObjectsWithAddresses();
-     assert.deepStrictEqual(filteredData, [
-       {
-       cellAddresses: [5],
-       data: {Name: 'Bohr', ' F i r s t n a m e ': 'Niels'}
-     },
-     {
-       cellAddresses: [8],
-       data: {Name: 'Kepler', ' F i r s t n a m e ': 'Johannes'}
-     }
-   ]);
+    await table.clearFilters();
+    await table.applyFilter('Name', { filterOn: 'values', values: ['Bohr', 'Kepler'] });
+    const filteredData = await table.getVisibleRowsAsObjectsWithAddresses();
+    assert.deepStrictEqual(filteredData, [
+      {
+        cellAddresses: [5],
+        data: { Name: 'Bohr', ' F i r s t n a m e ': 'Niels' },
+      },
+      {
+        cellAddresses: [8],
+        data: { Name: 'Kepler', ' F i r s t n a m e ': 'Johannes' },
+      },
+    ]);
 
-   await assert.rejects(table.applyFilter('Name', {filterOn: 'values', values: ['Test'] }),
-     new Error('Only one filter at a time supported currently!'));
+    await assert.rejects(
+      table.applyFilter('Name', { filterOn: 'values', values: ['Test'] }),
+      new Error('Only one filter at a time supported currently!'),
+    );
 
-   await table.clearFilters();
-   await assert.rejects(table.applyFilter('Name', {filterOn: 'color', color: ['red'] }),
-     new Error('Only value based filtering supported currently!'));
+    await table.clearFilters();
+    await assert.rejects(
+      table.applyFilter('Name', { filterOn: 'color', color: ['red'] }),
+      new Error('Only value based filtering supported currently!'),
+    );
 
-   await table.clearFilters();
-   const allData = await table.getVisibleRowsAsObjectsWithAddresses(25);
-   assert.strictEqual(allData.length, 10);
+    await table.clearFilters();
+    const allData = await table.getVisibleRowsAsObjectsWithAddresses(25);
+    assert.strictEqual(allData.length, 10);
   });
 });

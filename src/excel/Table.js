@@ -171,7 +171,7 @@ export class Table {
       cellAddresses: row.cellAddresses[0],
       data: headers.reduce(
         (rowObj, colName, colIdx, _) => ({ ...rowObj, [colName]: row.values[0][colIdx] }),
-        {}
+        {},
       ),
     }));
   }
