@@ -147,14 +147,14 @@ function handleTable(container, segs, method, body) {
       }
       if ((segs.length >= 3) && (segs[1] === 'filter') && (segs[2] === 'apply')) {
         if (table.filters) {
-          throw new Error("Only one filter at a time supported currently!");
+          throw new Error('Only one filter at a time supported currently!');
         }
-        const criteria = JSON.parse(body).criteria;
+        const { criteria } = JSON.parse(body);
         if (criteria.filterOn !== 'values') {
-          throw new Error("Only value based filtering supported currently!");
+          throw new Error('Only value based filtering supported currently!');
         }
         const colName = segs[0];
-        table.filters = {column: colName, criteria};
+        table.filters = { column: colName, criteria };
         return null;
       }
       if (body) {
@@ -193,15 +193,14 @@ function handleTable(container, segs, method, body) {
     }
     case 'range': {
       if ((segs.length >= 2) && (segs[0] === 'visibleView') && (segs[1] === 'rows')) {
-        const colIdx = table.filters? table.headerNames.indexOf(table.filters.column): -1;
-        const result = [{cellAddresses: [[0]], values: [table.headerNames]}];
-        for (var i = 0; i < table.rows.length; i++) {
-          const row = table.rows[i];
-          if ((! table.filters) || table.filters.criteria.values.includes(row[colIdx])) {
-            result.push({cellAddresses: [[i + 1]], values: [row]});
+        const colIdx = table.filters ? table.headerNames.indexOf(table.filters.column) : -1;
+        const result = [{ cellAddresses: [[0]], values: [table.headerNames] }];
+        for (const [i, row] of table.rows.entries()) {
+          if ((!table.filters) || table.filters.criteria.values.includes(row[colIdx])) {
+            result.push({ cellAddresses: [[i + 1]], values: [row] });
           }
         }
-        return {value: result};
+        return { value: result };
       }
       return {
         address: 'sheet!A1:B10',
@@ -415,7 +414,7 @@ export class OneDriveMock extends OneDrive {
       }
     } else if (segs[0] === 'createSession') {
       return {
-        id: JSON.parse(body).persistChanges? 'test-session-id': 'test-non-persistent-session-id',
+        id: JSON.parse(body).persistChanges ? 'test-session-id' : 'test-non-persistent-session-id',
       };
     } else if (segs[0] === 'refreshSession' || segs[0] === 'closeSession') {
       return {};

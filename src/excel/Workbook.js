@@ -30,8 +30,8 @@ export class Workbook extends NamedItemContainer {
     const uri = `${this.uri}/createSession`;
     const result = await this._oneDrive.doFetch(uri, false, {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({persistChanges})
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ persistChanges }),
     });
     this._sessionId = result.id;
     return this._sessionId;
