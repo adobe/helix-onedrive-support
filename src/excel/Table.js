@@ -157,18 +157,22 @@ export class Table {
   async applyFilter(column, criteria) {
     await this._oneDrive.doFetch(`${this.uri}/columns/${column}/filter/apply`, true, {
       method: 'POST',
-      body: JSON.stringify({criteria})
+      body: JSON.stringify({ criteria }),
     });
   }
 
   async getVisibleRowsAsObjectsWithAddresses(maxRows = -1) {
     // +1 to maxRows since result is inclusive of header
-    var path = `${this.uri}/range/visibleView/rows` + (maxRows != -1? `?$top=${maxRows + 1}`: '');
+    const pathSuffix = maxRows !== -1 ? `?$top=${maxRows + 1}` : '';
+    const path = `${this.uri}/range/visibleView/rows${pathSuffix}`;
     const resp = await this._oneDrive.doFetch(path);
     const headers = resp.value.shift().values[0];
-    return resp.value.map((row) => ({cellAddresses: row.cellAddresses[0],
-      data: headers.reduce((rowObj, colName, colIdx, _) =>
-        ({ ...rowObj, [colName]: row.values[0][colIdx]}),
-        {})}));
+    return resp.value.map((row) => ({
+      cellAddresses: row.cellAddresses[0],
+      data: headers.reduce(
+        (rowObj, colName, colIdx, _) => ({ ...rowObj, [colName]: row.values[0][colIdx] }),
+        {}
+      ),
+    }));
   }
 }
