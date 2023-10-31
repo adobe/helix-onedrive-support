@@ -1,3 +1,10 @@
+# [11.1.0](https://github.com/adobe/helix-onedrive-support/compare/v11.0.6...v11.1.0) (2023-10-31)
+
+
+### Features
+
+* support for non-persistent sessions and table filtering ([bba88fc](https://github.com/adobe/helix-onedrive-support/commit/bba88fcc3150490436af2d0944ed54a5c5517502))
+
 ## [11.0.6](https://github.com/adobe/helix-onedrive-support/compare/v11.0.5...v11.0.6) (2023-10-31)
 
 
