@@ -23,13 +23,15 @@ export class Workbook extends NamedItemContainer {
     this._log = log;
   }
 
-  async createSession() {
+  async createSession(persistChanges = true) {
     if (this._sessionId) {
       throw new StatusCodeError('This workbook is already associated with a session', 400);
     }
     const uri = `${this.uri}/createSession`;
     const result = await this._oneDrive.doFetch(uri, false, {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ persistChanges }),
     });
     this._sessionId = result.id;
     return this._sessionId;

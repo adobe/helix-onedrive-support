@@ -145,6 +145,18 @@ function handleTable(container, segs, method, body) {
         });
         return null;
       }
+      if ((segs.length >= 3) && (segs[1] === 'filter') && (segs[2] === 'apply')) {
+        if (table.filters) {
+          throw new Error('Only one filter at a time supported currently!');
+        }
+        const { criteria } = JSON.parse(body);
+        if (criteria.filterOn !== 'values') {
+          throw new Error('Only value based filtering supported currently!');
+        }
+        const colName = segs[0];
+        table.filters = { column: colName, criteria };
+        return null;
+      }
       if (body) {
         ({ name, index = table.headerNames.length } = body);
         table.headerNames.splice(index, 0, name);
@@ -180,10 +192,24 @@ function handleTable(container, segs, method, body) {
       };
     }
     case 'range': {
+      if ((segs.length >= 2) && (segs[0] === 'visibleView') && (segs[1] === 'rows')) {
+        const colIdx = table.filters ? table.headerNames.indexOf(table.filters.column) : -1;
+        const result = [{ cellAddresses: [[0]], values: [table.headerNames] }];
+        for (const [i, row] of table.rows.entries()) {
+          if ((!table.filters) || table.filters.criteria.values.includes(row[colIdx])) {
+            result.push({ cellAddresses: [[i + 1]], values: [row] });
+          }
+        }
+        return { value: result };
+      }
       return {
         address: 'sheet!A1:B10',
         addressLocal: 'A1:B10',
       };
+    }
+    case 'clearFilters': {
+      table.filters = null;
+      return {};
     }
     default:
       if (body) {
@@ -388,7 +414,7 @@ export class OneDriveMock extends OneDrive {
       }
     } else if (segs[0] === 'createSession') {
       return {
-        id: 'test-session-id',
+        id: JSON.parse(body).persistChanges ? 'test-session-id' : 'test-non-persistent-session-id',
       };
     } else if (segs[0] === 'refreshSession' || segs[0] === 'closeSession') {
       return {};

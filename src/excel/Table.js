@@ -147,4 +147,32 @@ export class Table {
   range() {
     return new Range(this._oneDrive, `${this.uri}/range`, this._log);
   }
+
+  async clearFilters() {
+    await this._oneDrive.doFetch(`${this.uri}/clearFilters`, true, {
+      method: 'POST',
+    });
+  }
+
+  async applyFilter(column, criteria) {
+    await this._oneDrive.doFetch(`${this.uri}/columns/${column}/filter/apply`, true, {
+      method: 'POST',
+      body: JSON.stringify({ criteria }),
+    });
+  }
+
+  async getVisibleRowsAsObjectsWithAddresses(maxRows = -1) {
+    // +1 to maxRows since result is inclusive of header
+    const pathSuffix = maxRows !== -1 ? `?$top=${maxRows + 1}` : '';
+    const path = `${this.uri}/range/visibleView/rows${pathSuffix}`;
+    const resp = await this._oneDrive.doFetch(path);
+    const headers = resp.value.shift().values[0];
+    return resp.value.map((row) => ({
+      cellAddresses: row.cellAddresses[0],
+      data: headers.reduce(
+        (rowObj, colName, colIdx, _) => ({ ...rowObj, [colName]: row.values[0][colIdx] }),
+        {},
+      ),
+    }));
+  }
 }
