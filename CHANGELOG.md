@@ -1,3 +1,10 @@
+## [11.1.1](https://github.com/adobe/helix-onedrive-support/compare/v11.1.0...v11.1.1) (2023-11-03)
+
+
+### Bug Fixes
+
+* add interface for doFetch ([#464](https://github.com/adobe/helix-onedrive-support/issues/464)) ([43eb52d](https://github.com/adobe/helix-onedrive-support/commit/43eb52d8cde7ce1580dad3af8218032bc7d65ecc))
+
 # [11.1.0](https://github.com/adobe/helix-onedrive-support/compare/v11.0.6...v11.1.0) (2023-10-31)
 
 
