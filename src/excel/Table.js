@@ -13,8 +13,15 @@ import { superTrim } from '../utils.js';
 import { Range } from './Range.js';
 
 export class Table {
-  constructor(oneDrive, prefix, name, log) {
-    this._oneDrive = oneDrive;
+  /**
+   * Create a new instance of this class.
+   * @param {import('../GraphAPI.js').GraphAPI} graphAPI graph API
+   * @param {string} prefix URI prefix for this table
+   * @param {string} name table name
+   * @param {any} log logger
+   */
+  constructor(graphAPI, prefix, name, log) {
+    this._graphAPI = graphAPI;
     this._prefix = prefix;
     this._name = name;
     this._log = log;
@@ -22,7 +29,7 @@ export class Table {
 
   async rename(name) {
     // TODO: check name for allowed characters and length
-    const result = await this._oneDrive.doFetch(this.uri, false, {
+    const result = await this._graphAPI.doFetch(this.uri, false, {
       method: 'PATCH',
       body: {
         name,
@@ -33,19 +40,19 @@ export class Table {
   }
 
   async getHeaderNames() {
-    const result = await this._oneDrive.doFetch(`${this.uri}/headerRowRange`);
+    const result = await this._graphAPI.doFetch(`${this.uri}/headerRowRange`);
     return result.values[0];
   }
 
   async getRows() {
-    const result = await this._oneDrive.doFetch(`${this.uri}/rows`);
+    const result = await this._graphAPI.doFetch(`${this.uri}/rows`);
     return result.value.map((v) => v.values[0]);
   }
 
   async getRowsAsObjects({ trim = false } = {}) {
     const { log } = this;
     this.log.debug(`get columns from ${this.uri}/columns`);
-    const result = await this._oneDrive.doFetch(`${this.uri}/columns`);
+    const result = await this._graphAPI.doFetch(`${this.uri}/columns`);
     const columnNames = result.value.map(({ name }) => name);
     log.debug(`got column names: ${columnNames}`);
 
@@ -68,7 +75,7 @@ export class Table {
   }
 
   async getRow(index) {
-    const result = await this._oneDrive.doFetch(`${this.uri}/rows/itemAt(index=${index})`);
+    const result = await this._graphAPI.doFetch(`${this.uri}/rows/itemAt(index=${index})`);
     return result.values[0];
   }
 
@@ -78,7 +85,7 @@ export class Table {
   }
 
   async addRows(values, index = null) {
-    const result = await this._oneDrive.doFetch(`${this.uri}/rows/add`, false, {
+    const result = await this._graphAPI.doFetch(`${this.uri}/rows/add`, false, {
       method: 'POST',
       body: {
         index,
@@ -89,7 +96,7 @@ export class Table {
   }
 
   async replaceRow(index, values) {
-    return this._oneDrive.doFetch(`${this.uri}/rows/itemAt(index=${index})`, false, {
+    return this._graphAPI.doFetch(`${this.uri}/rows/itemAt(index=${index})`, false, {
       method: 'PATCH',
       body: {
         values: [values],
@@ -98,18 +105,18 @@ export class Table {
   }
 
   async deleteRow(index) {
-    return this._oneDrive.doFetch(`${this.uri}/rows/itemAt(index=${index})`, true, {
+    return this._graphAPI.doFetch(`${this.uri}/rows/itemAt(index=${index})`, true, {
       method: 'DELETE',
     });
   }
 
   async getRowCount() {
-    const result = await this._oneDrive.doFetch(`${this.uri}/dataBodyRange?$select=rowCount`);
+    const result = await this._graphAPI.doFetch(`${this.uri}/dataBodyRange?$select=rowCount`);
     return result.rowCount;
   }
 
   async getColumn(name) {
-    const result = await this._oneDrive.doFetch(`${this.uri}/columns('${name}')`);
+    const result = await this._graphAPI.doFetch(`${this.uri}/columns('${name}')`);
     return result.values;
   }
 
@@ -120,14 +127,14 @@ export class Table {
     if (index !== undefined) {
       body.index = index;
     }
-    return this._oneDrive.doFetch(`${this.uri}/columns`, false, {
+    return this._graphAPI.doFetch(`${this.uri}/columns`, false, {
       method: 'POST',
       body,
     });
   }
 
   async deleteColumn(name) {
-    return this._oneDrive.doFetch(`${this.uri}/columns/${name}`, true, {
+    return this._graphAPI.doFetch(`${this.uri}/columns/${name}`, true, {
       method: 'DELETE',
     });
   }
@@ -145,17 +152,17 @@ export class Table {
   }
 
   range() {
-    return new Range(this._oneDrive, `${this.uri}/range`, this._log);
+    return new Range(this._graphAPI, `${this.uri}/range`, this._log);
   }
 
   async clearFilters() {
-    await this._oneDrive.doFetch(`${this.uri}/clearFilters`, true, {
+    await this._graphAPI.doFetch(`${this.uri}/clearFilters`, true, {
       method: 'POST',
     });
   }
 
   async applyFilter(column, criteria) {
-    await this._oneDrive.doFetch(`${this.uri}/columns/${column}/filter/apply`, true, {
+    await this._graphAPI.doFetch(`${this.uri}/columns/${column}/filter/apply`, true, {
       method: 'POST',
       body: JSON.stringify({ criteria }),
     });
@@ -165,7 +172,7 @@ export class Table {
     // +1 to maxRows since result is inclusive of header
     const pathSuffix = maxRows !== -1 ? `?$top=${maxRows + 1}` : '';
     const path = `${this.uri}/range/visibleView/rows${pathSuffix}`;
-    const resp = await this._oneDrive.doFetch(path);
+    const resp = await this._graphAPI.doFetch(path);
     const headers = resp.value.shift().values[0];
     return resp.value.map((row) => ({
       cellAddresses: row.cellAddresses[0],

@@ -12,12 +12,16 @@
 import { StatusCodeError } from '../StatusCodeError.js';
 
 export class NamedItemContainer {
-  constructor(oneDrive) {
-    this._oneDrive = oneDrive;
+  /**
+   * Create a new instance of this class.
+   * @param {import('../GraphAPI.js').GraphAPI} graphAPI graph API
+   */
+  constructor(graphAPI) {
+    this._graphAPI = graphAPI;
   }
 
   async getNamedItems() {
-    const result = await this._oneDrive.doFetch(`${this.uri}/names`);
+    const result = await this._graphAPI.doFetch(`${this.uri}/names`);
     return result.value.map((v) => ({
       name: v.name,
       value: v.value,
@@ -28,7 +32,7 @@ export class NamedItemContainer {
   async getNamedItem(name) {
     try {
       // await result in order to be able to catch errors
-      return await this._oneDrive.doFetch(`${this.uri}/names/${name}`);
+      return await this._graphAPI.doFetch(`${this.uri}/names/${name}`);
     } catch (e) {
       if (e.statusCode === 404) {
         return null;
@@ -40,7 +44,7 @@ export class NamedItemContainer {
   async addNamedItem(name, reference, comment) {
     try {
       // await result in order to be able to catch errors
-      return await this._oneDrive.doFetch(`${this.uri}/names/add`, false, {
+      return await this._graphAPI.doFetch(`${this.uri}/names/add`, false, {
         method: 'POST',
         body: {
           name,
@@ -59,7 +63,7 @@ export class NamedItemContainer {
   async deleteNamedItem(name) {
     try {
       // await result in order to be able to catch errors
-      return await this._oneDrive.doFetch(`${this.uri}/names/${name}`, true, {
+      return await this._graphAPI.doFetch(`${this.uri}/names/${name}`, true, {
         method: 'DELETE',
       });
     } catch (e) {

@@ -12,8 +12,14 @@
 import { superTrim } from '../utils.js';
 
 export class Range {
-  constructor(oneDrive, uri, log) {
-    this._oneDrive = oneDrive;
+  /**
+   * Create a new instance of this class.
+   * @param {import('../GraphAPI.js').GraphAPI} graphAPI graph API
+   * @param {string} uri URI of this range
+   * @param {any} log logger
+   */
+  constructor(graphAPI, uri, log) {
+    this._graphAPI = graphAPI;
     this._uri = uri;
     this._log = log;
   }
@@ -29,7 +35,7 @@ export class Range {
   async getData() {
     if (!this._data) {
       this.log.debug(`get range data from ${this.uri}`);
-      this._data = await this._oneDrive.doFetch(this.uri);
+      this._data = await this._graphAPI.doFetch(this.uri);
     }
     return this._data;
   }
@@ -72,14 +78,14 @@ export class Range {
       } else {
         // optimization: ask for the values, only, not the complete range object
         this.log.debug(`get range values from ${this.uri}`);
-        this._values = (await this._oneDrive.doFetch(`${this.uri}?$select=values`)).values;
+        this._values = (await this._graphAPI.doFetch(`${this.uri}?$select=values`)).values;
       }
     }
     return this._values;
   }
 
   async update(newValues) {
-    const result = await this._oneDrive.doFetch(this.uri, false, {
+    const result = await this._graphAPI.doFetch(this.uri, false, {
       method: 'PATCH',
       body: newValues,
     });
@@ -87,7 +93,7 @@ export class Range {
   }
 
   async delete(shift = 'Up') {
-    await this._oneDrive.doFetch(`${this.uri}/delete`, false, {
+    await this._graphAPI.doFetch(`${this.uri}/delete`, false, {
       method: 'POST',
       body: { shift },
     });
@@ -96,7 +102,7 @@ export class Range {
   }
 
   async insert(shift = 'Down') {
-    const result = await this._oneDrive.doFetch(`${this.uri}/insert`, false, {
+    const result = await this._graphAPI.doFetch(`${this.uri}/insert`, false, {
       method: 'POST',
       body: { shift },
     });

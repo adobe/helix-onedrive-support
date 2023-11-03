@@ -15,10 +15,16 @@ import { Table } from './Table.js';
 import { Worksheet } from './Worksheet.js';
 
 export class Workbook extends NamedItemContainer {
-  constructor(oneDrive, uri, log) {
-    super(oneDrive);
+  /**
+   * Create a new instance of this class.
+   * @param {import('../GraphAPI.js').GraphAPI} graphAPI graph API
+   * @param {string} uri relative URI
+   * @param {any} log logger
+   */
+  constructor(graphAPI, uri, log) {
+    super(graphAPI);
 
-    this._oneDrive = oneDrive;
+    this._graphAPI = graphAPI;
     this._uri = uri;
     this._log = log;
   }
@@ -28,7 +34,7 @@ export class Workbook extends NamedItemContainer {
       throw new StatusCodeError('This workbook is already associated with a session', 400);
     }
     const uri = `${this.uri}/createSession`;
-    const result = await this._oneDrive.doFetch(uri, false, {
+    const result = await this._graphAPI.doFetch(uri, false, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ persistChanges }),
@@ -40,7 +46,7 @@ export class Workbook extends NamedItemContainer {
   async closeSession() {
     if (this._sessionId) {
       const uri = `${this.uri}/closeSession`;
-      await this._oneDrive.doFetch(uri, false, {
+      await this._graphAPI.doFetch(uri, false, {
         method: 'POST',
         headers: {
           'Workbook-Session-Id': this._sessionId,
@@ -55,7 +61,7 @@ export class Workbook extends NamedItemContainer {
   async refreshSession() {
     if (this._sessionId) {
       const uri = `${this.uri}/refreshSession`;
-      await this._oneDrive.doFetch(uri, false, {
+      await this._graphAPI.doFetch(uri, false, {
         method: 'POST',
         headers: {
           'Workbook-Session-Id': this._sessionId,
@@ -85,7 +91,7 @@ export class Workbook extends NamedItemContainer {
     if (this._sessionId) {
       opts.headers['Workbook-Session-Id'] = this._sessionId;
     }
-    return this._oneDrive.doFetch(relUrl, rawResponseBody, opts);
+    return this._graphAPI.doFetch(relUrl, rawResponseBody, opts);
   }
 
   async getData() {
