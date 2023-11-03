@@ -15,10 +15,17 @@ import { Table } from './Table.js';
 import { Range } from './Range.js';
 
 export class Worksheet extends NamedItemContainer {
-  constructor(oneDrive, prefix, name, log) {
-    super(oneDrive);
+  /**
+   * Create a new instance of this class.
+   * @param {import('../GraphAPI.js').GraphAPI} graphAPI graph API
+   * @param {string} prefix URI prefix for this sheet
+   * @param {string} name sheet name
+   * @param {any} log logger
+   */
+  constructor(graphAPI, prefix, name, log) {
+    super(graphAPI);
 
-    this._oneDrive = oneDrive;
+    this._graphAPI = graphAPI;
     this._uri = `${prefix}/${name}`;
     this._name = name;
     this._log = log;
@@ -33,18 +40,18 @@ export class Worksheet extends NamedItemContainer {
   }
 
   async getData() {
-    const result = await this._oneDrive.doFetch(this._uri);
+    const result = await this._graphAPI.doFetch(this._uri);
     return result.value;
   }
 
   async getTableNames() {
     this.log.debug(`get table names from ${this._uri}/tables`);
-    const result = await this._oneDrive.doFetch(`${this._uri}/tables`);
+    const result = await this._graphAPI.doFetch(`${this._uri}/tables`);
     return result.value.map((v) => v.name);
   }
 
   table(name) {
-    return new Table(this._oneDrive, `${this._uri}/tables`, name, this._log);
+    return new Table(this._graphAPI, `${this._uri}/tables`, name, this._log);
   }
 
   async addTable(address, hasHeaders, name) {
@@ -54,7 +61,7 @@ export class Worksheet extends NamedItemContainer {
         throw new StatusCodeError(`Table name already exists: ${name}`, 409);
       }
     }
-    const result = await this._oneDrive.doFetch(`${this.uri}/tables/add`, false, {
+    const result = await this._graphAPI.doFetch(`${this.uri}/tables/add`, false, {
       method: 'POST',
       body: {
         address,
@@ -69,10 +76,10 @@ export class Worksheet extends NamedItemContainer {
   }
 
   usedRange() {
-    return new Range(this._oneDrive, `${this._uri}/usedRange`, this._log);
+    return new Range(this._graphAPI, `${this._uri}/usedRange`, this._log);
   }
 
   range(address) {
-    return new Range(this._oneDrive, `${this._uri}/range(address='${address}')`, this._log);
+    return new Range(this._graphAPI, `${this._uri}/range(address='${address}')`, this._log);
   }
 }
