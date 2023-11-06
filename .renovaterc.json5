@@ -10,7 +10,7 @@
       packageNames: [
         '@azure/msal-node'
       ],
-      allowedVersions: '!/2\\.3\\.0/'
+      allowedVersions: '!/2\\.[34]\\.0/'
     },
   ]
 }
