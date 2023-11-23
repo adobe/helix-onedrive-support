@@ -10,11 +10,11 @@
  * governing permissions and limitations under the License.
  */
 
-/* eslint-disable no-console,no-await-in-loop */
-
+/* eslint-disable no-console,no-await-in-loop,max-len */
 import { S3CacheManager } from '@adobe/helix-shared-tokencache';
 import { GetObjectCommand, ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3';
 import { Console } from 'node:console';
+import { writeFile } from 'node:fs/promises';
 
 const out = process.stdout.write.bind(process.stdout);
 
@@ -100,6 +100,8 @@ async function run() {
   console.log('loading projects.... done', ids.length);
   const projects = {};
   let counter = 0;
+
+  const fileName = `contentsource-list-${new Date().toISOString().replace(/:/g, '-')}.json`;
   for (const id of ids) {
     // eslint-disable-next-line no-plusplus
     if (++counter % 100 === 0) {
@@ -133,6 +135,7 @@ async function run() {
       bucket: 'helix-content-bus',
       type: 'google',
     });
+    const before = Object.keys(projects).length;
     if (await onedriveCache.hasCache('content')) {
       const project = await getProject();
       const onedriveContext = createCacheContext('OneDrive', project);
@@ -145,9 +148,15 @@ async function run() {
       const p = await googleCache.getCache('content');
       await p.beforeCacheAccess(googleContext);
     }
+
+    if (Object.keys(projects).length > before) {
+      await writeFile(fileName, JSON.stringify(projects, null, 2));
+    }
   }
 
   out(JSON.stringify(projects, null, 2));
 }
 
 run().catch(console.error);
+
+//  jq -r 'to_entries[]|[.key, .value.repository, .value.mountpoint, .value.account, .value.type] | @csv'
