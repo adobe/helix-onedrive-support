@@ -36,7 +36,7 @@
     "@adobe/eslint-config-helix": "2.0.5",
     "@semantic-release/changelog": "6.0.3",
     "@semantic-release/git": "10.0.1",
-    "@aws-sdk/client-s3": "3.465.0",
+    "@aws-sdk/client-s3": "3.470.0",
     "ajv": "8.12.0",
     "c8": "8.0.1",
     "codecov": "3.8.3",
@@ -49,12 +49,12 @@
     "jsdoc-to-markdown": "8.0.0",
     "jsdoc-tsimport-plugin": "1.0.5",
     "junit-report-builder": "3.1.0",
-    "lint-staged": "15.1.0",
+    "lint-staged": "15.2.0",
     "mocha": "10.2.0",
     "mocha-multi-reporters": "1.5.1",
     "nock": "13.4.0",
-    "npm": "10.2.4",
-    "semantic-release": "22.0.8"
+    "npm": "10.2.5",
+    "semantic-release": "22.0.10"
   },
   "lint-staged": {
     "*.js": "eslint"
