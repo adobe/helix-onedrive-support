@@ -71,6 +71,14 @@ export class Range {
     return rows;
   }
 
+  async getRowCount() {
+    if (this._data) {
+      return this._data.rowCount;
+    }
+    const { rowCount } = await this._graphAPI.doFetch(`${this.uri}?$select=rowCount`);
+    return rowCount;
+  }
+
   async getValues() {
     if (!this._values) {
       if (this._data) {

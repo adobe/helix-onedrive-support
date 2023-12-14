@@ -51,6 +51,7 @@ export default {
         ['this', 2020],
         [' Space\u200B ', '\t 2021 '],
       ],
+      rowCount: 5,
     },
   },
   {

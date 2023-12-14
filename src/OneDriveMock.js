@@ -224,11 +224,16 @@ function handleTable(container, segs, method, body) {
  * @param {object} range The mock range
  * @param {string} method Request method
  * @param {object} body Request body
+ * @param {string} query query to select values
  * @returns {object} The response value
  */
-function handleRange(range, method, body) {
+function handleRange(range, method, body, query) {
   if (method === 'PATCH') {
     range.values = body;
+  }
+  if (method === 'GET' && query) {
+    const property = new URLSearchParams(query).get('$select');
+    return { [property]: range[property] };
   }
   return range;
 }
@@ -424,7 +429,7 @@ export class OneDriveMock extends OneDrive {
     const type = segs.shift();
     switch (type) {
       case 'usedRange':
-        return handleRange(sheet.usedRange, method, body);
+        return handleRange(sheet.usedRange, method, body, query);
       case 'tables':
         return handleTable(sheet, segs, method, body);
       case 'names':
