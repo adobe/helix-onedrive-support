@@ -1,3 +1,10 @@
+# [11.2.0](https://github.com/adobe/helix-onedrive-support/compare/v11.1.3...v11.2.0) (2023-12-15)
+
+
+### Features
+
+* introduce Range.getRowCount ([#474](https://github.com/adobe/helix-onedrive-support/issues/474)) ([593d3c1](https://github.com/adobe/helix-onedrive-support/commit/593d3c1a685444493fafa78d594e9c1e6bf58f85))
+
 ## [11.1.3](https://github.com/adobe/helix-onedrive-support/compare/v11.1.2...v11.1.3) (2023-12-09)
 
 
