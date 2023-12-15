@@ -217,4 +217,9 @@ describe('Workbook Tests', () => {
     assert.deepStrictEqual(result, ['table1', 'table2']);
     nock.done();
   });
+
+  it('workbook get application and calculate', async () => {
+    const app = book.application();
+    await assert.doesNotReject(() => app.calculate('Full'));
+  });
 });

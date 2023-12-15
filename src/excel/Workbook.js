@@ -13,6 +13,7 @@ import { NamedItemContainer } from './NamedItemContainer.js';
 import { StatusCodeError } from '../StatusCodeError.js';
 import { Table } from './Table.js';
 import { Worksheet } from './Worksheet.js';
+import { Application } from './Application.js';
 
 export class Workbook extends NamedItemContainer {
   /**
@@ -156,6 +157,10 @@ export class Workbook extends NamedItemContainer {
       await table.rename(name);
     }
     return table;
+  }
+
+  application() {
+    return new Application(this, `${this._uri}/application`, this._log);
   }
 
   get uri() {

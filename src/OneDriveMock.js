@@ -434,6 +434,8 @@ export class OneDriveMock extends OneDrive {
         return handleTable(sheet, segs, method, body);
       case 'names':
         return handleNamedItems(sheet, segs, method, body);
+      case 'application':
+        return { calculate: () => {} };
       default:
         if (type?.startsWith('range(address=') && sheet.usedRange?.values) {
           const address = type.match(/range\(address='([^)]+)'\)/)[1];
