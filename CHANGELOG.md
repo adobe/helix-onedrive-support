@@ -1,3 +1,10 @@
+# [11.3.0](https://github.com/adobe/helix-onedrive-support/compare/v11.2.0...v11.3.0) (2023-12-15)
+
+
+### Features
+
+* add workbook.application ([#475](https://github.com/adobe/helix-onedrive-support/issues/475)) ([782aa5f](https://github.com/adobe/helix-onedrive-support/commit/782aa5ffae19bfe08a02d7e7fb0218c1ccf09878))
+
 # [11.2.0](https://github.com/adobe/helix-onedrive-support/compare/v11.1.3...v11.2.0) (2023-12-15)
 
 
