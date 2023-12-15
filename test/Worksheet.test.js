@@ -43,11 +43,13 @@ describe('Worksheet Tests', () => {
     const values = await sheet.getNamedItems();
     assert.deepStrictEqual(values, [{ name: 'alice', value: '$A2', comment: 'none' }]);
   });
+
   it('Get named item', async () => {
     const name = 'alice';
     const values = await sheet.getNamedItem(name);
     assert.deepStrictEqual(values, { name: 'alice', value: '$A2', comment: 'none' });
   });
+
   it('Add named item', async () => {
     const namedItem = { name: 'bob', value: '$B2', comment: 'none' };
     await sheet.addNamedItem(namedItem.name, namedItem.value, namedItem.comment);
@@ -57,6 +59,7 @@ describe('Worksheet Tests', () => {
       value: '$B2',
     });
   });
+
   it('Delete named item', async () => {
     const name = 'alice';
     await sheet.deleteNamedItem(name);
@@ -64,50 +67,75 @@ describe('Worksheet Tests', () => {
       .findIndex((item) => item.name === name);
     assert.strictEqual(index, -1);
   });
+
   it('Get table names', async () => {
     const values = await sheet.getTableNames();
     assert.deepStrictEqual(values, ['table']);
   });
+
   it('Add table with a generated name', async () => {
     const table = await sheet.addTable('A1:B4', true);
     assert.strictEqual(table.name, 'Table2');
   });
+
   it('Add table with a specific name', async () => {
     const table = await sheet.addTable('A1:B4', true, 'index_table');
     assert.strictEqual(table.name, 'index_table');
   });
+
   it('Add table with a specific name that is also the generated one', async () => {
     const table = await sheet.addTable('A1:B4', true, 'Table2');
     assert.strictEqual(table.name, 'Table2');
   });
+
   it('Add table with an existing name', async () => {
     await assert.rejects(async () => sheet.addTable('A1:B4', true, 'table'), /Table name already exists/);
   });
+
   it('Get used range address', async () => {
     const range = sheet.usedRange();
     const address = await range.getAddress();
     assert.strictEqual(address, 'sheet!A1:B4');
   });
+
   it('Get used range address local', async () => {
     const range = sheet.usedRange();
     const address = await range.getAddressLocal();
     assert.strictEqual(address, 'A1:B4');
   });
+
+  it('Get used range row count', async () => {
+    const range = sheet.usedRange();
+    const rowCount = await range.getRowCount();
+    assert.strictEqual(rowCount, 5);
+  });
+
+  it('Get used range row count after fetching all data', async () => {
+    const range = sheet.usedRange();
+    await range.getData();
+
+    const rowCount = await range.getRowCount();
+    assert.strictEqual(rowCount, 5);
+  });
+
   it('Get range', async () => {
     const range = sheet.range('A1:B4');
     const address = await range.getAddress();
     assert.strictEqual(address, 'A1:B4');
   });
+
   it('Get all data', async () => {
     const range = sheet.usedRange();
     const data = await range.getData();
     assert.deepStrictEqual(data, oneDrive.workbooks[0].data.sheets[0].usedRange);
   });
+
   it('Get column names', async () => {
     const range = sheet.usedRange();
     const names = await range.getColumnNames();
     assert.deepStrictEqual(names, ['project', '  c r e a t e d  ']);
   });
+
   it('Get rows as objects', async () => {
     const range = sheet.usedRange();
     const data = await range.getData();
@@ -120,6 +148,7 @@ describe('Worksheet Tests', () => {
       { '  c r e a t e d  ': '\t 2021 ', project: ' Space\u200B ' },
     ]);
   });
+
   it('Get rows as objects (trimmed)', async () => {
     const range = sheet.usedRange();
     const data = await range.getRowsAsObjects({ trim: true });
@@ -130,6 +159,7 @@ describe('Worksheet Tests', () => {
       { 'c r e a t e d': '2021', project: 'Space' },
     ]);
   });
+
   it('Replace usedRange', async () => {
     const values = [
       ['', ''],

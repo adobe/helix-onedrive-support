@@ -49,6 +49,11 @@ export declare interface Range {
   getRowsAsObjects(opts?:FormatOptions): Promise<Array<object>>;
 
   /**
+   * Returns the row count.
+   */
+  getRowCount(): Promise<number>;
+
+  /**
    * Returns the values of the range.
    */
   getValues(): Promise<Array<object>>;
@@ -63,15 +68,15 @@ export declare interface Range {
 
   /**
    * Deletes the cells associated with the range.
-   * @param shiftValue Specifies which way to shift the cells. 
+   * @param shiftValue Specifies which way to shift the cells.
    *                   The possible values are: Up, Left.
    */
   delete(shiftValue: string): Promise<void>;
 
   /**
-   * Inserts a cell or a range of cells into the worksheet in place of this range, 
+   * Inserts a cell or a range of cells into the worksheet in place of this range,
    * and shifts the other cells to make space.
-   * @param shiftValue Specifies which way to shift the cells. 
+   * @param shiftValue Specifies which way to shift the cells.
    *                   The possible values are: Down, Right.
    */
   insert(shiftValue: string): Promise<void>;
