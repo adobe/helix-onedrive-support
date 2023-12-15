@@ -13,6 +13,7 @@ import { Table } from './Table';
 import { Worksheet } from './Worksheet';
 import { GraphResult } from '../OneDrive';
 import { NamedItem } from './NamedItem';
+import { Application } from './Application';
 
 /**
  * Excel Work book
@@ -120,4 +121,9 @@ export declare interface Workbook {
    * @param {string} sessionId session id
    */
   setSessionId(sessionId: string): void;
+
+  /**
+   * Return the workbook application
+   */
+  application(): Application;
 }
