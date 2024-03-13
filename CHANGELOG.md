@@ -1,3 +1,10 @@
+## [11.3.13](https://github.com/adobe/helix-onedrive-support/compare/v11.3.12...v11.3.13) (2024-03-13)
+
+
+### Bug Fixes
+
+* detect temporary issue ([#506](https://github.com/adobe/helix-onedrive-support/issues/506)) ([75377b8](https://github.com/adobe/helix-onedrive-support/commit/75377b867e5b1bb4721a402b49924ea1c2c17f4e))
+
 ## [11.3.12](https://github.com/adobe/helix-onedrive-support/compare/v11.3.11...v11.3.12) (2024-03-10)
 
 
