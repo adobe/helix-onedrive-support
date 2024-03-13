@@ -135,6 +135,10 @@ export class OneDrive {
     } catch (e) {
       if (text.startsWith('<!DOCTYPE html>')) {
         log.warn('Graph API returned html response', text);
+        if (!rateLimit && text.indexOf('This is a temporary issue') !== -1) {
+          // eslint-disable-next-line no-param-reassign
+          rateLimit = new RateLimit({ retryAfter: 60 });
+        }
         text = 'Something went wrong: HTML error from graph api.';
       }
       err = new StatusCodeError(text, resp.status, null, rateLimit);
