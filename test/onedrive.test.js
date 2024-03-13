@@ -12,9 +12,11 @@
 
 /* eslint-env mocha */
 import assert from 'assert';
+import path from 'path';
 import { UnsecuredJWT } from 'jose';
 import { OneDrive } from '../src/OneDrive.js';
 import { OneDriveAuth } from '../src/OneDriveAuth.js';
+import { RateLimit } from '../src/RateLimit.js';
 import { OneDriveMock as MockDrive } from '../src/OneDriveMock.js';
 import { StatusCodeError } from '../src/index.js';
 import { Nock } from './utils.js';
@@ -637,12 +639,15 @@ describe('OneDrive Tests', () => {
   it('detects html errors', async () => {
     nock('https://graph.microsoft.com/v1.0')
       .get('/me')
-      .reply(503, '<!DOCTYPE html><div class="title">Something went wrong</div>');
+      .replyWithFile(503, path.resolve(__testdir, 'fixtures', 'graphapi.html'));
 
     const od = new OneDrive({
       auth: DEFAULT_AUTH(),
     });
-    await assert.rejects(od.me(), new StatusCodeError('Something went wrong: HTML error from graph api.', 503));
+    await assert.rejects(
+      od.me(),
+      new StatusCodeError('Something went wrong: HTML error from graph api.', 503, null, new RateLimit({ retryAfter: 60 })),
+    );
   }).timeout(5000);
 
   it('propagates 404s as warnings', async () => {
