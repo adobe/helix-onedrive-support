@@ -50,7 +50,7 @@
     "jsdoc-tsimport-plugin": "1.0.5",
     "junit-report-builder": "3.2.1",
     "lint-staged": "15.2.2",
-    "mocha": "10.3.0",
+    "mocha": "10.4.0",
     "mocha-multi-reporters": "1.5.1",
     "nock": "13.5.4",
     "npm": "10.5.0",
