@@ -1,0 +1,20 @@
+name: Semantic Release Version Check
+on:
+  push:
+    branches-ignore:
+      - 'main'
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  ci_trigger:
+    runs-on: ubuntu-latest
+    name: Comment Semantic Release Status
+    steps:
+      - name: Comment
+        id: comment
+        uses: adobe-rnd/github-semantic-release-comment-action@main
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
