@@ -324,7 +324,9 @@ export class OneDrive {
     do {
       // eslint-disable-next-line no-await-in-loop
       const result = await this.listChildren(folderItem, folderRelPath, query);
-      fileList = fileList.concat(result.value);
+      if (result.value) {
+        fileList = fileList.concat(result.value);
+      }
       if (result['@odata.nextLink']) {
         const nextLink = new URL(result['@odata.nextLink']);
         query.$skiptoken = nextLink.searchParams.get('$skiptoken');
