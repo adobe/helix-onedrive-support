@@ -1,3 +1,10 @@
+## [11.3.23](https://github.com/adobe/helix-onedrive-support/compare/v11.3.22...v11.3.23) (2024-05-15)
+
+
+### Bug Fixes
+
+* assert children list contains a value ([#528](https://github.com/adobe/helix-onedrive-support/issues/528)) ([9d84cc1](https://github.com/adobe/helix-onedrive-support/commit/9d84cc183142f44b29b2a19f7a516c4a959971e3))
+
 ## [11.3.22](https://github.com/adobe/helix-onedrive-support/compare/v11.3.21...v11.3.22) (2024-05-11)
 
 
