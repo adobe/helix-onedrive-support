@@ -414,6 +414,49 @@ describe('OneDrive Tests', () => {
     assert.strictEqual(list.value.length, 200);
   });
 
+  it('can handle missing `result.value` in fuzzyGetDriveItem', async () => {
+    const oneDrive = new OneDrive({
+      auth: {
+        authenticate: () => ({
+          accessToken: 'dummy-token',
+        }),
+        log: console,
+      },
+    });
+    const folderItem = {
+      parentReference: {
+        driveId: 'driveId',
+      },
+      id: 'folderId',
+    };
+    // asking for a path with a duplicated suffix will ask for the parent children list
+    // to get a fuzzy match: this list will not contain a `value`, though, because it
+    // actually points to a file, not a folder
+    const relPath = '/media/sample.gif/sample.gif';
+    const parent = '/media/sample.gif';
+
+    nock('https://graph.microsoft.com/v1.0')
+      .get(`/drives/${folderItem.parentReference.driveId}/items/${folderItem.id}:${relPath}`)
+      .reply(404, {
+        error: {
+          code: 'itemNotFound',
+          message: 'The resource could not be found.',
+        },
+      })
+      .get(`/drives/${folderItem.parentReference.driveId}/items/${folderItem.id}:${parent}:/children`)
+      .query(true)
+      .reply(200, {
+        '@odata.context': 'https://graph.microsoft.com/v1.0/$metadata#Edm.Null',
+        '@odata.null': true,
+      });
+
+    const items = await oneDrive.fuzzyGetDriveItem(folderItem, relPath, {
+      $top: 999,
+      $select: 'name,parentReference,file,id,size,webUrl,lastModifiedDateTime',
+    });
+    assert.strictEqual(items.length, 0);
+  });
+
   it('can get the user profile: me', async () => {
     const expected = {
       '@odata.context': 'https://graph.microsoft.com/v1.0/$metadata#users/$entity',
