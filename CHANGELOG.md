@@ -1,3 +1,10 @@
+## [11.3.29](https://github.com/adobe/helix-onedrive-support/compare/v11.3.28...v11.3.29) (2024-06-08)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/helix-shared-tokencache to v1.4.9 ([8985f4d](https://github.com/adobe/helix-onedrive-support/commit/8985f4d75ad88b8058866ab45ede1f8e6ee1ec61))
+
 ## [11.3.28](https://github.com/adobe/helix-onedrive-support/compare/v11.3.27...v11.3.28) (2024-06-07)
 
 
