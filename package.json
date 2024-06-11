@@ -30,7 +30,7 @@
   "dependencies": {
     "@adobe/fetch": "4.1.8",
     "@adobe/helix-shared-tokencache": "1.4.9",
-    "@azure/msal-node": "2.2.0",
+    "@azure/msal-node": "2.9.2",
     "jose": "5.4.0"
   },
   "devDependencies": {
