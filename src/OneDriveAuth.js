@@ -312,6 +312,7 @@ export class OneDriveAuth {
             });
           } catch (e) {
             this.handleAcquireError(account, e, true);
+            this.cachePlugin.clear();
           }
         }
       }

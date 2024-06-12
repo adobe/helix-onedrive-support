@@ -93,7 +93,6 @@ describe('OneDriveAuth Tests', () => {
   });
 
   it('can authenticate against a resource', async () => {
-    nock.discovery();
     nock.token({
       token_type: 'Bearer',
       refresh_token: 'dummy',
@@ -137,7 +136,6 @@ describe('OneDriveAuth Tests', () => {
   });
 
   it('can authenticate against a resource (by plugin)', async () => {
-    nock.discovery();
     nock.token({
       token_type: 'Bearer',
       refresh_token: 'dummy',
@@ -192,8 +190,6 @@ describe('OneDriveAuth Tests', () => {
   });
 
   it('can authenticate with device code', async () => {
-    nock.discovery();
-
     nock('https://login.microsoftonline.com')
       .post('/adobe/oauth2/v2.0/devicecode')
       .reply(200, {
@@ -228,7 +224,6 @@ describe('OneDriveAuth Tests', () => {
   });
 
   it('catches 401 errors when authenticating', async () => {
-    nock.discovery();
     nock.unauthenticated();
 
     const od = new OneDriveAuth({
@@ -245,7 +240,6 @@ describe('OneDriveAuth Tests', () => {
   });
 
   it('returns null when silent acquire fails', async () => {
-    nock.discovery();
     nock('https://login.microsoftonline.com')
       .post('/adobe/oauth2/v2.0/devicecode')
       .reply(200, {
@@ -280,16 +274,15 @@ describe('OneDriveAuth Tests', () => {
       }),
       acquireMethod: AcquireMethod.BY_DEVICE_CODE,
     });
-    await od1.authenticate();
+    let result = await od1.authenticate();
+    assert.strictEqual(result.account.homeAccountId, 'Bob.adobe');
 
     // make the cached access token expire
     const entry = JSON.parse(caches.get('default').data);
     entry.AccessToken[Object.keys(entry.AccessToken)[0]].expires_on = Math.floor(Date.now() / 1000);
     caches.get('default').data = JSON.stringify(entry);
 
-    nock.discovery();
     nock.unauthenticated();
-    // nock.openid();
     nock.revoked();
 
     let baseRefreshed = false;
@@ -301,6 +294,9 @@ describe('OneDriveAuth Tests', () => {
       cachePlugin: new MemCachePlugin({
         key: 'default',
         base: {
+          afterCacheAccess() {
+            return true;
+          },
           beforeCacheAccess: () => {
             baseRefreshed = true;
           },
@@ -309,10 +305,10 @@ describe('OneDriveAuth Tests', () => {
       }),
     });
 
-    const result = await od2.authenticate(true);
+    result = await od2.authenticate(true);
     assert.strictEqual(result, null);
     assert.strictEqual(baseRefreshed, true);
-    assert.strictEqual(caches.get('default').data, undefined);
+    assert.strictEqual(caches.get('default'), undefined);
 
     const od3 = new OneDriveAuth({
       clientId: '83ab2922-5f11-4e4d-96f3-d1e0ff152856',
