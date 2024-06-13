@@ -2,15 +2,5 @@
   $schema: 'https://docs.renovatebot.com/renovate-schema.json',
   extends: [
     'local>adobe/helix-shared'
-  ],
-  packageRules: [
-    {
-      // issues with Cachemanager.getIdToken() probably due to:
-      // https://github.com/AzureAD/microsoft-authentication-library-for-js/commit/0f5e6c2142889ea9f43d808f270aec9264afd363#diff-9386241630b242163033adcf355efb44fbb1f78fc9516e3553f226e4a5c0738bL287
-      packageNames: [
-        '@azure/msal-node'
-      ],
-      allowedVersions: '2.2.0'
-    },
   ]
 }
