@@ -1,3 +1,10 @@
+## [11.3.31](https://github.com/adobe/helix-onedrive-support/compare/v11.3.30...v11.3.31) (2024-06-18)
+
+
+### Bug Fixes
+
+* add config ([11ec39d](https://github.com/adobe/helix-onedrive-support/commit/11ec39dd00665cdfc0b96e6c2983dcf8065f0ec9))
+
 ## [11.3.30](https://github.com/adobe/helix-onedrive-support/compare/v11.3.29...v11.3.30) (2024-06-15)
 
 
