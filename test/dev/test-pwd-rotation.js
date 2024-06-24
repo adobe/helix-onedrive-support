@@ -69,22 +69,7 @@ async function clearAccessToken(plugin, expire) {
   }
 }
 
-async function run() {
-  const contentBusId = process.argv[2];
-  const url = process.argv[3];
-  if (!url) {
-    console.error('usage test-pwd-rotation <contentBusId> <mount-url>');
-    process.exit(1);
-  }
-  const key = `${contentBusId}/.helix-auth/auth-onedrive-content.json`;
-  const basePlugin = new S3CachePlugin({
-    bucket: 'helix-content-bus',
-    key,
-    secret: contentBusId,
-  });
-
-  const cachePlugin = new MemCachePlugin({ key, base: basePlugin });
-
+async function getClient(cachePlugin, url) {
   const auth = new OneDriveAuth({
     log: console,
     clientId: process.env.AZURE_HELIX_SERVICE_CLIENT_ID,
@@ -103,13 +88,33 @@ async function run() {
     auth,
     noShareLinkCache: true,
   });
+  return client;
+}
+
+async function run() {
+  const contentBusId = process.argv[2];
+  const url = process.argv[3];
+  if (!url) {
+    console.error('usage test-pwd-rotation <contentBusId> <mount-url>');
+    process.exit(1);
+  }
+  const key = `${contentBusId}/.helix-auth/auth-onedrive-content.json`;
+  const basePlugin = new S3CachePlugin({
+    bucket: 'helix-content-bus',
+    key,
+    secret: contentBusId,
+  });
+
+  const cachePlugin = new MemCachePlugin({ key, base: basePlugin });
+
+  let client = await getClient(cachePlugin, url);
   await testReadAccessOnedrive(client, url);
 
-  await rl.question('\nRotate password and press enter to continue...');
+  await rl.question('\nRevoke user sessions in azure and press enter...');
 
-  await clearAccessToken(basePlugin, false);
-  await testReadAccessOnedrive(client, url);
   await clearAccessToken(basePlugin, true);
+
+  client = await getClient(cachePlugin, url);
   await testReadAccessOnedrive(client, url);
 }
 
