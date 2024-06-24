@@ -12,8 +12,11 @@
 
 /* eslint-disable no-console */
 
+import { config } from 'dotenv';
 import { S3CacheManager } from '@adobe/helix-shared-tokencache';
 import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
+
+config();
 
 function createCacheContext() {
   return {
