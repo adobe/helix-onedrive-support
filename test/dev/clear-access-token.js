@@ -14,7 +14,7 @@ import { S3CachePlugin } from '@adobe/helix-shared-tokencache';
 async function run() {
   const contentBusId = process.argv[2];
   if (!contentBusId) {
-    console.error('usage clear-access-token <contentBusId>');
+    console.error('usage clear-access-token <contentBusId> [expire]');
     process.exit(1);
   }
   const p = new S3CachePlugin({
@@ -34,11 +34,22 @@ async function run() {
     },
   };
   await p.beforeCacheAccess(ctx);
-  delete data.AccessToken;
+  if (process.argv[3]) {
+    const at = data.AccessToken[Object.keys(data.AccessToken)[0]];
+    at.cached_at = 1;
+    at.expires_on = 2;
+    at.extended_expires_on = 3;
+  } else {
+    delete data.AccessToken;
+  }
   ctx.cacheHasChanged = true;
   await p.afterCacheAccess(ctx);
   console.log(`Account: ${Object.values(data.Account)[0].username}`);
-  console.log('cleared access token');
+  if (process.argv[3]) {
+    console.log('expired access token');
+  } else {
+    console.log('cleared access token');
+  }
 }
 
 run().catch(console.error);
