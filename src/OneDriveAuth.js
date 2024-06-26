@@ -101,6 +101,7 @@ export class OneDriveAuth {
         log: this._log,
         key: 'default',
         caches: new Map(),
+        type: 'onedrive',
       });
     }
 

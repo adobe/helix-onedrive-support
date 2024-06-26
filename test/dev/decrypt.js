@@ -11,6 +11,7 @@
  */
 
 /* eslint-disable no-console */
+
 import fs from 'fs/promises';
 import { decrypt } from '@adobe/helix-shared-tokencache';
 

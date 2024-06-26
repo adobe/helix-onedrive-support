@@ -9,6 +9,9 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+
+/* eslint-disable no-console */
+
 import { S3CachePlugin } from '@adobe/helix-shared-tokencache';
 
 async function run() {
@@ -21,6 +24,7 @@ async function run() {
     bucket: 'helix-content-bus',
     key: `${contentBusId}/.helix-auth/auth-onedrive-content.json`,
     secret: contentBusId,
+    type: 'onedrive',
   });
   let data = {};
   const ctx = {

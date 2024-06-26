@@ -9,6 +9,9 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+
+/* eslint-disable no-console */
+
 import { S3CacheManager } from '@adobe/helix-shared-tokencache';
 import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
 

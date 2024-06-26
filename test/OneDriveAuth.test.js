@@ -147,6 +147,7 @@ describe('OneDriveAuth Tests', () => {
     const cachePlugin = new MemCachePlugin({
       key: 'default',
       caches,
+      type: 'onedrive',
     });
     caches.set('default', {
       metadata: {
@@ -271,6 +272,7 @@ describe('OneDriveAuth Tests', () => {
       cachePlugin: new MemCachePlugin({
         key: 'default',
         caches,
+        type: 'onedrive',
       }),
       acquireMethod: AcquireMethod.BY_DEVICE_CODE,
     });
@@ -302,6 +304,7 @@ describe('OneDriveAuth Tests', () => {
           },
         },
         caches,
+        type: 'onedrive',
       }),
     });
 
@@ -318,6 +321,7 @@ describe('OneDriveAuth Tests', () => {
       cachePlugin: new MemCachePlugin({
         key: 'default',
         caches,
+        type: 'onedrive',
       }),
     });
     await assert.rejects(
