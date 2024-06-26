@@ -1,3 +1,10 @@
+## [11.3.36](https://github.com/adobe/helix-onedrive-support/compare/v11.3.35...v11.3.36) (2024-06-26)
+
+
+### Bug Fixes
+
+* **deps:** add 'onedrive' to cache plugins ([#548](https://github.com/adobe/helix-onedrive-support/issues/548)) ([75e4bb6](https://github.com/adobe/helix-onedrive-support/commit/75e4bb64cf96c0ef949a9c6b23478d27113cb1c4))
+
 ## [11.3.35](https://github.com/adobe/helix-onedrive-support/compare/v11.3.34...v11.3.35) (2024-06-26)
 
 
