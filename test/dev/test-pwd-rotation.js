@@ -9,6 +9,9 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+
+/* eslint-disable no-console */
+
 import { MemCachePlugin, S3CachePlugin } from '@adobe/helix-shared-tokencache';
 import chalk from 'chalk-template';
 import 'dotenv/config';
@@ -103,9 +106,14 @@ async function run() {
     bucket: 'helix-content-bus',
     key,
     secret: contentBusId,
+    type: 'onedrive',
   });
 
-  const cachePlugin = new MemCachePlugin({ key, base: basePlugin });
+  const cachePlugin = new MemCachePlugin({
+    key,
+    base: basePlugin,
+    type: 'onedrive',
+  });
 
   let client = await getClient(cachePlugin, url);
   await testReadAccessOnedrive(client, url);
