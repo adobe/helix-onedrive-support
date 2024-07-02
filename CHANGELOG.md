@@ -1,3 +1,10 @@
+# [11.4.0](https://github.com/adobe/helix-onedrive-support/compare/v11.3.38...v11.4.0) (2024-07-02)
+
+
+### Features
+
+* allow to set user agent ([070167d](https://github.com/adobe/helix-onedrive-support/commit/070167dd77b1c793f0afb1031edfce5cc8b23a92))
+
 ## [11.3.38](https://github.com/adobe/helix-onedrive-support/compare/v11.3.37...v11.3.38) (2024-06-29)
 
 
