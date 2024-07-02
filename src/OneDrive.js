@@ -87,7 +87,9 @@ export class OneDrive {
    * @param {OneDriveOptions} opts Options
    */
   constructor(opts) {
-    this.fetchContext = keepAliveNoCache({ userAgent: 'adobe-fetch' });
+    this.fetchContext = keepAliveNoCache({
+      userAgent: opts.userAgent || 'adobe-fetch',
+    });
 
     if (!opts.auth) {
       throw new Error('Missing auth.');

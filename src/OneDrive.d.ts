@@ -29,6 +29,12 @@ export declare interface OneDriveOptions {
    * Note that the cache is only used, if the `noShareLinkCache` flag is `falsy`
    */
   shareLinkCache?: Map<string, DriveItem>,
+
+  /**
+   * user agent to include by default in the requests
+   * @example "NONISV|Contoso|GovernanceCheck/1.0"
+   */
+  userAgent: string;
 }
 
 export declare interface GraphResult {
