@@ -798,7 +798,38 @@ describe('OneDrive Tests', () => {
       auth: DEFAULT_AUTH(),
     });
     const result = await od.getDriveItem(folderItem, relPath, true);
-    assert(Buffer.isBuffer(result));
+    assert.strictEqual(result.toString(), 'This is the contents of that file');
+  });
+
+  it('doFetch includes default user agent', async () => {
+    nock('https://graph.microsoft.com/v1.0')
+      .get('/drives/1234')
+      .reply(function handler() {
+        return [200, { userAgent: this.req.headers['user-agent'] }];
+      });
+    const od = new OneDrive({
+      auth: DEFAULT_AUTH(),
+    });
+    const result = await od.doFetch('/drives/1234');
+    assert.deepStrictEqual(result, {
+      userAgent: 'adobe-fetch',
+    });
+  });
+
+  it('doFetch includes custom user agent', async () => {
+    nock('https://graph.microsoft.com/v1.0')
+      .get('/drives/1234')
+      .reply(function handler() {
+        return [200, { userAgent: this.req.headers['user-agent'] }];
+      });
+    const od = new OneDrive({
+      auth: DEFAULT_AUTH(),
+      userAgent: 'NONISV|Contoso|GovernanceCheck/1.0',
+    });
+    const result = await od.doFetch('/drives/1234');
+    assert.deepStrictEqual(result, {
+      userAgent: 'NONISV|Contoso|GovernanceCheck/1.0',
+    });
   });
 
   it('getParentDriveItem returns item', async () => {
