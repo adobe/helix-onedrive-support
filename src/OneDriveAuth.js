@@ -51,10 +51,10 @@ const globalTenantCache = new Map();
  * @param {String} appName application name, e.g. `HELIX_SERVICE`, or undefined
  * @returns {Object} containing `clientId` and `clientSecret` or an empty object
  */
-function getClientIdSecret(appName) {
+function getClientIdAndSecret(appName) {
   if (appName) {
-    const clientId = process.env[`AZURE_${appName}_CLIENT_ID`];
-    const clientSecret = process.env[`AZURE_${appName}_CLIENT_SECRET`];
+    const clientId = process.env[`AZURE_${appName.toUpperCase()}_CLIENT_ID`];
+    const clientSecret = process.env[`AZURE_${appName.toUpperCase()}_CLIENT_SECRET`];
     if (clientId && clientSecret) {
       return { clientId, clientSecret };
     }
@@ -136,10 +136,10 @@ export class OneDriveAuth {
 
       const metadata = await cachePlugin.getPluginMetadata();
       if (metadata?.useClientCredentials) {
-        this.acquireMethod = AcquireMethod.BY_CLIENT_CREDENTIAL;
+        this.pluginUseClientCredentials = true;
       }
 
-      const { clientId, clientSecret } = getClientIdSecret(metadata?.appName);
+      const { clientId, clientSecret } = getClientIdAndSecret(metadata?.appName);
       const msalConfig = {
         auth: {
           clientId: clientId ?? this.clientId,
@@ -359,7 +359,8 @@ export class OneDriveAuth {
           scopes: this.scopes,
         });
       }
-      if (this.acquireMethod === AcquireMethod.BY_CLIENT_CREDENTIAL) {
+      if (this.acquireMethod === AcquireMethod.BY_CLIENT_CREDENTIAL
+          || this.pluginUseClientCredentials) {
         log.debug('acquire token with client credentials.');
         return await app.acquireTokenByClientCredential({
           scopes: this.scopes,
