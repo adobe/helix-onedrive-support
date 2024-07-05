@@ -47,10 +47,23 @@ export const AcquireMethod = {
 const globalTenantCache = new Map();
 
 /**
+ * Return client id and secret stored in the process, matching an application name given.
+ * @param {String} appName application name, e.g. `HELIX_SERVICE`, or undefined
+ * @returns {Object} containing `clientId` and `clientSecret` or an empty object
+ */
+function getClientIdSecret(appName) {
+  if (appName) {
+    const clientId = process.env[`AZURE_${appName}_CLIENT_ID`];
+    const clientSecret = process.env[`AZURE_${appName}_CLIENT_SECRET`];
+    if (clientId && clientSecret) {
+      return { clientId, clientSecret };
+    }
+  }
+  return {};
+}
+
+/**
  * Helper class that facilitates accessing one drive.
- *
- * @class
- * @field {ConfidentialClientApplication|PublicClientApplication} app
  */
 export class OneDriveAuth {
   /**
@@ -73,6 +86,8 @@ export class OneDriveAuth {
     this.clientSecret = opts.clientSecret || '';
     this._log = opts.log || console;
     this.tenant = opts.tenant;
+
+    /** @type {import('@adobe/helix-shared-tokencache/src/CachePlugin.js').CachePlugin} */
     this.cachePlugin = opts.cachePlugin;
     this.scopes = opts.scopes || DEFAULT_SCOPES;
     this.onCode = opts.onCode;
@@ -110,16 +125,25 @@ export class OneDriveAuth {
     }
   }
 
-  get app() {
+  /**
+   * Gets the client application, creating it if necessary.
+   *
+   * @returns {import("@azure/msal-node").ClientApplication} client application
+   */
+  async getApp() {
     if (!this._app) {
-      const {
-        log,
-        cachePlugin,
-      } = this;
+      const { log, cachePlugin } = this;
+
+      const metadata = await cachePlugin.getPluginMetadata();
+      if (metadata?.useClientCredentials) {
+        this.acquireMethod = AcquireMethod.BY_CLIENT_CREDENTIAL;
+      }
+
+      const { clientId, clientSecret } = getClientIdSecret(metadata?.appName);
       const msalConfig = {
         auth: {
-          clientId: this.clientId,
-          clientSecret: this.clientSecret,
+          clientId: clientId ?? this.clientId,
+          clientSecret: clientSecret ?? this.clientSecret,
           authority: this.getAuthorityUrl(),
         },
         system: {
@@ -241,7 +265,8 @@ export class OneDriveAuth {
    * @returns {boolean}
    */
   async isAuthenticated() {
-    const accounts = await this.app.getTokenCache().getAllAccounts();
+    const app = await this.getApp();
+    const accounts = await app.getTokenCache().getAllAccounts();
     return accounts.length > 0;
   }
 
@@ -286,8 +311,9 @@ export class OneDriveAuth {
    * @returns {Promise<null|AuthenticationResult>}
    */
   async doAuthenticate(silentOnly) {
-    const { log, app } = this;
+    const { log } = this;
 
+    const app = await this.getApp();
     let accounts = await app.getTokenCache().getAllAccounts();
     if (accounts.length > 0) {
       let account = accounts[0];
@@ -333,9 +359,7 @@ export class OneDriveAuth {
           scopes: this.scopes,
         });
       }
-      if (this.acquireMethod === AcquireMethod.BY_CLIENT_CREDENTIAL
-          // check if plugin wants us to use client credentials
-          || (await this.cachePlugin.getPluginMetadata() || {}).useClientCredentials) {
+      if (this.acquireMethod === AcquireMethod.BY_CLIENT_CREDENTIAL) {
         log.debug('acquire token with client credentials.');
         return await app.acquireTokenByClientCredential({
           scopes: this.scopes,
