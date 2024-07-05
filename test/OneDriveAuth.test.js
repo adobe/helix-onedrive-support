@@ -376,6 +376,7 @@ describe('OneDriveAuth Tests', () => {
           beforeCacheAccess: () => {
             baseRefreshed = true;
           },
+          getPluginMetadata: () => {},
         },
         caches,
         type: 'onedrive',
