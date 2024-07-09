@@ -1,3 +1,10 @@
+## [11.5.1](https://github.com/adobe/helix-onedrive-support/compare/v11.5.0...v11.5.1) (2024-07-09)
+
+
+### Bug Fixes
+
+* cachePlugin might be undefined ([#557](https://github.com/adobe/helix-onedrive-support/issues/557)) ([2a1d94f](https://github.com/adobe/helix-onedrive-support/commit/2a1d94f3c572d98eca24ae4472e6ae5f262c2541))
+
 # [11.5.0](https://github.com/adobe/helix-onedrive-support/compare/v11.4.1...v11.5.0) (2024-07-09)
 
 
