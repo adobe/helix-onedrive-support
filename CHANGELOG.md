@@ -1,3 +1,10 @@
+# [11.5.0](https://github.com/adobe/helix-onedrive-support/compare/v11.4.1...v11.5.0) (2024-07-09)
+
+
+### Features
+
+* support custom client id (as appName) in metadata ([#553](https://github.com/adobe/helix-onedrive-support/issues/553)) ([eebff24](https://github.com/adobe/helix-onedrive-support/commit/eebff24e8d2160f0133bebde21b779b16bbe832e))
+
 ## [11.4.1](https://github.com/adobe/helix-onedrive-support/compare/v11.4.0...v11.4.1) (2024-07-06)
 
 
