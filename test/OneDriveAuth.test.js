@@ -190,6 +190,80 @@ describe('OneDriveAuth Tests', () => {
     });
   });
 
+  it('can authenticate against a resource (by custom client id and secret)', async () => {
+    const clientId = 'd88a7742-9581-46f0-aaf1-eb0a45044bf1';
+
+    nock('https://login.microsoftonline.com')
+      .post('/adobe/oauth2/v2.0/token')
+      .reply((_, requestBody) => {
+        assert.strictEqual(new URLSearchParams(requestBody).get('client_id'), clientId);
+        return [200, {
+          token_type: 'Bearer',
+          refresh_token: 'dummy',
+          access_token: 'dummy',
+          expires_in: 81000,
+        }];
+      });
+
+    const savedEnv = { ...process.env };
+    Object.assign(process.env, {
+      AZURE_FRANKLIN_CONNECTOR_CLIENT_ID: clientId,
+      AZURE_FRANKLIN_CONNECTOR_CLIENT_SECRET: 'another-secret',
+    });
+
+    const caches = new Map();
+    const cachePlugin = new MemCachePlugin({
+      key: 'default',
+      caches,
+      type: 'onedrive',
+    });
+    caches.set('default', {
+      metadata: {
+        useClientCredentials: true,
+        appName: 'FRANKLIN_CONNECTOR',
+      },
+    });
+
+    const od = new OneDriveAuth({
+      clientId: '83ab2922-5f11-4e4d-96f3-d1e0ff152856',
+      clientSecret: 'test-client-secret',
+      resource: 'test-resource',
+      tenant: 'adobe',
+      cachePlugin,
+    });
+
+    try {
+      const resp = await od.authenticate();
+      delete resp.expiresOn;
+      delete resp.extExpiresOn;
+      delete resp.correlationId;
+      assert.deepStrictEqual(resp, {
+        accessToken: 'dummy',
+        account: null,
+        authority: 'https://login.microsoftonline.com/adobe/',
+        cloudGraphHostName: '',
+        code: undefined,
+        familyId: '',
+        fromCache: false,
+        fromNativeBroker: false,
+        idToken: '',
+        idTokenClaims: {},
+        refreshOn: undefined,
+        msGraphHost: '',
+        requestId: '',
+        scopes: [
+          'https://graph.microsoft.com/.default',
+        ],
+        state: '',
+        tenantId: '',
+        tokenType: 'Bearer',
+        uniqueId: '',
+      });
+    } finally {
+      process.env = savedEnv;
+    }
+  });
+
   it('can authenticate with device code', async () => {
     nock('https://login.microsoftonline.com')
       .post('/adobe/oauth2/v2.0/devicecode')
@@ -302,6 +376,7 @@ describe('OneDriveAuth Tests', () => {
           beforeCacheAccess: () => {
             baseRefreshed = true;
           },
+          getPluginMetadata: () => {},
         },
         caches,
         type: 'onedrive',
