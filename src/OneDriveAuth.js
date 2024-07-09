@@ -134,7 +134,7 @@ export class OneDriveAuth {
     if (!this._app) {
       const { log, cachePlugin } = this;
 
-      const metadata = await cachePlugin.getPluginMetadata();
+      const metadata = await cachePlugin?.getPluginMetadata();
       if (metadata?.useClientCredentials) {
         this.pluginUseClientCredentials = true;
       }
@@ -302,7 +302,7 @@ export class OneDriveAuth {
     const { log } = this;
     const msg = `Error while reacquiring token from cache${forced ? ' (forced)' : ''}.`;
 
-    log.warn(`${msg}\nUsername: ${account.username}\nAuth-Location: ${this.cachePlugin.location}\nMessage: ${e.message}`);
+    log.warn(`${msg}\nUsername: ${account.username}\nAuth-Location: ${this.cachePlugin?.location}\nMessage: ${e.message}`);
   }
 
   /**

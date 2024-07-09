@@ -42,13 +42,29 @@ describe('OneDriveAuth Tests', () => {
     assert.ok(auth);
   });
 
-  it('can be constructed with accesToken without clientId.', async () => {
+  it('can be constructed with accessToken without clientId.', async () => {
     const auth = new OneDriveAuth({
       accessToken: 'Bearer dummy',
     });
     assert.ok(auth);
     const accessToken = await auth.authenticate();
     assert.strictEqual(accessToken.accessToken, 'Bearer dummy');
+  });
+
+  it('can be constructed without cache plugin', async () => {
+    const savedValue = process.env.HELIX_ONEDRIVE_LOCAL_AUTH_CACHE;
+    try {
+      delete process.env.HELIX_ONEDRIVE_LOCAL_AUTH_CACHE;
+      const auth = new OneDriveAuth({
+        accessToken: 'Bearer dummy',
+      });
+      assert.ok(auth);
+      const accessToken = await auth.authenticate();
+      assert.strictEqual(accessToken.accessToken, 'Bearer dummy');
+      assert.strictEqual(auth.cachePlugin, undefined);
+    } finally {
+      process.env.HELIX_ONEDRIVE_LOCAL_AUTH_CACHE = savedValue;
+    }
   });
 
   it('can be disposed.', async () => {
