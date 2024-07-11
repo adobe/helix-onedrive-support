@@ -82,7 +82,7 @@ export declare class OneDriveAuth {
   /**
    * the MSAL client application
    */
-  app: ClientApplication;
+  getApp(): Promise<ClientApplication>;
 
   /**
    * the authority url for login.
