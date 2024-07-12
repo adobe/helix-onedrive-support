@@ -325,7 +325,7 @@ export class OneDriveAuth {
       }
 
       // try again with fresh mem cache
-      if (this.cachePlugin instanceof MemCachePlugin) {
+      if (typeof this.cachePlugin.clear === 'function') {
         this.cachePlugin.clear();
 
         accounts = await app.getTokenCache().getAllAccounts();
