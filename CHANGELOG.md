@@ -1,3 +1,10 @@
+## [11.5.4](https://github.com/adobe/helix-onedrive-support/compare/v11.5.3...v11.5.4) (2024-07-12)
+
+
+### Bug Fixes
+
+* **deps:** change @adobe/helix-shared-tokencache dep to non-fixed ([#559](https://github.com/adobe/helix-onedrive-support/issues/559)) ([5c7a5ba](https://github.com/adobe/helix-onedrive-support/commit/5c7a5ba5d1cd80a183f7555343ade3b338afcb1b))
+
 ## [11.5.3](https://github.com/adobe/helix-onedrive-support/compare/v11.5.2...v11.5.3) (2024-07-09)
 
 
