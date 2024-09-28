@@ -31,11 +31,11 @@
     "@adobe/fetch": "4.1.9",
     "@adobe/helix-shared-tokencache": "^1.4.19",
     "@azure/msal-node": "2.14.0",
-    "jose": "5.9.2"
+    "jose": "5.9.3"
   },
   "devDependencies": {
     "@adobe/eslint-config-helix": "2.0.7",
-    "@aws-sdk/client-s3": "3.654.0",
+    "@aws-sdk/client-s3": "3.658.1",
     "@semantic-release/changelog": "6.0.3",
     "@semantic-release/git": "10.0.1",
     "ajv": "8.17.1",
@@ -47,7 +47,7 @@
     "eslint-plugin-import": "2.30.0",
     "husky": "9.1.6",
     "install": "0.13.0",
-    "jsdoc-to-markdown": "9.0.1",
+    "jsdoc-to-markdown": "9.0.2",
     "jsdoc-tsimport-plugin": "1.0.5",
     "junit-report-builder": "5.1.1",
     "lint-staged": "15.2.10",
@@ -56,7 +56,7 @@
     "mocha-suppress-logs": "0.5.1",
     "nock": "13.5.5",
     "npm": "10.8.3",
-    "semantic-release": "24.1.1"
+    "semantic-release": "24.1.2"
   },
   "lint-staged": {
     "*.js": "eslint"
