@@ -53,12 +53,20 @@ export function Nock() {
     .post('/common/oauth2/token?api-version=1.0')
     .reply(200, auth);
 
-  nocker.token = (token) => nocker('https://login.microsoftonline.com')
+  nocker.loginMicrosoftOnline = () => nocker('https://login.microsoftonline.com')
     .post('/adobe/oauth2/v2.0/token')
+    .query((query) => {
+      /* we only accept client-request-id or no query */
+      if (query) {
+        return Object.keys(query).every((key) => key === 'client-request-id');
+      }
+      return true;
+    });
+
+  nocker.token = (token) => nocker.loginMicrosoftOnline()
     .reply(200, token);
 
-  nocker.unauthenticated = () => nocker('https://login.microsoftonline.com')
-    .post('/adobe/oauth2/v2.0/token')
+  nocker.unauthenticated = () => nocker.loginMicrosoftOnline()
     .reply(401, {
       error: 'invalid_client',
       error_description: 'AADSTS7000215: Invalid client secret provided.',
@@ -71,8 +79,7 @@ export function Nock() {
       error_uri: 'https://login.microsoftonline.com/error?code=7000215',
     });
 
-  nocker.revoked = () => nocker('https://login.microsoftonline.com')
-    .post('/adobe/oauth2/v2.0/token')
+  nocker.revoked = () => nocker.loginMicrosoftOnline()
     .reply(400, {
       error: 'invalid_grant',
       error_description: 'AADSTS50173: The provided grant has expired due to it being revoked, a fresh auth token is needed. The user might have changed or reset their password.',
