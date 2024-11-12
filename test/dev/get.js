@@ -15,6 +15,11 @@
 import { config } from 'dotenv';
 import { S3CacheManager } from '@adobe/helix-shared-tokencache';
 import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { promisify } from 'util';
+import zlib from 'zlib';
+import { Response } from '@adobe/fetch';
+
+const gunzip = promisify(zlib.gunzip);
 
 config();
 
@@ -51,18 +56,39 @@ async function run() {
   }
 
   let contentBusId;
-  if (owner !== 'default') {
-    const s3 = new S3Client();
-    const res = await s3.send(new GetObjectCommand({
-      Bucket: 'helix-code-bus',
-      Key: `${owner}/${repo}/main/helix-config.json`,
-    }));
-    contentBusId = res.Metadata['x-contentbus-id'].substring(2);
-    if (!contentBusId) {
-      throw Error('no contentBusId');
-    }
-  } else {
+  if (owner === 'default') {
     contentBusId = 'default';
+  } else {
+    try {
+      const s3 = new S3Client();
+      const res = await s3.send(new GetObjectCommand({
+        Bucket: 'helix-code-bus',
+        Key: `${owner}/${repo}/main/helix-config.json`,
+      }));
+      contentBusId = res.Metadata['x-contentbus-id'].substring(2);
+    } catch (e) {
+      console.error(`unable to load helix-config.json:${e.message}`);
+    }
+  }
+  if (!contentBusId) {
+    // load from helix5 config
+    try {
+      const s3 = new S3Client();
+      const res = await s3.send(new GetObjectCommand({
+        Bucket: 'helix-config-bus',
+        Key: `orgs/${owner}/sites/${repo}.json`,
+      }));
+      let buf = await new Response(res.Body, {}).buffer();
+      if (res.ContentEncoding === 'gzip') {
+        buf = await gunzip(buf);
+      }
+      contentBusId = JSON.parse(buf).content.contentBusId;
+    } catch (e) {
+      console.error(`unable to load helix5 config:${e.message}`);
+    }
+  }
+  if (!contentBusId) {
+    throw Error('no contentBusId');
   }
 
   const projectCache = new S3CacheManager({
