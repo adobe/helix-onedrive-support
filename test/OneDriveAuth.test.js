@@ -211,6 +211,7 @@ describe('OneDriveAuth Tests', () => {
 
     nock('https://login.microsoftonline.com')
       .post('/adobe/oauth2/v2.0/token')
+      .query(true)
       .reply((_, requestBody) => {
         assert.strictEqual(new URLSearchParams(requestBody).get('client_id'), clientId);
         return [200, {
