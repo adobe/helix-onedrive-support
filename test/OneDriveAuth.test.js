@@ -209,9 +209,7 @@ describe('OneDriveAuth Tests', () => {
   it('can authenticate against a resource (by custom client id and secret)', async () => {
     const clientId = 'd88a7742-9581-46f0-aaf1-eb0a45044bf1';
 
-    nock('https://login.microsoftonline.com')
-      .post('/adobe/oauth2/v2.0/token')
-      .query(true)
+    nock.loginMicrosoftOnline()
       .reply((_, requestBody) => {
         assert.strictEqual(new URLSearchParams(requestBody).get('client_id'), clientId);
         return [200, {
