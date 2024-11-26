@@ -161,14 +161,15 @@ export class OneDrive {
     const { log, auth: { logFields, tenant } } = this;
     const url = `https://graph.microsoft.com/v1.0${relUrl}`;
     const method = opts.method || 'GET';
+    const start = Date.now();
     let resp;
 
     try {
       const { fetch } = this.fetchContext;
       resp = await fetch(url, opts);
-      log.info(`OneDrive API [tenant:${tenant}] ${logFields}: ${method} ${relUrl} ${resp.status}`);
+      log.info(`OneDrive API [tenant:${tenant}] ${logFields}: ${method} ${relUrl} ${resp.status} ${Date.now() - start}ms`);
     } catch (e) {
-      log.info(`OneDrive API [tenant:${tenant}] ${logFields}: ${method} ${relUrl} ${e.message}`);
+      log.info(`OneDrive API [tenant:${tenant}] ${logFields}: ${method} ${relUrl} ${e.message} ${Date.now() - start}ms`);
       throw StatusCodeError.fromError(e);
     }
 
