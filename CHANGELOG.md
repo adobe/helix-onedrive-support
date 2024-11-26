@@ -1,3 +1,10 @@
+## [11.5.26](https://github.com/adobe/helix-onedrive-support/compare/v11.5.25...v11.5.26) (2024-11-26)
+
+
+### Bug Fixes
+
+* log time for OneDrive API call ([e8496ba](https://github.com/adobe/helix-onedrive-support/commit/e8496bae40ef89a99bb15ccb1078f3df91ffb38f))
+
 ## [11.5.25](https://github.com/adobe/helix-onedrive-support/compare/v11.5.24...v11.5.25) (2024-11-23)
 
 
