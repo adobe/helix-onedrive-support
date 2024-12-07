@@ -12,9 +12,10 @@
 
 // eslint-disable-next-line max-classes-per-file
 import { keepAliveNoCache } from '@adobe/fetch';
+import { editDistance, sanitizeName, splitByExtension } from '@adobe/helix-shared-string';
+
 import { Workbook } from './excel/Workbook.js';
 import { StatusCodeError } from './StatusCodeError.js';
-import { editDistance, sanitizeName, splitByExtension } from './utils.js';
 import { SharePointSite } from './SharePointSite.js';
 import { RateLimit } from './RateLimit.js';
 

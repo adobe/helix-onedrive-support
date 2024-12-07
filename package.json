@@ -4,8 +4,7 @@
   "description": "Helix OneDrive Support",
   "main": "src/index.js",
   "exports": {
-    ".": "./src/index.js",
-    "./utils": "./src/utils.js"
+    ".": "./src/index.js"
   },
   "type": "module",
   "types": "src/index.d.ts",
@@ -28,7 +27,8 @@
   },
   "homepage": "https://github.com/adobe/helix-onedrive-support#readme",
   "dependencies": {
-    "@adobe/fetch": "4.1.10",
+    "@adobe/fetch": "^4.1.10",
+    "@adobe/helix-shared-string": "2.1.0",
     "@adobe/helix-shared-tokencache": "^1.4.19",
     "@azure/msal-node": "2.16.2",
     "jose": "5.9.6"

@@ -12,7 +12,8 @@
 
 /* eslint-env mocha */
 import assert from 'assert';
-import { OneDriveMock, StatusCodeError } from '../src/index.js';
+import { OneDriveMock } from '../src/OneDriveMock.js';
+import { StatusCodeError } from '../src/StatusCodeError.js';
 import exampleBook from './fixtures/book.js';
 
 describe('Worksheet Tests', () => {

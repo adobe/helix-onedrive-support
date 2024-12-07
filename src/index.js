@@ -13,7 +13,6 @@ export { OneDrive } from './OneDrive.js';
 export { OneDriveAuth, AcquireMethod } from './OneDriveAuth.js';
 
 export { OneDriveMock } from './OneDriveMock.js';
-export { StatusCodeError } from './StatusCodeError.js';
 
 export { NamedItemContainer } from './excel/NamedItemContainer.js';
 export { Range } from './excel/Range.js';

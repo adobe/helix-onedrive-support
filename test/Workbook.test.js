@@ -13,7 +13,8 @@
 /* eslint-env mocha */
 import assert from 'assert';
 import { UnsecuredJWT } from 'jose';
-import { OneDriveMock, StatusCodeError } from '../src/index.js';
+import { OneDriveMock } from '../src/OneDriveMock.js';
+import { StatusCodeError } from '../src/StatusCodeError.js';
 import exampleBook from './fixtures/book.js';
 import { OneDrive } from '../src/OneDrive.js';
 import { OneDriveAuth } from '../src/OneDriveAuth.js';

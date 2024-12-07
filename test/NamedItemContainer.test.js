@@ -15,7 +15,7 @@ import assert from 'assert';
 import { UnsecuredJWT } from 'jose';
 import { OneDrive } from '../src/OneDrive.js';
 import { OneDriveAuth } from '../src/OneDriveAuth.js';
-import { StatusCodeError } from '../src/index.js';
+import { StatusCodeError } from '../src/StatusCodeError.js';
 import { Nock } from './utils.js';
 import { NamedItemContainer } from '../src/excel/NamedItemContainer.js';
 

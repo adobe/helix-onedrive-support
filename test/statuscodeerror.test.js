@@ -14,7 +14,7 @@
 
 import assert from 'assert';
 import { AbortError, FetchError } from '@adobe/fetch';
-import { StatusCodeError } from '../src/index.js';
+import { StatusCodeError } from '../src/StatusCodeError.js';
 
 describe('StatusCodeError Tests', () => {
   it('Set the status code', async () => {
