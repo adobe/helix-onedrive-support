@@ -35,13 +35,13 @@
   },
   "devDependencies": {
     "@adobe/eslint-config-helix": "2.0.8",
-    "@aws-sdk/client-s3": "3.701.0",
+    "@aws-sdk/client-s3": "3.705.0",
     "@semantic-release/changelog": "6.0.3",
     "@semantic-release/git": "10.0.1",
     "ajv": "8.17.1",
     "c8": "10.1.2",
     "chalk-template": "1.1.0",
-    "dotenv": "16.4.5",
+    "dotenv": "16.4.7",
     "eslint": "8.57.1",
     "eslint-plugin-header": "3.1.1",
     "eslint-plugin-import": "2.31.0",
@@ -55,7 +55,7 @@
     "mocha-multi-reporters": "1.5.1",
     "mocha-suppress-logs": "0.5.1",
     "nock": "13.5.6",
-    "npm": "10.9.1",
+    "npm": "10.9.2",
     "semantic-release": "24.2.0"
   },
   "lint-staged": {
