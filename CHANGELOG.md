@@ -1,3 +1,15 @@
+# [12.0.0](https://github.com/adobe/helix-onedrive-support/compare/v11.5.29...v12.0.0) (2024-12-07)
+
+
+### Bug Fixes
+
+* use string functions in @adobe/helix-shared-string ([629fa1d](https://github.com/adobe/helix-onedrive-support/commit/629fa1d4226f7430d56258785b51b3f6b9c2edc6))
+
+
+### BREAKING CHANGES
+
+* no longer export StatusCodeError
+
 ## [11.5.29](https://github.com/adobe/helix-onedrive-support/compare/v11.5.28...v11.5.29) (2024-12-05)
 
 
