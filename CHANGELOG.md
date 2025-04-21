@@ -1,3 +1,10 @@
+## [12.0.15](https://github.com/adobe/helix-onedrive-support/compare/v12.0.14...v12.0.15) (2025-04-21)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @azure/msal-node to v3.5.1 ([#644](https://github.com/adobe/helix-onedrive-support/issues/644)) ([fd27b98](https://github.com/adobe/helix-onedrive-support/commit/fd27b98f4295a2fa00753c32b95655a0fb3eafce))
+
 ## [12.0.14](https://github.com/adobe/helix-onedrive-support/compare/v12.0.13...v12.0.14) (2025-04-14)
 
 
