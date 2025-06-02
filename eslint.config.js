@@ -9,7 +9,6 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import importPlugin from 'eslint-plugin-import';
 import { defineConfig, globalIgnores } from '@eslint/config-helpers';
 import { recommended, source, test } from '@adobe/eslint-config-helix';
 
@@ -25,7 +24,7 @@ export default defineConfig([
       'no-param-reassign': ['error', { props: false }],
     },
     plugins: {
-      import: importPlugin,
+      import: recommended.plugins.import,
     },
     extends: [recommended],
   },
