@@ -1,3 +1,10 @@
+## [12.0.21](https://github.com/adobe/helix-onedrive-support/compare/v12.0.20...v12.0.21) (2025-06-26)
+
+
+### Bug Fixes
+
+* log JSON for call to graph API ([#664](https://github.com/adobe/helix-onedrive-support/issues/664)) ([3d0a44b](https://github.com/adobe/helix-onedrive-support/commit/3d0a44bf8ade5be3acd2d4dd1be590ff60ffc3fe))
+
 ## [12.0.20](https://github.com/adobe/helix-onedrive-support/compare/v12.0.19...v12.0.20) (2025-06-24)
 
 
