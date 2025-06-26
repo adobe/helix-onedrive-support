@@ -92,7 +92,8 @@ export class OneDriveAuth {
     this.scopes = opts.scopes || DEFAULT_SCOPES;
     this.onCode = opts.onCode;
     this.acquireMethod = opts.acquireMethod || '';
-    this.logFields = Object.entries(opts.logFields || {})
+    this.details = opts.logFields || {};
+    this.logFields = Object.entries(this.details)
       .map(([key, value]) => `[${key}:${value}]`).join(' ');
 
     const validAcquireMethods = Array.from(Object.values(AcquireMethod));
