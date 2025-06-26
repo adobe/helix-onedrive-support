@@ -159,7 +159,7 @@ export class OneDrive {
     }
     opts.headers.authorization = `Bearer ${accessToken}`;
 
-    const { log, auth: { logFields, tenant } } = this;
+    const { log, auth: { details, tenant } } = this;
     const url = `https://graph.microsoft.com/v1.0${relUrl}`;
     const method = opts.method || 'GET';
     const start = Date.now();
@@ -168,9 +168,27 @@ export class OneDrive {
     try {
       const { fetch } = this.fetchContext;
       resp = await fetch(url, opts);
-      log.info(`OneDrive API [tenant:${tenant}] ${logFields}: ${method} ${relUrl} ${resp.status} ${Date.now() - start}ms`);
+      log.info('%j', {
+        onedrive: {
+          ...details,
+          tenant,
+          method,
+          url: relUrl,
+          status: resp.status,
+          duration: Date.now() - start,
+        },
+      });
     } catch (e) {
-      log.info(`OneDrive API [tenant:${tenant}] ${logFields}: ${method} ${relUrl} ${e.message} ${Date.now() - start}ms`);
+      log.info('%j', {
+        onedrive: {
+          ...details,
+          tenant,
+          method,
+          url: relUrl,
+          error: e.message,
+          duration: Date.now() - start,
+        },
+      });
       throw StatusCodeError.fromError(e);
     }
 
