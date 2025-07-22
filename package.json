@@ -31,11 +31,11 @@
     "@adobe/helix-shared-string": "^2.1.0",
     "@adobe/helix-shared-tokencache": "^1.4.19",
     "@azure/msal-node": "3.6.3",
-    "jose": "6.0.11"
+    "jose": "6.0.12"
   },
   "devDependencies": {
     "@adobe/eslint-config-helix": "3.0.8",
-    "@aws-sdk/client-s3": "3.844.0",
+    "@aws-sdk/client-s3": "3.850.0",
     "@eslint/config-helpers": "0.3.0",
     "@semantic-release/changelog": "6.0.3",
     "@semantic-release/git": "10.0.1",
@@ -46,7 +46,7 @@
     "eslint": "9.4.0",
     "husky": "9.1.7",
     "install": "0.13.0",
-    "jsdoc-to-markdown": "9.1.1",
+    "jsdoc-to-markdown": "9.1.2",
     "jsdoc-tsimport-plugin": "1.0.5",
     "junit-report-builder": "5.1.1",
     "lint-staged": "16.1.2",
