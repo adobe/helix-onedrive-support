@@ -34,7 +34,7 @@
     "jose": "6.0.12"
   },
   "devDependencies": {
-    "@adobe/eslint-config-helix": "3.0.8",
+    "@adobe/eslint-config-helix": "3.0.9",
     "@aws-sdk/client-s3": "3.864.0",
     "@eslint/config-helpers": "0.3.1",
     "@semantic-release/changelog": "6.0.3",
