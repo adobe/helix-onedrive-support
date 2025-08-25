@@ -30,12 +30,12 @@
     "@adobe/fetch": "^4.1.10",
     "@adobe/helix-shared-string": "^2.1.0",
     "@adobe/helix-shared-tokencache": "^1.4.19",
-    "@azure/msal-node": "3.7.1",
-    "jose": "6.0.12"
+    "@azure/msal-node": "3.7.2",
+    "jose": "6.0.13"
   },
   "devDependencies": {
     "@adobe/eslint-config-helix": "3.0.9",
-    "@aws-sdk/client-s3": "3.864.0",
+    "@aws-sdk/client-s3": "3.873.0",
     "@eslint/config-helpers": "0.3.1",
     "@semantic-release/changelog": "6.0.3",
     "@semantic-release/git": "10.0.1",
