@@ -118,6 +118,12 @@ export declare class OneDrive extends EventEmitter {
   static driveItemFromURL(url: URL): DriveItem;
 
   /**
+   * Creates a new OneDrive helper using a static method. Facilitates creating a
+   * sinon stub to change the instance type returned.
+   */
+  static create(opts: OneDriveOptions): OneDrive;
+
+  /**
    * Creates a new OneDrive helper.
    * @param {OneDriveOptions} opts Options.
    */
