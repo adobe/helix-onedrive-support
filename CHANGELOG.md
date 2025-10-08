@@ -1,3 +1,10 @@
+# [12.1.0](https://github.com/adobe/helix-onedrive-support/compare/v12.0.30...v12.1.0) (2025-10-08)
+
+
+### Features
+
+* introduce OneDrive.create(opts) ([#687](https://github.com/adobe/helix-onedrive-support/issues/687)) ([21ea1c3](https://github.com/adobe/helix-onedrive-support/commit/21ea1c3a3f133b5d23480c8804d9af7182114c7e))
+
 ## [12.0.30](https://github.com/adobe/helix-onedrive-support/compare/v12.0.29...v12.0.30) (2025-10-06)
 
 
