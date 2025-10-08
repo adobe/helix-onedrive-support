@@ -84,6 +84,10 @@ export class OneDrive {
     };
   }
 
+  static create(opts) {
+    return new OneDrive(opts);
+  }
+
   /**
    * @param {OneDriveOptions} opts Options
    */

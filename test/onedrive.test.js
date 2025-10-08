@@ -51,7 +51,12 @@ describe('OneDrive Tests', () => {
   });
 
   it('can be constructed.', async () => {
-    const drive = new OneDrive({
+    let drive = new OneDrive({
+      auth: DEFAULT_AUTH(),
+    });
+    assert.ok(drive);
+
+    drive = OneDrive.create({
       auth: DEFAULT_AUTH(),
     });
     assert.ok(drive);
