@@ -18,7 +18,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/adobe/helix-onedrive-support"
+    "url": "https://github.com/adobe/helix-onedrive-support.git"
   },
   "author": "",
   "license": "Apache-2.0",
