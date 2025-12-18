@@ -50,7 +50,7 @@ export class Workbook extends NamedItemContainer {
       await this._graphAPI.doFetch(uri, false, {
         method: 'POST',
         headers: {
-          'Workbook-Session-Id': this._sessionId,
+          'workbook-session-id': this._sessionId,
         },
       });
       this._sessionId = null;
@@ -65,7 +65,7 @@ export class Workbook extends NamedItemContainer {
       await this._graphAPI.doFetch(uri, false, {
         method: 'POST',
         headers: {
-          'Workbook-Session-Id': this._sessionId,
+          'workbook-session-id': this._sessionId,
         },
       });
       return;
@@ -90,7 +90,7 @@ export class Workbook extends NamedItemContainer {
       opts.headers = {};
     }
     if (this._sessionId) {
-      opts.headers['Workbook-Session-Id'] = this._sessionId;
+      opts.headers['workbook-session-id'] = this._sessionId;
     }
     return this._graphAPI.doFetch(relUrl, rawResponseBody, opts);
   }
