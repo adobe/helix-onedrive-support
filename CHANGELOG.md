@@ -1,3 +1,10 @@
+## [12.1.6](https://github.com/adobe/helix-onedrive-support/compare/v12.1.5...v12.1.6) (2025-12-18)
+
+
+### Bug Fixes
+
+* log workbook session id ([#705](https://github.com/adobe/helix-onedrive-support/issues/705)) ([238f28a](https://github.com/adobe/helix-onedrive-support/commit/238f28a7677c2be0e8247b2f952e63dad382048b))
+
 ## [12.1.5](https://github.com/adobe/helix-onedrive-support/compare/v12.1.4...v12.1.5) (2025-12-10)
 
 
