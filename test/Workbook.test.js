@@ -197,7 +197,7 @@ describe('Workbook Tests', () => {
     };
     nock('https://graph.microsoft.com/v1.0')
       .get(`/drives/${folderItem.parentReference.driveId}/items/${folderItem.id}/workbook/tables`)
-      .matchHeader('Workbook-Session-Id', 'test-session-id')
+      .matchHeader('workbook-session-id', 'test-session-id')
       .reply(200, { value: [{ name: 'table1' }, { name: 'table2' }] });
     const DEFAULT_AUTH = (opts = {}) => new OneDriveAuth({
       clientId: 'foo',

@@ -169,26 +169,33 @@ export class OneDrive {
     const start = Date.now();
     let resp;
 
+    const message = {
+      ...details,
+      tenant,
+      method,
+      url: relUrl,
+    };
+    if (opts.headers['workbook-session-id']) {
+      message.sessionId = opts.headers['workbook-session-id'];
+    }
+
     try {
       const { fetch } = this.fetchContext;
       resp = await fetch(url, opts);
-      log.info('%j', {
+
+      const { status } = resp;
+      const level = status >= 400 ? 'warn' : 'info';
+      log[level]('%j', {
         onedrive: {
-          ...details,
-          tenant,
-          method,
-          url: relUrl,
-          status: resp.status,
+          ...message,
+          status,
           duration: Date.now() - start,
         },
       });
     } catch (e) {
-      log.info('%j', {
+      log.warn('%j', {
         onedrive: {
-          ...details,
-          tenant,
-          method,
-          url: relUrl,
+          ...message,
           error: e.message,
           duration: Date.now() - start,
         },
