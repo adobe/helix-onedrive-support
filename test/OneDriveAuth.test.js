@@ -423,6 +423,79 @@ describe('OneDriveAuth Tests', () => {
     );
   });
 
+  it('throws an error when non-silent acquire fails', async () => {
+    nock('https://login.microsoftonline.com')
+      .post('/adobe/oauth2/v2.0/devicecode')
+      .reply(200, {
+        device_code: 'DAQABAAEAAAD',
+        expires_in: 900,
+        interval: 5,
+        message: 'To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code DTSWBVY27 to authenticate.',
+        user_code: 'DTSWBVY27',
+        verification_uri: 'https://microsoft.com/devicelogin',
+      });
+    nock.token({
+      token_type: 'Bearer',
+      refresh_token: 'dummy',
+      access_token: 'dummy',
+      expires_in: 81000,
+      id_token: new UnsecuredJWT({ sub: 'test' }).encode(),
+      client_info: Buffer.from(JSON.stringify({ uid: 'Bob', utid: 'adobe' })).toString('base64'),
+    });
+
+    const caches = new Map();
+    const od1 = new OneDriveAuth({
+      clientId: '83ab2922-5f11-4e4d-96f3-d1e0ff152856',
+      clientSecret: 'test-client-secret',
+      resource: 'test-resource',
+      tenant: 'adobe',
+      onCode: async (code) => {
+        assert.strictEqual(code.userCode, 'DTSWBVY27');
+      },
+      cachePlugin: new MemCachePlugin({
+        key: 'default',
+        caches,
+        type: 'onedrive',
+      }),
+      acquireMethod: AcquireMethod.BY_DEVICE_CODE,
+    });
+    const result = await od1.authenticate();
+    assert.strictEqual(result.account.homeAccountId, 'Bob.adobe');
+
+    // make the cached access token expire
+    const entry = JSON.parse(caches.get('default').data);
+    entry.AccessToken[Object.keys(entry.AccessToken)[0]].expires_on = Math.floor(Date.now() / 1000);
+    caches.get('default').data = JSON.stringify(entry);
+
+    nock.unauthenticated();
+    nock.revoked();
+
+    const od2 = new OneDriveAuth({
+      clientId: '83ab2922-5f11-4e4d-96f3-d1e0ff152856',
+      clientSecret: 'test-client-secret',
+      resource: 'test-resource',
+      tenant: 'adobe',
+      cachePlugin: new MemCachePlugin({
+        key: 'default',
+        base: {
+          afterCacheAccess() {
+            return true;
+          },
+          beforeCacheAccess: () => {
+          },
+          getPluginMetadata: () => {},
+        },
+        caches,
+        type: 'onedrive',
+      }),
+    });
+
+    await assert.rejects(
+      async () => od2.authenticate(),
+      /invalid_grant: Error\(s\): 50173 - Timestamp: [0-9-: Z]{20} - Description: AADSTS50173: The provided grant has expired due to it being revoked, a fresh auth token is needed. The user might have changed or reset their password. - Correlation ID: [0-9a-f-]{36} - Trace ID: [0-9a-f-]{36}/,
+    );
+  });
+
   it('uses the tenant from a mountpoint', async () => {
     const od = new OneDriveAuth({
       clientId: 'foobar',
