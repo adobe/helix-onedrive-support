@@ -1,3 +1,10 @@
+# [12.2.0](https://github.com/adobe/helix-onedrive-support/compare/v12.1.7...v12.2.0) (2026-01-22)
+
+
+### Features
+
+* **auth:** propragate MSAL error if an existing account failed to auth ([#714](https://github.com/adobe/helix-onedrive-support/issues/714)) ([4821134](https://github.com/adobe/helix-onedrive-support/commit/4821134101a4b3de151db84f35e3635166b83955))
+
 ## [12.1.7](https://github.com/adobe/helix-onedrive-support/compare/v12.1.6...v12.1.7) (2025-12-22)
 
 
