@@ -424,6 +424,7 @@ describe('OneDriveAuth Tests', () => {
   });
 
   it('throws an error when non-silent acquire fails', async () => {
+    // acquire token by device code
     nock('https://login.microsoftonline.com')
       .post('/adobe/oauth2/v2.0/devicecode')
       .reply(200, {
@@ -470,6 +471,7 @@ describe('OneDriveAuth Tests', () => {
     nock.unauthenticated();
     nock.revoked();
 
+    // now try to use that expired access token
     const od2 = new OneDriveAuth({
       clientId: '83ab2922-5f11-4e4d-96f3-d1e0ff152856',
       clientSecret: 'test-client-secret',
@@ -490,10 +492,16 @@ describe('OneDriveAuth Tests', () => {
       }),
     });
 
-    await assert.rejects(
-      async () => od2.authenticate(),
-      /invalid_grant: Error\(s\): 50173 - Timestamp: [0-9-: Z]{20} - Description: AADSTS50173: The provided grant has expired due to it being revoked, a fresh auth token is needed. The user might have changed or reset their password. - Correlation ID: [0-9a-f-]{36} - Trace ID: [0-9a-f-]{36}/,
-    );
+    try {
+      await od2.authenticate();
+      throw new Error('Missing rejection');
+    } catch (e) {
+      assert.strictEqual(e.message, 'Unable to acquire token silently and no other acquire method supplied');
+      assert.match(
+        e.details.msalError.errorMessage,
+        /The provided grant has expired due to it being revoked, a fresh auth token is needed. The user might have changed or reset their password./,
+      );
+    }
   });
 
   it('uses the tenant from a mountpoint', async () => {

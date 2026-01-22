@@ -313,7 +313,7 @@ export class OneDriveAuth {
    */
   async doAuthenticate(silentOnly) {
     const { log } = this;
-    let acquireError = null;
+    let msalError = null;
 
     const app = await this.getApp();
     let accounts = await app.getTokenCache().getAllAccounts();
@@ -324,7 +324,7 @@ export class OneDriveAuth {
         return await app.acquireTokenSilent({ account });
       } catch (e) {
         this.handleAcquireError(account, e);
-        acquireError = e;
+        msalError = e;
       }
 
       // try again with fresh mem cache
@@ -342,7 +342,7 @@ export class OneDriveAuth {
             });
           } catch (e) {
             this.handleAcquireError(account, e, true);
-            acquireError = e;
+            msalError = e;
             this.cachePlugin.clear();
           }
         }
@@ -375,8 +375,8 @@ export class OneDriveAuth {
       throw e;
     }
 
-    const message = acquireError?.message ?? 'Unable to acquire token silently and no other acquire method supplied';
-    throw new StatusCodeError(message, 401, { code: 'silentAcquireFailed', message });
+    const message = 'Unable to acquire token silently and no other acquire method supplied';
+    throw new StatusCodeError(message, 401, { code: 'silentAcquireFailed', message, msalError });
   }
 
   /**
