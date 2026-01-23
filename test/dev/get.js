@@ -96,6 +96,8 @@ async function run() {
   if (await orgCache.hasCache('content')) {
     const p = await orgCache.getCache('content');
     await p.beforeCacheAccess(createCacheContext());
+    console.log('plugin metadata:');
+    console.log(await p.getPluginMetadata());
   } else {
     console.log('n/a');
   }

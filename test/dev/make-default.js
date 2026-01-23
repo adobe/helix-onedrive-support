@@ -21,10 +21,10 @@ async function run() {
     console.error('usage: node make-default.js owner/repo [dst-owner] [type = onedrive] [key = content]');
     process.exit(1);
   }
-  const [srcOwner, srcRepo] = srcOwnerRepo.split['/'];
+  const [srcOwner, srcRepo] = srcOwnerRepo.split('/');
   let dstOwner = owner;
   if (!dstOwner) {
-    [dstOwner] = srcOwner;
+    dstOwner = srcOwner;
   }
   const contentBusId = await getContentBusId(srcOwner, srcRepo);
   if (!contentBusId) {
@@ -68,12 +68,17 @@ async function run() {
   };
 
   const projectPlugin = await projectCache.getCache(key);
+  const meta = await projectPlugin.getPluginMetadata();
   const orgPlugin = await orgCache.getCache(key);
 
   await projectPlugin.beforeCacheAccess(ctx);
   ctx.cacheHasChanged = true;
   await orgPlugin.afterCacheAccess(ctx);
-  console.log(`Account: ${Object.values(data.Account)[0].username}`);
+  if (meta && Object.keys(meta).length > 0) {
+    console.log('setting plugin metadata', meta);
+    await orgPlugin.setPluginMetadata(meta);
+  }
+
   console.log('token updated.');
 }
 
