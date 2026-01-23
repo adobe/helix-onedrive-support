@@ -14,12 +14,7 @@
 
 import { config } from 'dotenv';
 import { S3CacheManager } from '@adobe/helix-shared-tokencache';
-import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { promisify } from 'util';
-import zlib from 'zlib';
-import { Response } from '@adobe/fetch';
-
-const gunzip = promisify(zlib.gunzip);
+import { getContentBusId } from './utils.js';
 
 config();
 
@@ -58,46 +53,36 @@ async function run() {
   let contentBusId;
   if (owner === 'default') {
     contentBusId = 'default';
+  } else if (!repo) {
+    contentBusId = '*';
   } else {
-    try {
-      const s3 = new S3Client();
-      const res = await s3.send(new GetObjectCommand({
-        Bucket: 'helix-code-bus',
-        Key: `${owner}/${repo}/main/helix-config.json`,
-      }));
-      contentBusId = res.Metadata['x-contentbus-id'].substring(2);
-    } catch (e) {
-      console.error(`unable to load helix-config.json:${e.message}`);
-    }
-  }
-  if (!contentBusId) {
-    // load from helix5 config
-    try {
-      const s3 = new S3Client();
-      const res = await s3.send(new GetObjectCommand({
-        Bucket: 'helix-config-bus',
-        Key: `orgs/${owner}/sites/${repo}.json`,
-      }));
-      let buf = await new Response(res.Body, {}).buffer();
-      if (res.ContentEncoding === 'gzip') {
-        buf = await gunzip(buf);
-      }
-      contentBusId = JSON.parse(buf).content.contentBusId;
-    } catch (e) {
-      console.error(`unable to load helix5 config:${e.message}`);
-    }
+    contentBusId = await getContentBusId(owner, repo);
   }
   if (!contentBusId) {
     throw Error('no contentBusId');
   }
 
-  const projectCache = new S3CacheManager({
-    log: console,
-    prefix: `${contentBusId}/.helix-auth`,
-    secret: contentBusId,
-    bucket: 'helix-content-bus',
-    type,
-  });
+  if (contentBusId !== '*') {
+    const projectCache = new S3CacheManager({
+      log: console,
+      prefix: `${contentBusId}/.helix-auth`,
+      secret: contentBusId,
+      bucket: 'helix-content-bus',
+      type,
+    });
+
+    console.log('PROJECT CACHE');
+    console.log('-----------------------------------');
+    if (await projectCache.hasCache('content')) {
+      const p = await projectCache.getCache('content');
+      await p.beforeCacheAccess(createCacheContext());
+      console.log('plugin metadata:');
+      console.log(await p.getPluginMetadata());
+    } else {
+      console.log('n/a');
+    }
+  }
+
   const orgCache = new S3CacheManager({
     log: console,
     prefix: `${owner}/.helix-auth`,
@@ -106,18 +91,7 @@ async function run() {
     type,
   });
 
-  console.log('project cache');
-  console.log('-----------------------------------');
-  if (await projectCache.hasCache('content')) {
-    const p = await projectCache.getCache('content');
-    await p.beforeCacheAccess(createCacheContext());
-    console.log('plugin metadata:');
-    console.log(await p.getPluginMetadata());
-  } else {
-    console.log('n/a');
-  }
-
-  console.log('\norg cache');
+  console.log('\nORG CACHE');
   console.log('-----------------------------------');
   if (await orgCache.hasCache('content')) {
     const p = await orgCache.getCache('content');

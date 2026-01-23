@@ -13,7 +13,7 @@
 /* eslint-disable no-console */
 
 import { S3CacheManager } from '@adobe/helix-shared-tokencache';
-import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { getContentBusId } from './utils.js';
 
 async function run() {
   const [, , srcOwnerRepo, owner, type = 'onedrive', key = 'content'] = process.argv;
@@ -21,16 +21,12 @@ async function run() {
     console.error('usage: node make-default.js owner/repo [dst-owner] [type = onedrive] [key = content]');
     process.exit(1);
   }
+  const [srcOwner, srcRepo] = srcOwnerRepo.split['/'];
   let dstOwner = owner;
   if (!dstOwner) {
-    [dstOwner] = srcOwnerRepo.split['/'];
+    [dstOwner] = srcOwner;
   }
-  const s3 = new S3Client();
-  const res = await s3.send(new GetObjectCommand({
-    Bucket: 'helix-code-bus',
-    Key: `${srcOwnerRepo}/main/helix-config.json`,
-  }));
-  const contentBusId = res.Metadata['x-contentbus-id'].substring(2);
+  const contentBusId = await getContentBusId(srcOwner, srcRepo);
   if (!contentBusId) {
     throw Error('no contentBusId');
   }
