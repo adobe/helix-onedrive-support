@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "@adobe/eslint-config-helix": "3.0.17",
-    "@aws-sdk/client-s3": "3.971.0",
+    "@aws-sdk/client-s3": "3.975.0",
     "@eslint/config-helpers": "0.5.1",
     "@semantic-release/changelog": "6.0.3",
     "@semantic-release/git": "10.0.1",
@@ -54,7 +54,7 @@
     "mocha-multi-reporters": "1.5.1",
     "mocha-suppress-logs": "0.6.0",
     "nock": "13.5.6",
-    "npm": "11.7.0",
+    "npm": "11.8.0",
     "semantic-release": "25.0.2"
   },
   "lint-staged": {
