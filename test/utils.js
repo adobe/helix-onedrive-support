@@ -38,6 +38,7 @@ export function Nock() {
       unmatched = [];
       nock.emitter.on('no match', noMatchHandler);
     }
+    nock.disableNetConnect();
     return scope;
   }
 
@@ -47,6 +48,7 @@ export function Nock() {
       assert.deepStrictEqual(unmatched.map((req) => req.options || req), []);
       nock.emitter.off('no match', noMatchHandler);
     }
+    nock.enableNetConnect();
   };
 
   nocker.loginWindowsNet = (auth = DEFAULT_AUTH) => nocker('https://login.windows.net')
@@ -54,7 +56,7 @@ export function Nock() {
     .reply(200, auth);
 
   nocker.loginMicrosoftOnline = () => nocker('https://login.microsoftonline.com')
-    .post('/adobe/oauth2/v2.0/token')
+    .post('/fa7b1b5a-7b34-4387-94ae-d2c178decee1/oauth2/v2.0/token')
     .query((query) => {
       /* we only accept client-request-id or no query */
       if (query) {

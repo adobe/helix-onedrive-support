@@ -120,7 +120,7 @@ describe('OneDriveAuth Tests', () => {
       clientId: '83ab2922-5f11-4e4d-96f3-d1e0ff152856',
       clientSecret: 'test-client-secret',
       resource: 'test-resource',
-      tenant: 'adobe',
+      tenant: 'fa7b1b5a-7b34-4387-94ae-d2c178decee1',
       acquireMethod: AcquireMethod.BY_CLIENT_CREDENTIAL,
     });
     const resp = await od.authenticate();
@@ -130,7 +130,7 @@ describe('OneDriveAuth Tests', () => {
     assert.deepStrictEqual(resp, {
       accessToken: 'dummy',
       account: null,
-      authority: 'https://login.microsoftonline.com/adobe/',
+      authority: 'https://login.microsoftonline.com/fa7b1b5a-7b34-4387-94ae-d2c178decee1/',
       cloudGraphHostName: '',
       code: undefined,
       familyId: '',
