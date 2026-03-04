@@ -135,7 +135,7 @@ describe('OneDriveAuth Tests', () => {
       code: undefined,
       familyId: '',
       fromCache: false,
-      fromNativeBroker: false,
+      fromPlatformBroker: false,
       idToken: '',
       idTokenClaims: {},
       msGraphHost: '',
@@ -157,7 +157,7 @@ describe('OneDriveAuth Tests', () => {
       refresh_token: 'dummy',
       access_token: 'dummy',
       expires_in: 81000,
-    });
+    }, 'adobe');
 
     const caches = new Map();
     const cachePlugin = new MemCachePlugin({
@@ -190,7 +190,7 @@ describe('OneDriveAuth Tests', () => {
       code: undefined,
       familyId: '',
       fromCache: false,
-      fromNativeBroker: false,
+      fromPlatformBroker: false,
       idToken: '',
       idTokenClaims: {},
       refreshOn: undefined,
@@ -209,7 +209,7 @@ describe('OneDriveAuth Tests', () => {
   it('can authenticate against a resource (by custom client id and secret)', async () => {
     const clientId = 'd88a7742-9581-46f0-aaf1-eb0a45044bf1';
 
-    nock.loginMicrosoftOnline()
+    nock.loginMicrosoftOnline('adobe')
       .reply((_, requestBody) => {
         assert.strictEqual(new URLSearchParams(requestBody).get('client_id'), clientId);
         return [200, {
@@ -260,7 +260,7 @@ describe('OneDriveAuth Tests', () => {
         code: undefined,
         familyId: '',
         fromCache: false,
-        fromNativeBroker: false,
+        fromPlatformBroker: false,
         idToken: '',
         idTokenClaims: {},
         refreshOn: undefined,
@@ -298,7 +298,7 @@ describe('OneDriveAuth Tests', () => {
       expires_in: 81000,
       id_token: new UnsecuredJWT({ sub: 'test' }).encode(),
       client_info: Buffer.from(JSON.stringify({ uid: 'Bob', utid: 'adobe' })).toString('base64'),
-    });
+    }, 'adobe');
 
     const od = new OneDriveAuth({
       clientId: '83ab2922-5f11-4e4d-96f3-d1e0ff152856',
@@ -314,7 +314,7 @@ describe('OneDriveAuth Tests', () => {
   });
 
   it('catches 401 errors when authenticating', async () => {
-    nock.unauthenticated();
+    nock.unauthenticated('adobe');
 
     const od = new OneDriveAuth({
       clientId: '83ab2922-5f11-4e4d-96f3-d1e0ff152856',
@@ -347,7 +347,7 @@ describe('OneDriveAuth Tests', () => {
       expires_in: 81000,
       id_token: new UnsecuredJWT({ sub: 'test' }).encode(),
       client_info: Buffer.from(JSON.stringify({ uid: 'Bob', utid: 'adobe' })).toString('base64'),
-    });
+    }, 'adobe');
 
     const caches = new Map();
     const od1 = new OneDriveAuth({
@@ -373,8 +373,8 @@ describe('OneDriveAuth Tests', () => {
     entry.AccessToken[Object.keys(entry.AccessToken)[0]].expires_on = Math.floor(Date.now() / 1000);
     caches.get('default').data = JSON.stringify(entry);
 
-    nock.unauthenticated();
-    nock.revoked();
+    nock.unauthenticated('adobe');
+    nock.revoked('adobe');
 
     let baseRefreshed = false;
     const od2 = new OneDriveAuth({
@@ -442,7 +442,7 @@ describe('OneDriveAuth Tests', () => {
       expires_in: 81000,
       id_token: new UnsecuredJWT({ sub: 'test' }).encode(),
       client_info: Buffer.from(JSON.stringify({ uid: 'Bob', utid: 'adobe' })).toString('base64'),
-    });
+    }, 'adobe');
 
     const caches = new Map();
     const od1 = new OneDriveAuth({
@@ -468,8 +468,8 @@ describe('OneDriveAuth Tests', () => {
     entry.AccessToken[Object.keys(entry.AccessToken)[0]].expires_on = Math.floor(Date.now() / 1000);
     caches.get('default').data = JSON.stringify(entry);
 
-    nock.unauthenticated();
-    nock.revoked();
+    nock.unauthenticated('adobe');
+    nock.revoked('adobe');
 
     // now try to use that expired access token
     const od2 = new OneDriveAuth({
