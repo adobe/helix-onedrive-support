@@ -1,3 +1,10 @@
+# [12.3.0](https://github.com/adobe/helix-onedrive-support/compare/v12.2.3...v12.3.0) (2026-03-10)
+
+
+### Features
+
+* **msal:** use custom network module and @adobe/fetch ([#729](https://github.com/adobe/helix-onedrive-support/issues/729)) ([6dc88a7](https://github.com/adobe/helix-onedrive-support/commit/6dc88a70a0447214b82aa3e6d59d7da7e97cb052))
+
 ## [12.2.3](https://github.com/adobe/helix-onedrive-support/compare/v12.2.2...v12.2.3) (2026-03-04)
 
 
