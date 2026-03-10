@@ -16,6 +16,7 @@ import { ConfidentialClientApplication, LogLevel, PublicClientApplication } from
 import { MemCachePlugin } from '@adobe/helix-shared-tokencache';
 import { decodeJwt } from 'jose';
 import { StatusCodeError } from './StatusCodeError.js';
+import { CustomNetworkModule } from './CustomNetworkModule.js';
 
 const AZ_AUTHORITY_HOST_URL = 'https://login.windows.net';
 const AZ_COMMON_TENANT = 'common';
@@ -155,6 +156,7 @@ export class OneDriveAuth {
             piiLoggingEnabled: false,
             logLevel: LogLevel.Info,
           },
+          networkClient: new CustomNetworkModule(this.fetchContext),
         },
       };
       if (cachePlugin) {
