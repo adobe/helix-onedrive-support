@@ -30,14 +30,14 @@
     "@adobe/fetch": "^4.2.3",
     "@adobe/helix-shared-string": "^2.1.0",
     "@adobe/helix-shared-tokencache": "^1.4.19",
-    "@azure/msal-common": "16.5.2",
-    "@azure/msal-node": "5.1.5",
+    "@azure/msal-common": "16.6.0",
+    "@azure/msal-node": "5.2.0",
     "jose": "6.2.3"
   },
   "devDependencies": {
     "@adobe/eslint-config-helix": "3.0.27",
-    "@aws-sdk/client-s3": "3.1042.0",
-    "@eslint/config-helpers": "0.5.5",
+    "@aws-sdk/client-s3": "3.1045.0",
+    "@eslint/config-helpers": "0.6.0",
     "@semantic-release/changelog": "6.0.3",
     "@semantic-release/git": "10.0.1",
     "ajv": "8.20.0",
@@ -54,8 +54,8 @@
     "mocha": "11.7.5",
     "mocha-multi-reporters": "1.5.1",
     "mocha-suppress-logs": "0.6.0",
-    "nock": "14.0.14",
-    "npm": "11.13.0",
+    "nock": "14.0.15",
+    "npm": "11.14.1",
     "semantic-release": "25.0.3"
   },
   "lint-staged": {
