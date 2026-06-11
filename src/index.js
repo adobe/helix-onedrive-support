@@ -19,3 +19,5 @@ export { Range } from './excel/Range.js';
 export { Table } from './excel/Table.js';
 export { Workbook } from './excel/Workbook.js';
 export { Worksheet } from './excel/Worksheet.js';
+
+export { sanitizeCache } from './sanitizeCache.js';
