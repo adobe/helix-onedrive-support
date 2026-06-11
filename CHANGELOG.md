@@ -1,3 +1,10 @@
+# [12.4.0](https://github.com/adobe/helix-onedrive-support/compare/v12.3.11...v12.4.0) (2026-06-11)
+
+
+### Features
+
+* add sanitizeCache to repair MSAL refresh-token cache key mismatches ([#757](https://github.com/adobe/helix-onedrive-support/issues/757)) ([077d05a](https://github.com/adobe/helix-onedrive-support/commit/077d05a28d3d7e87f18281bd933bea049d6978ee))
+
 ## [12.3.11](https://github.com/adobe/helix-onedrive-support/compare/v12.3.10...v12.3.11) (2026-06-08)
 
 
