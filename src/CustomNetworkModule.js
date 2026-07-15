@@ -146,9 +146,9 @@ export class CustomNetworkModule {
         clearTimeout(timerId);
       }
       if (error instanceof Error && error.name === 'AbortError') {
-        throw createAuthError(ClientAuthErrorCodes.networkError, 'Request timeout');
+        throw createAuthError(ClientAuthErrorCodes.networkError, '', 'Request timeout');
       }
-      const baseAuthError = createAuthError(ClientAuthErrorCodes.networkError, `Network request failed: ${error instanceof Error ? error.message : /* c8 ignore next */ 'unknown'}`);
+      const baseAuthError = createAuthError(ClientAuthErrorCodes.networkError, '', `Network request failed: ${error instanceof Error ? error.message : /* c8 ignore next */ 'unknown'}`);
       throw createNetworkError(
         baseAuthError,
         undefined,
@@ -163,7 +163,7 @@ export class CustomNetworkModule {
         status: response.status,
       };
     } catch (error) {
-      throw createAuthError(ClientAuthErrorCodes.tokenParsingError, `Failed to parse response: ${error instanceof Error ? error.message : /* c8 ignore next */ 'unknown'}`);
+      throw createAuthError(ClientAuthErrorCodes.tokenParsingError, '', `Failed to parse response: ${error instanceof Error ? error.message : /* c8 ignore next */ 'unknown'}`);
     }
   }
 }
