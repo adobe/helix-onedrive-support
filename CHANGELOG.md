@@ -1,3 +1,10 @@
+## [12.4.9](https://github.com/adobe/helix-onedrive-support/compare/v12.4.8...v12.4.9) (2026-09-14)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @azure/msal-common to v16.14.0 ([#779](https://github.com/adobe/helix-onedrive-support/issues/779)) ([fe78b37](https://github.com/adobe/helix-onedrive-support/commit/fe78b3728385265f4845993f9ed0bbb8c012f9fa))
+
 ## [12.4.8](https://github.com/adobe/helix-onedrive-support/compare/v12.4.7...v12.4.8) (2026-09-08)
 
 
