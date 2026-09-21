@@ -1,3 +1,10 @@
+## [12.4.10](https://github.com/adobe/helix-onedrive-support/compare/v12.4.9...v12.4.10) (2026-09-21)
+
+
+### Bug Fixes
+
+* **deps:** update dependency jose to v6.2.12 ([#782](https://github.com/adobe/helix-onedrive-support/issues/782)) ([dfc83a3](https://github.com/adobe/helix-onedrive-support/commit/dfc83a322c2d95dd2904da2ff251a849b7982332))
+
 ## [12.4.9](https://github.com/adobe/helix-onedrive-support/compare/v12.4.8...v12.4.9) (2026-09-14)
 
 
