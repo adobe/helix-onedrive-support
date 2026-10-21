@@ -809,9 +809,7 @@ describe('OneDrive Tests', () => {
   it('doFetch includes default user agent', async () => {
     nock('https://graph.microsoft.com/v1.0')
       .get('/drives/1234')
-      .reply(function handler() {
-        return [200, { userAgent: this.req.headers['user-agent'] }];
-      });
+      .reply(async (request) => [200, { userAgent: request.headers.get('user-agent') }]);
     const od = new OneDrive({
       auth: DEFAULT_AUTH(),
     });
@@ -824,9 +822,7 @@ describe('OneDrive Tests', () => {
   it('doFetch includes custom user agent', async () => {
     nock('https://graph.microsoft.com/v1.0')
       .get('/drives/1234')
-      .reply(function handler() {
-        return [200, { userAgent: this.req.headers['user-agent'] }];
-      });
+      .reply(async (request) => [200, { userAgent: request.headers.get('user-agent') }]);
     const od = new OneDrive({
       auth: DEFAULT_AUTH(),
       userAgent: 'NONISV|Contoso|GovernanceCheck/1.0',
@@ -916,7 +912,8 @@ describe('OneDrive Tests', () => {
     };
     nock('https://graph.microsoft.com/v1.0')
       .post('/subscriptions')
-      .reply((_, body) => {
+      .reply(async (request) => {
+        const body = await request.json();
         delete body.expirationDateTime;
         assert.deepStrictEqual(body, opts);
         return [200, {
@@ -940,7 +937,8 @@ describe('OneDrive Tests', () => {
 
     nock('https://graph.microsoft.com/v1.0')
       .patch(`/subscriptions/${id}`)
-      .reply((_, body) => {
+      .reply(async (request) => {
+        const body = await request.json();
         const expires = Date.parse(body.expirationDateTime);
         assert(expires >= now + expiresIn);
         return [200, { id }];

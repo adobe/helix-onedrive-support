@@ -71,7 +71,7 @@ describe('CustomNetworkModule Tests', () => {
   it('send a request that times out', async () => {
     nock(AZ_AUTHORITY_HOST_URL)
       .get('/')
-      .delay(1000)
+      .delay(100)
       .reply(200, { message: 'Hello, world!' });
 
     await assert.rejects(
