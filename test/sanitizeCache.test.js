@@ -9,8 +9,6 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-
-/* eslint-env mocha */
 import assert from 'assert';
 import { internals } from '@azure/msal-node';
 import { sanitizeCache } from '../src/sanitizeCache.js';
