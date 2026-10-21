@@ -130,7 +130,8 @@ export class OneDriveAuth {
   /**
    * Gets the client application, creating it if necessary.
    *
-   * @returns {Promise<import("@azure/msal-node").ClientApplication>} client application
+  * @returns {Promise<(import("@azure/msal-node").PublicClientApplication|
+  * import("@azure/msal-node").ConfidentialClientApplication)>} client application
    */
   async getApp() {
     if (!this._app) {
