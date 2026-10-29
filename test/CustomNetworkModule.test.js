@@ -9,8 +9,6 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-
-/* eslint-env mocha */
 import assert from 'assert';
 import { keepAliveNoCache } from '@adobe/fetch';
 import { CustomNetworkModule } from '../src/CustomNetworkModule.js';
@@ -71,7 +69,7 @@ describe('CustomNetworkModule Tests', () => {
   it('send a request that times out', async () => {
     nock(AZ_AUTHORITY_HOST_URL)
       .get('/')
-      .delay(1000)
+      .delay(100)
       .reply(200, { message: 'Hello, world!' });
 
     await assert.rejects(

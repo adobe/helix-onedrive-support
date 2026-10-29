@@ -14,6 +14,7 @@
 
 import { MemCachePlugin, S3CachePlugin } from '@adobe/helix-shared-tokencache';
 import chalk from 'chalk-template';
+// eslint-disable-next-line import/no-unresolved
 import 'dotenv/config';
 import readlinePromises from 'readline/promises';
 import { OneDrive, OneDriveAuth } from '../../src/index.js';

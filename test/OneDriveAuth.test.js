@@ -9,8 +9,6 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-
-/* eslint-env mocha */
 import assert from 'assert';
 import { UnsecuredJWT } from 'jose';
 import { MemCachePlugin } from '@adobe/helix-shared-tokencache';
@@ -212,7 +210,8 @@ describe('OneDriveAuth Tests', () => {
     const clientId = 'd88a7742-9581-46f0-aaf1-eb0a45044bf1';
 
     nock.loginMicrosoftOnline('adobe')
-      .reply((_, requestBody) => {
+      .reply(async (request) => {
+        const requestBody = await request.text();
         assert.strictEqual(new URLSearchParams(requestBody).get('client_id'), clientId);
         return [200, {
           token_type: 'Bearer',

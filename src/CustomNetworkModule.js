@@ -140,6 +140,12 @@ export class CustomNetworkModule {
     try {
       const { fetch } = this.fetchContext;
       response = await fetch(url, fetchOptions);
+
+      return {
+        headers: getHeaderDict(response.headers),
+        body: (await response.json()),
+        status: response.status,
+      };
     } catch (error) {
       // Clean up timeout to prevent memory leaks
       if (timerId) {
@@ -148,6 +154,11 @@ export class CustomNetworkModule {
       if (error instanceof Error && error.name === 'AbortError') {
         throw createAuthError(ClientAuthErrorCodes.networkError, '', 'Request timeout');
       }
+      if (response) {
+        // parsing the response failed
+        throw createAuthError(ClientAuthErrorCodes.tokenParsingError, '', `Failed to parse response: ${error instanceof Error ? error.message : /* c8 ignore next */ 'unknown'}`);
+      }
+      // error already occurred while fetching the response
       const baseAuthError = createAuthError(ClientAuthErrorCodes.networkError, '', `Network request failed: ${error instanceof Error ? error.message : /* c8 ignore next */ 'unknown'}`);
       throw createNetworkError(
         baseAuthError,
@@ -155,15 +166,6 @@ export class CustomNetworkModule {
         undefined,
         error instanceof Error ? error : /* c8 ignore next */ undefined,
       );
-    }
-    try {
-      return {
-        headers: getHeaderDict(response.headers),
-        body: (await response.json()),
-        status: response.status,
-      };
-    } catch (error) {
-      throw createAuthError(ClientAuthErrorCodes.tokenParsingError, '', `Failed to parse response: ${error instanceof Error ? error.message : /* c8 ignore next */ 'unknown'}`);
     }
   }
 }
