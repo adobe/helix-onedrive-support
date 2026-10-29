@@ -1,6 +1,6 @@
 {
   "name": "@adobe/helix-onedrive-support",
-  "version": "12.4.12",
+  "version": "12.4.14",
   "description": "Helix OneDrive Support",
   "main": "src/index.js",
   "exports": {
@@ -31,11 +31,11 @@
     "@adobe/helix-shared-string": "^2.1.0",
     "@adobe/helix-shared-tokencache": "^1.4.19",
     "@azure/msal-common": "16.14.2",
-    "@azure/msal-node": "5.6.0",
+    "@azure/msal-node": "7.1.0",
     "jose": "6.2.12"
   },
   "devDependencies": {
-    "@adobe/eslint-config-helix": "3.0.32",
+    "@adobe/eslint-config-helix": "3.0.33",
     "@aws-sdk/client-s3": "3.1137.0",
     "@eslint/config-helpers": "0.7.0",
     "@semantic-release/changelog": "7.0.0",
