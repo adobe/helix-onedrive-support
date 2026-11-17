@@ -1,3 +1,10 @@
+## [12.4.15](https://github.com/adobe/helix-onedrive-support/compare/v12.4.14...v12.4.15) (2026-11-17)
+
+
+### Bug Fixes
+
+* **deps:** update external fixes ([#795](https://github.com/adobe/helix-onedrive-support/issues/795)) ([9e5c067](https://github.com/adobe/helix-onedrive-support/commit/9e5c0678ce843fc2132c2b73dc1d6e6f660735ca))
+
 ## [12.4.14](https://github.com/adobe/helix-onedrive-support/compare/v12.4.13...v12.4.14) (2026-10-24)
 
 
