@@ -30,9 +30,9 @@
     "@adobe/fetch": "^4.2.3",
     "@adobe/helix-shared-string": "^2.1.0",
     "@adobe/helix-shared-tokencache": "^1.4.19",
-    "@azure/msal-common": "16.14.2",
-    "@azure/msal-node": "7.1.0",
-    "jose": "6.2.12"
+    "@azure/msal-common": "16.15.0",
+    "@azure/msal-node": "7.1.2",
+    "jose": "6.2.15"
   },
   "devDependencies": {
     "@adobe/eslint-config-helix": "3.0.34",
